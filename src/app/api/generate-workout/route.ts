@@ -1,22 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 
 // Forçar rota dinâmica - evita erro de build quando env var não está presente
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-// Instanciar OpenAI apenas quando a variável de ambiente estiver disponível
-const getOpenAIClient = () => {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY não configurada');
-  }
-  return new OpenAI({ apiKey });
-};
+interface EquipmentInput {
+  name: string;
+}
+
+interface UserProfile {
+  goal?: string;
+  level?: string;
+  conditions?: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { equipment, userProfile } = await request.json();
+    const { equipment, userProfile } = (await request.json()) as {
+      equipment: EquipmentInput[];
+      userProfile?: UserProfile;
+    };
 
     if (!equipment || equipment.length === 0) {
       return NextResponse.json(
@@ -26,18 +30,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se a API key está configurada
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json(
-        { error: 'API OpenAI não configurada. Configure a variável OPENAI_API_KEY.' },
+        { error: 'API Gemini não configurada. Configure a variável GEMINI_API_KEY.' },
         { status: 500 }
       );
     }
 
-    const openai = getOpenAIClient();
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    const equipmentList = equipment.map((eq: any) => eq.name).join(', ');
-    
-    const prompt = `Você é um personal trainer especializado. Crie um treino completo e detalhado baseado nos seguintes equipamentos disponíveis: ${equipmentList}.
+    const equipmentList = equipment.map((eq) => eq.name).join(', ');
+
+    const prompt = `Você é um personal trainer especializado em criar treinos personalizados. Sempre retorne respostas em JSON válido.
+
+Crie um treino completo e detalhado baseado nos seguintes equipamentos disponíveis: ${equipmentList}.
 
 ${userProfile ? `
 Perfil do usuário:
@@ -70,28 +76,21 @@ Retorne APENAS um JSON válido no seguinte formato:
   }
 }`;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'Você é um personal trainer especializado em criar treinos personalizados. Sempre retorne respostas em JSON válido.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 2000,
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        temperature: 0.7,
+      },
     });
 
-    const content = response.choices[0]?.message?.content || '{}';
-    
+    const content = response.text || '{}';
+
     // Extrair JSON da resposta
-    let jsonMatch = content.match(/\{[\s\S]*\}/);
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
     let parsedData;
-    
+
     if (jsonMatch) {
       parsedData = JSON.parse(jsonMatch[0]);
     } else {

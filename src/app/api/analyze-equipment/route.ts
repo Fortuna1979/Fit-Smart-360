@@ -1,53 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 
 // Forçar rota dinâmica - evita erro de build quando env var não está presente
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function POST(request: NextRequest) {
-  try {
-    // Validar se a chave API está configurada
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'Chave API da OpenAI não configurada' },
-        { status: 500 }
-      );
-    }
-
-    // Instanciar OpenAI apenas quando a variável de ambiente estiver disponível
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    // Receber dados do body
-    const body = await request.json();
-    const { imageBase64 } = body;
-
-    // Validar se a imagem foi enviada
-    if (!imageBase64) {
-      return NextResponse.json(
-        { error: 'Imagem não fornecida' },
-        { status: 400 }
-      );
-    }
-
-    // Validar formato Base64
-    if (!imageBase64.startsWith('data:image/')) {
-      return NextResponse.json(
-        { error: 'Formato de imagem inválido. Use Base64 com data URI' },
-        { status: 400 }
-      );
-    }
-
-    // Chamar OpenAI Vision API
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `Você é um personal trainer especializado. Analise esta imagem e identifique se há um equipamento de academia/fitness.
+const PROMPT = `Você é um personal trainer especializado. Analise esta imagem e identifique se há um equipamento de academia/fitness.
 
 Se houver um equipamento, você DEVE retornar um JSON completo com PELO MENOS 3-5 EXERCÍCIOS DIFERENTES que podem ser realizados neste equipamento.
 
@@ -110,23 +68,62 @@ REGRAS OBRIGATÓRIAS:
 4. Dê instruções detalhadas de execução
 5. Inclua dicas de segurança e erros comuns
 
-Retorne APENAS o JSON, sem texto adicional ou markdown.`,
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: imageBase64,
-              },
-            },
+Retorne APENAS o JSON, sem texto adicional ou markdown.`;
+
+export async function POST(request: NextRequest) {
+  try {
+    // Validar se a chave API está configurada
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: 'Chave API do Gemini não configurada' },
+        { status: 500 }
+      );
+    }
+
+    // Receber dados do body
+    const body = await request.json();
+    const { imageBase64 } = body;
+
+    // Validar se a imagem foi enviada
+    if (!imageBase64) {
+      return NextResponse.json(
+        { error: 'Imagem não fornecida' },
+        { status: 400 }
+      );
+    }
+
+    // Validar formato Base64
+    if (!imageBase64.startsWith('data:image/')) {
+      return NextResponse.json(
+        { error: 'Formato de imagem inválido. Use Base64 com data URI' },
+        { status: 400 }
+      );
+    }
+
+    const [header, data] = imageBase64.split(',');
+    const mimeType = header.match(/data:(.*?);base64/)?.[1] || 'image/jpeg';
+
+    // Instanciar Gemini apenas quando a variável de ambiente estiver disponível
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: PROMPT },
+            { inlineData: { mimeType, data } },
           ],
         },
       ],
-      max_tokens: 2500,
-      temperature: 0.7,
+      config: {
+        responseMimeType: 'application/json',
+        temperature: 0.7,
+      },
     });
 
-    // Extrair resposta
-    const content = response.choices[0]?.message?.content;
+    const content = response.text;
 
     if (!content) {
       return NextResponse.json(
@@ -138,7 +135,6 @@ Retorne APENAS o JSON, sem texto adicional ou markdown.`,
     // Parse do JSON retornado
     let result;
     try {
-      // Remover possíveis markdown code blocks
       const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       result = JSON.parse(cleanContent);
     } catch (parseError) {
@@ -168,8 +164,7 @@ Retorne APENAS o JSON, sem texto adicional ou markdown.`,
 
     const status = error && typeof error === 'object' && 'status' in error ? (error as { status: number }).status : undefined;
 
-    // Tratar erros específicos da OpenAI
-    if (status === 401) {
+    if (status === 401 || status === 403) {
       return NextResponse.json(
         { error: 'Chave API inválida' },
         { status: 401 }
