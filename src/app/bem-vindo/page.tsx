@@ -48,16 +48,30 @@ export default function BemVindoPage() {
           {/* Destaques */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             {[
-              { icon: '🏋️', label: 'Treinos personalizados' },
-              { icon: '📸', label: 'Scan de equipamentos' },
-              { icon: '📊', label: 'Acompanhe seu progresso' },
+              {
+                img: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=300&h=300&fit=crop&q=80',
+                label: 'Treinos personalizados',
+              },
+              {
+                img: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=300&h=300&fit=crop&q=80',
+                label: 'Scan de equipamentos',
+              },
+              {
+                img: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=300&h=300&fit=crop&q=80',
+                label: 'Acompanhe seu progresso',
+              },
             ].map((item) => (
               <div
                 key={item.label}
-                className="bg-gray-800/60 border border-gray-700 rounded-2xl p-3 flex flex-col items-center gap-2"
+                className="relative overflow-hidden rounded-2xl border border-gray-700 flex flex-col items-center"
               >
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-xs text-gray-400 leading-tight text-center">{item.label}</span>
+                <div
+                  className="w-full h-20 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${item.img})` }}
+                />
+                <div className="w-full bg-gray-800/80 px-1 py-2">
+                  <span className="text-xs text-gray-300 leading-tight text-center block">{item.label}</span>
+                </div>
               </div>
             ))}
           </div>
