@@ -1,18 +1,12 @@
 import { getSupabaseClient, UserData, Equipment, WorkoutPlan, WorkoutProgress } from './supabase';
 
-// Gerar ID único para o usuário (baseado em fingerprint do navegador)
-export const getUserId = (): string => {
-  let userId = localStorage.getItem('app_user_id');
-  if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    localStorage.setItem('app_user_id', userId);
-  }
-  return userId;
-};
+// Obter o ID do usuário autenticado no Supabase (auth.uid())
+export const getUserId = async (): Promise<string | null> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
 
-// Verificar se Supabase está configurado
-const isSupabaseConfigured = (): boolean => {
-  return getSupabaseClient() !== null;
+  const { data } = await supabase.auth.getUser();
+  return data.user?.id ?? null;
 };
 
 // ============================================
@@ -26,8 +20,12 @@ export const saveUserData = async (userData: Omit<UserData, 'id' | 'user_id' | '
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado. Dados não salvos.');
+    return null;
+  }
+
   try {
     // Verificar se usuário já existe
     const { data: existing } = await supabase
@@ -71,8 +69,12 @@ export const getUserData = async () => {
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado.');
+    return null;
+  }
+
   try {
     const { data, error } = await supabase
       .from('user_data')
@@ -99,8 +101,12 @@ export const saveEquipment = async (equipment: Omit<Equipment, 'id' | 'user_id' 
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado. Equipamento não salvo.');
+    return null;
+  }
+
   try {
     const { data, error } = await supabase
       .from('scanned_equipments')
@@ -123,8 +129,12 @@ export const getEquipments = async () => {
     return [];
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado.');
+    return [];
+  }
+
   try {
     const { data, error } = await supabase
       .from('scanned_equipments')
@@ -171,8 +181,12 @@ export const saveWorkoutPlan = async (workout: Omit<WorkoutPlan, 'id' | 'user_id
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado. Plano de treino não salvo.');
+    return null;
+  }
+
   try {
     // Desativar outros treinos ativos
     if (workout.is_active) {
@@ -203,8 +217,12 @@ export const getActiveWorkout = async () => {
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado.');
+    return null;
+  }
+
   try {
     const { data, error } = await supabase
       .from('workout_plans')
@@ -230,8 +248,12 @@ export const getCurrentWorkout = async (workoutDay: number) => {
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado.');
+    return null;
+  }
+
   try {
     const { data, error } = await supabase
       .from('workout_plans')
@@ -259,12 +281,16 @@ export const updateWorkoutDay = async (workoutDay: number) => {
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado.');
+    return null;
+  }
+
   try {
     // Salvar no localStorage para acesso rápido
     localStorage.setItem('workout_day', workoutDay.toString());
-    
+
     // Atualizar no Supabase
     const { data, error } = await supabase
       .from('workout_plans')
@@ -291,8 +317,12 @@ export const saveWorkoutProgress = async (progress: Omit<WorkoutProgress, 'id' |
     return null;
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado. Progresso não salvo.');
+    return null;
+  }
+
   try {
     // Verificar se progresso já existe
     const { data: existing } = await supabase
@@ -339,8 +369,12 @@ export const getWorkoutProgress = async () => {
     return { days: 0, achievements: 0 };
   }
 
-  const userId = getUserId();
-  
+  const userId = await getUserId();
+  if (!userId) {
+    console.warn('Usuário não autenticado.');
+    return { days: 0, achievements: 0 };
+  }
+
   try {
     const { data, error } = await supabase
       .from('workout_progress')
@@ -363,8 +397,6 @@ export const incrementWorkoutProgress = async () => {
     return null;
   }
 
-  const userId = getUserId();
-  
   try {
     const current = await getWorkoutProgress();
     

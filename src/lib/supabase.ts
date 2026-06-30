@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { FitnessLevel, Gender, Goal, SubscriptionPlan } from './types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -38,6 +39,7 @@ export const supabase = new Proxy({} as SupabaseClient, {
       // Retornar função mock que não faz nada
       return () => Promise.resolve({ data: null, error: { message: 'Supabase não configurado' } });
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (client as any)[prop];
   }
 });
@@ -50,12 +52,14 @@ export interface UserData {
   age: number;
   weight: number;
   height: number;
-  gender: string;
-  goal: string;
-  fitness_level?: string;
+  gender: Gender;
+  goal: Goal;
+  fitness_level?: FitnessLevel;
   weekly_frequency?: number;
   has_bariatric_surgery?: boolean;
   uses_glp1_medication?: boolean;
+  health_data_consent_at?: string;
+  subscription_plan?: SubscriptionPlan;
   created_at?: string;
   updated_at?: string;
 }
@@ -69,6 +73,7 @@ export interface Equipment {
   description: string;
   detected: boolean;
   image_url?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   exercises?: any[];
   tips?: string[];
   common_mistakes?: string[];
@@ -81,7 +86,9 @@ export interface WorkoutPlan {
   name: string;
   type: 'upper' | 'lower';
   duration: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   exercises: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   equipments: any[];
   workout_day: number;
   is_active?: boolean;

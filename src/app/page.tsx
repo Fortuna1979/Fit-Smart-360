@@ -8,20 +8,17 @@ import { Button } from '@/components/ui/button';
 export default function LandingPage() {
   const router = useRouter();
   const [showPricing, setShowPricing] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+
+  const handleFreePlanSignup = () => {
+    router.push('/auth');
+  };
 
   const handleBasicPlanCheckout = () => {
-    const url = billingCycle === 'monthly' 
-      ? 'https://pay.kiwify.com.br/y5kh8ps'
-      : 'https://pay.kiwify.com.br/a6u9cUX';
-    window.open(url, '_blank');
+    window.open('https://pay.kiwify.com.br/y5kh8ps', '_blank');
   };
 
   const handlePremiumPlanCheckout = () => {
-    const url = billingCycle === 'monthly' 
-      ? 'https://pay.kiwify.com.br/3aKNiC9'
-      : 'https://pay.kiwify.com.br/LBdYxub';
-    window.open(url, '_blank');
+    window.open('https://pay.kiwify.com.br/3aKNiC9', '_blank');
   };
 
   return (
@@ -297,51 +294,14 @@ export default function LandingPage() {
               </Button>
             </div>
 
-            {/* Toggle Mensal/Anual */}
-            <div className="flex justify-center mb-8">
-              <div className="inline-flex bg-gray-800 rounded-full p-1">
-                <button
-                  onClick={() => setBillingCycle('monthly')}
-                  className={`px-6 py-2 rounded-full font-semibold transition-all ${
-                    billingCycle === 'monthly'
-                      ? 'bg-yellow-500 text-black'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Mensal
-                </button>
-                <button
-                  onClick={() => setBillingCycle('annual')}
-                  className={`px-6 py-2 rounded-full font-semibold transition-all ${
-                    billingCycle === 'annual'
-                      ? 'bg-yellow-500 text-black'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Anual
-                  <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
-                    Economize
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Plano Básico */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Plano Gratuito */}
               <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8">
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Plano Básico</h3>
+                  <h3 className="text-2xl font-bold mb-2">Gratuito</h3>
                   <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-3xl sm:text-5xl font-bold text-yellow-500">
-                      R$ {billingCycle === 'monthly' ? '19,99' : '9,99'}
-                    </span>
-                    <span className="text-gray-400">/mês</span>
+                    <span className="text-3xl sm:text-5xl font-bold text-yellow-500">R$ 0</span>
                   </div>
-                  {billingCycle === 'annual' && (
-                    <p className="text-sm text-green-500 mt-2 font-semibold">
-                      R$ 119,88 cobrado anualmente
-                    </p>
-                  )}
                   <p className="text-sm text-gray-400 mt-2">Com anúncios</p>
                 </div>
 
@@ -356,15 +316,46 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-yellow-500 mt-1">✓</span>
-                    <span className="text-gray-300">Plano nutricional completo</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-yellow-500 mt-1">✓</span>
                     <span className="text-gray-300">Cronômetro e acompanhamento</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-yellow-500 mt-1">✓</span>
-                    <span className="text-gray-300">Anúncios a cada 2 treinos</span>
+                    <span className="text-gray-300">Anúncio a cada 2 exercícios</span>
+                  </li>
+                </ul>
+
+                <Button
+                  onClick={handleFreePlanSignup}
+                  variant="outline"
+                  className="w-full border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 font-bold"
+                >
+                  Criar Conta Gratuita
+                </Button>
+              </div>
+
+              {/* Plano Básico */}
+              <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold mb-2">Básico</h3>
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-3xl sm:text-5xl font-bold text-yellow-500">R$ 9,99</span>
+                    <span className="text-gray-400">/mês</span>
+                  </div>
+                  <p className="text-sm text-gray-400 mt-2">Sem anúncios</p>
+                </div>
+
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start gap-3">
+                    <span className="text-yellow-500 mt-1">✓</span>
+                    <span className="text-gray-300">Tudo do plano gratuito</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-yellow-500 mt-1">✓</span>
+                    <span className="text-gray-300 font-semibold">Sem anúncios</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-yellow-500 mt-1">✓</span>
+                    <span className="text-gray-300">Plano nutricional completo</span>
                   </li>
                 </ul>
 
@@ -383,18 +374,11 @@ export default function LandingPage() {
                 </div>
 
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">Plano Premium</h3>
+                  <h3 className="text-2xl font-bold mb-2">Premium</h3>
                   <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-3xl sm:text-5xl font-bold text-yellow-500">
-                      R$ {billingCycle === 'monthly' ? '24,99' : '19,99'}
-                    </span>
+                    <span className="text-3xl sm:text-5xl font-bold text-yellow-500">R$ 19,99</span>
                     <span className="text-gray-400">/mês</span>
                   </div>
-                  {billingCycle === 'annual' && (
-                    <p className="text-sm text-green-500 mt-2 font-semibold">
-                      R$ 239,88 cobrado anualmente
-                    </p>
-                  )}
                   <p className="text-sm text-yellow-500 mt-2 font-semibold">Sem anúncios</p>
                 </div>
 
@@ -402,10 +386,6 @@ export default function LandingPage() {
                   <li className="flex items-start gap-3">
                     <span className="text-yellow-500 mt-1">✓</span>
                     <span className="text-gray-300">Tudo do plano básico</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="text-yellow-500 mt-1">✓</span>
-                    <span className="text-gray-300 font-semibold">Experiência sem anúncios</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-yellow-500 mt-1">✓</span>
@@ -461,7 +441,12 @@ export default function LandingPage() {
           </p>
           <div className="flex justify-center gap-6">
             <button className="hover:text-yellow-500 transition-colors">Termos de Uso</button>
-            <button className="hover:text-yellow-500 transition-colors">Política de Privacidade</button>
+            <button
+              onClick={() => router.push('/privacidade')}
+              className="hover:text-yellow-500 transition-colors"
+            >
+              Política de Privacidade
+            </button>
             <button className="hover:text-yellow-500 transition-colors">Contato</button>
           </div>
         </div>

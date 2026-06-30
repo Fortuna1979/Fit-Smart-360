@@ -3,18 +3,20 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
-  Dumbbell, Camera, TrendingUp, Apple, Droplet, Settings, 
-  Play, Calendar, Award, ChevronRight, Zap
+  Dumbbell, Camera, TrendingUp, Apple, Droplet, Settings,
+  Play, Calendar, Award, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculateBMI, translateGoal, translateFitnessLevel } from '@/lib/utils';
-import { 
-  getUserData, 
-  getEquipments, 
-  saveWorkoutPlan, 
+import {
+  getUserData,
+  getEquipments,
+  saveWorkoutPlan,
   getCurrentWorkout,
   updateWorkoutDay
 } from '@/lib/supabase-helpers';
+import { useRequireAuth } from '@/hooks/use-require-auth';
+import type { UserData, Equipment as EquipmentRow } from '@/lib/supabase';
 
 interface Exercise {
   name: string;
@@ -51,14 +53,18 @@ interface WorkoutPlan {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userData, setUserData] = useState<any>(null);
+  const { isChecking } = useRequireAuth();
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [todayWorkout, setTodayWorkout] = useState<WorkoutPlan | null>(null);
   const [workoutDay, setWorkoutDay] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadData();
-  }, [router]);
+    if (!isChecking) {
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isChecking]);
 
   const loadData = async () => {
     try {
@@ -106,7 +112,7 @@ export default function DashboardPage() {
 
       // Carregar equipamentos do Supabase
       const equipmentsData = await getEquipments();
-      const scannedEquipments: Equipment[] = equipmentsData.map((eq: any) => ({
+      const scannedEquipments: Equipment[] = equipmentsData.map((eq: EquipmentRow) => ({
         equipmentName: eq.equipment_name,
         category: eq.category,
         muscleGroups: eq.muscle_groups,
@@ -305,7 +311,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (isLoading) {
+  if (isChecking || isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -361,7 +367,7 @@ export default function DashboardPage() {
           </div>
           <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
             <p className="text-xs text-gray-400 mb-1">Nível</p>
-            <p className="text-lg font-bold">{translateFitnessLevel(userData.fitness_level || userData.fitnessLevel || 'iniciante')}</p>
+            <p className="text-lg font-bold">{translateFitnessLevel(userData.fitness_level || 'iniciante')}</p>
           </div>
           <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
             <p className="text-xs text-gray-400 mb-1">Objetivo</p>
@@ -503,7 +509,7 @@ export default function DashboardPage() {
         <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-xl p-6 text-center">
           <Zap className="w-8 h-8 text-yellow-500 mx-auto mb-3" />
           <p className="text-lg font-semibold mb-2">
-            "A disciplina é a ponte entre objetivos e conquistas"
+            &ldquo;A disciplina é a ponte entre objetivos e conquistas&rdquo;
           </p>
           <p className="text-sm text-gray-400">Continue firme! 💪</p>
         </div>

@@ -6,10 +6,24 @@ import { Dumbbell, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { getSupabaseClient } from '@/lib/supabase';
+import { getUserData } from '@/lib/supabase-helpers';
+
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  'Invalid login credentials': 'E-mail ou senha incorretos.',
+  'User already registered': 'Este e-mail já está cadastrado.',
+};
+
+function translateAuthError(message: string): string {
+  return AUTH_ERROR_MESSAGES[message] || message;
+}
 
 export default function AuthPage() {
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,27 +31,63 @@ export default function AuthPage() {
     confirmPassword: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setErrorMessage(null);
+    setInfoMessage(null);
+
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      setErrorMessage('Supabase não está configurado. Verifique as variáveis de ambiente.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      // Simulação de autenticação
       if (isLogin) {
-        // Login bem-sucedido - verificar onboarding no localStorage (persiste entre sessões)
-        const hasCompletedOnboarding = localStorage.getItem('onboarding_completed');
-        if (hasCompletedOnboarding === 'true') {
-          router.push('/dashboard');
-        } else {
-          router.push('/onboarding');
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) {
+          setErrorMessage(translateAuthError(error.message));
+          return;
         }
+
+        const userData = await getUserData();
+        router.push(userData ? '/dashboard' : '/onboarding');
       } else {
-        // Cadastro bem-sucedido - vai para onboarding
-        router.push('/onboarding');
+        if (formData.password !== formData.confirmPassword) {
+          setErrorMessage('As senhas não coincidem.');
+          return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: { name: formData.name },
+          },
+        });
+
+        if (error) {
+          setErrorMessage(translateAuthError(error.message));
+          return;
+        }
+
+        if (data.session) {
+          router.push('/onboarding');
+        } else {
+          setInfoMessage('Cadastro realizado! Verifique seu e-mail para confirmar a conta antes de entrar.');
+        }
       }
     } catch (error) {
-      console.error('Erro no login:', error);
-      // Em caso de erro, sempre vai para onboarding
-      router.push('/onboarding');
+      console.error('Erro na autenticação:', error);
+      setErrorMessage('Ocorreu um erro inesperado. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -85,6 +135,18 @@ export default function AuthPage() {
                 : 'Comece sua jornada fitness hoje'}
             </p>
           </div>
+
+          {/* Messages */}
+          {errorMessage && (
+            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+              <p className="text-sm text-center text-red-400">{errorMessage}</p>
+            </div>
+          )}
+          {infoMessage && (
+            <div className="mb-6 p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
+              <p className="text-sm text-center text-green-400">{infoMessage}</p>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -181,9 +243,10 @@ export default function AuthPage() {
 
             <Button
               type="submit"
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-6 text-lg"
+              disabled={isSubmitting}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-6 text-lg disabled:opacity-60"
             >
-              {isLogin ? 'Entrar' : 'Criar conta'}
+              {isSubmitting ? 'Aguarde...' : isLogin ? 'Entrar' : 'Criar conta'}
             </Button>
           </form>
 
@@ -192,7 +255,11 @@ export default function AuthPage() {
             <p className="text-gray-400">
               {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
               <button
-                onClick={() => setIsLogin(!isLogin)}
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setErrorMessage(null);
+                  setInfoMessage(null);
+                }}
                 className="text-yellow-500 hover:text-yellow-400 font-semibold transition-colors"
               >
                 {isLogin ? 'Cadastre-se' : 'Faça login'}
@@ -215,7 +282,13 @@ export default function AuthPage() {
           Ao continuar, você concorda com nossos{' '}
           <button className="text-yellow-500 hover:underline">Termos de Uso</button>
           {' '}e{' '}
-          <button className="text-yellow-500 hover:underline">Política de Privacidade</button>
+          <button
+            type="button"
+            onClick={() => router.push('/privacidade')}
+            className="text-yellow-500 hover:underline"
+          >
+            Política de Privacidade
+          </button>
         </p>
       </div>
     </div>

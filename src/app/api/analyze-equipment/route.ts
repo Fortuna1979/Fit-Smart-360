@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Inicializar cliente OpenAI
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Forçar rota dinâmica - evita erro de build quando env var não está presente
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +14,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Instanciar OpenAI apenas quando a variável de ambiente estiver disponível
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     // Receber dados do body
     const body = await request.json();
@@ -161,25 +163,27 @@ Retorne APENAS o JSON, sem texto adicional ou markdown.`,
       timestamp: new Date().toISOString(),
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Erro ao analisar equipamento:', error);
 
+    const status = error && typeof error === 'object' && 'status' in error ? (error as { status: number }).status : undefined;
+
     // Tratar erros específicos da OpenAI
-    if (error?.status === 401) {
+    if (status === 401) {
       return NextResponse.json(
         { error: 'Chave API inválida' },
         { status: 401 }
       );
     }
 
-    if (error?.status === 429) {
+    if (status === 429) {
       return NextResponse.json(
         { error: 'Limite de requisições excedido. Tente novamente em alguns instantes' },
         { status: 429 }
       );
     }
 
-    if (error?.status === 400) {
+    if (status === 400) {
       return NextResponse.json(
         { error: 'Requisição inválida. Verifique o formato da imagem' },
         { status: 400 }
@@ -188,9 +192,9 @@ Retorne APENAS o JSON, sem texto adicional ou markdown.`,
 
     // Erro genérico
     return NextResponse.json(
-      { 
+      {
         error: 'Erro ao processar análise',
-        details: error?.message || 'Erro desconhecido'
+        details: error instanceof Error ? error.message : 'Erro desconhecido'
       },
       { status: 500 }
     );

@@ -7,14 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { calculateBMI, getBMICategory, determineFitnessLevel, translateGoal, translateFitnessLevel } from '@/lib/utils';
 import { saveUserData } from '@/lib/supabase-helpers';
+import { useRequireAuth } from '@/hooks/use-require-auth';
 import type { Gender, Goal } from '@/lib/types';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { isChecking } = useRequireAuth();
   const [step, setStep] = useState(1);
   const totalSteps = 5;
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [consentGiven, setConsentGiven] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -60,9 +66,11 @@ export default function OnboardingPage() {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
+      setIsSaving(true);
+      setSaveError(null);
       try {
         // Salvar dados no Supabase
-        await saveUserData({
+        const saved = await saveUserData({
           name: formData.name,
           age: Number(formData.age),
           weight: Number(formData.weight),
@@ -72,24 +80,28 @@ export default function OnboardingPage() {
           fitness_level: determineFitnessLevel(Number(formData.age), calculateBMI(Number(formData.weight), Number(formData.height)), Number(formData.weeklyFrequency)),
           weekly_frequency: Number(formData.weeklyFrequency),
           has_bariatric_surgery: formData.hasBariatricSurgery === 'sim',
-          uses_glp1_medication: formData.usesGLP1Medication === 'sim'
+          uses_glp1_medication: formData.usesGLP1Medication === 'sim',
+          health_data_consent_at: new Date().toISOString()
         });
+
+        if (!saved) {
+          setSaveError('Não foi possível salvar seus dados. Verifique sua conexão e tente novamente.');
+          return;
+        }
 
         // Salvar flag de onboarding completo no localStorage (persiste entre sessões)
         localStorage.setItem('onboarding_completed', 'true');
-        
+
         // Limpar dados temporários do onboarding
         localStorage.removeItem('onboarding_step');
         localStorage.removeItem('onboarding_form_data');
-        
+
         router.push('/dashboard');
       } catch (error) {
         console.error('Erro ao salvar dados:', error);
-        // Mesmo com erro, continuar para o dashboard
-        localStorage.setItem('onboarding_completed', 'true');
-        localStorage.removeItem('onboarding_step');
-        localStorage.removeItem('onboarding_form_data');
-        router.push('/dashboard');
+        setSaveError('Ocorreu um erro ao salvar seus dados. Tente novamente.');
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -115,7 +127,7 @@ export default function OnboardingPage() {
       case 4:
         return formData.weeklyFrequency;
       case 5:
-        return formData.hasBariatricSurgery && formData.usesGLP1Medication;
+        return formData.hasBariatricSurgery && formData.usesGLP1Medication && consentGiven;
       default:
         return false;
     }
@@ -129,6 +141,14 @@ export default function OnboardingPage() {
   const fitnessLevel = formData.age && formData.weeklyFrequency
     ? determineFitnessLevel(Number(formData.age), bmi, Number(formData.weeklyFrequency))
     : 'iniciante';
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-gray-400">Carregando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
@@ -397,6 +417,28 @@ export default function OnboardingPage() {
                   </RadioGroup>
                 </div>
 
+                {/* Consentimento LGPD para dados sensíveis de saúde */}
+                <div className="flex items-start gap-3 p-4 bg-gray-800/50 border border-gray-700 rounded-xl">
+                  <Checkbox
+                    id="consent"
+                    checked={consentGiven}
+                    onCheckedChange={(checked) => setConsentGiven(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="consent" className="text-sm text-gray-300 font-normal leading-relaxed cursor-pointer">
+                    Concordo com o uso dos meus dados de saúde (cirurgia bariátrica e uso de
+                    medicamentos) para personalizar meu treino, conforme a{' '}
+                    <button
+                      type="button"
+                      onClick={() => router.push('/privacidade')}
+                      className="text-yellow-500 hover:underline"
+                    >
+                      Política de Privacidade
+                    </button>
+                    .
+                  </Label>
+                </div>
+
                 {/* Resumo Final */}
                 {isStepValid() && (
                   <div className="p-6 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30 rounded-xl space-y-4">
@@ -425,6 +467,13 @@ export default function OnboardingPage() {
             </div>
           )}
 
+          {/* Save Error */}
+          {saveError && (
+            <div className="mt-6 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
+              <p className="text-sm text-center text-red-400">{saveError}</p>
+            </div>
+          )}
+
           {/* Navigation Buttons */}
           <div className="flex gap-3 mt-8">
             {step > 1 && (
@@ -439,10 +488,10 @@ export default function OnboardingPage() {
             )}
             <Button
               onClick={handleNext}
-              disabled={!isStepValid()}
+              disabled={!isStepValid() || isSaving}
               className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {step === totalSteps ? 'Finalizar' : 'Continuar'}
+              {isSaving ? 'Salvando...' : step === totalSteps ? 'Finalizar' : 'Continuar'}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

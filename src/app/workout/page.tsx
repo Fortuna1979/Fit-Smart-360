@@ -7,7 +7,9 @@ import {
   AlertCircle, ArrowLeft, Trophy, Sparkles, X, Maximize2, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getActiveWorkout, incrementWorkoutProgress, clearLocalStorage } from '@/lib/supabase-helpers';
+import { getActiveWorkout, getUserData, incrementWorkoutProgress, clearLocalStorage } from '@/lib/supabase-helpers';
+import { useRequireAuth } from '@/hooks/use-require-auth';
+import { AdBanner } from '@/components/AdBanner';
 
 interface Exercise {
   name: string;
@@ -29,10 +31,14 @@ interface WorkoutPlan {
   exercises: Exercise[];
 }
 
-type WorkoutState = 'exercise' | 'rest' | 'completed';
+type WorkoutState = 'exercise' | 'rest' | 'ad' | 'completed';
+
+// Anúncio aparece a cada 2 exercícios (depois do 2º, 4º, 6º...) só para plano gratuito
+const AD_EVERY_N_EXERCISES = 2;
 
 export default function WorkoutPage() {
   const router = useRouter();
+  const { isChecking } = useRequireAuth();
   const [workout, setWorkout] = useState<WorkoutPlan | null>(null);
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [currentSet, setCurrentSet] = useState(1);
@@ -42,17 +48,25 @@ export default function WorkoutPage() {
   const [exerciseVideoUrl, setExerciseVideoUrl] = useState<string>('');
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isLoadingVideo, setIsLoadingVideo] = useState(false);
+  const [isFreePlan, setIsFreePlan] = useState(false);
+  const [adTime, setAdTime] = useState(0);
 
   useEffect(() => {
-    // Limpar localStorage ao carregar a página
-    clearLocalStorage();
-    loadWorkout();
-  }, [router]);
+    if (!isChecking) {
+      // Limpar localStorage ao carregar a página
+      clearLocalStorage();
+      loadWorkout();
+      getUserData().then((userData) => {
+        setIsFreePlan(!userData?.subscription_plan || userData.subscription_plan === 'free');
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isChecking]);
 
   const loadWorkout = async () => {
     try {
       // Tentar carregar do sessionStorage primeiro (mais rápido)
-      let activeWorkout = sessionStorage.getItem('active_workout');
+      const activeWorkout = sessionStorage.getItem('active_workout');
       
       if (activeWorkout) {
         const workoutData = JSON.parse(activeWorkout);
@@ -177,7 +191,24 @@ export default function WorkoutPage() {
     return () => clearInterval(interval);
   }, [isTimerRunning, restTime]);
 
-  if (!workout) {
+  useEffect(() => {
+    // Cronômetro do anúncio (mesma duração do descanso entre séries)
+    if (state !== 'ad' || adTime <= 0) return;
+
+    const interval = setInterval(() => {
+      setAdTime(prev => {
+        if (prev <= 1) {
+          setState('exercise');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [state, adTime]);
+
+  if (isChecking || !workout) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
@@ -201,9 +232,18 @@ export default function WorkoutPage() {
       setCurrentSet(currentSet + 1);
     } else {
       if (currentExerciseIndex < workout.exercises.length - 1) {
+        const nextExerciseNumber = currentExerciseIndex + 2; // 1-based
+        const showAd = isFreePlan && nextExerciseNumber % AD_EVERY_N_EXERCISES === 0;
+
         setCurrentExerciseIndex(currentExerciseIndex + 1);
         setCurrentSet(1);
-        setState('exercise');
+
+        if (showAd) {
+          setAdTime(restSeconds);
+          setState('ad');
+        } else {
+          setState('exercise');
+        }
       } else {
         completeWorkout();
       }
@@ -437,6 +477,22 @@ export default function WorkoutPage() {
     );
   }
 
+  // Tela de anúncio (plano gratuito, a cada 2 exercícios)
+  if (state === 'ad') {
+    return (
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
+        <div className="text-center space-y-6">
+          <div>
+            <h2 className="text-xl font-bold mb-1">Continuando em {adTime}s...</h2>
+            <p className="text-gray-400 text-sm">Seu próximo exercício já vai começar</p>
+          </div>
+
+          <AdBanner />
+        </div>
+      </div>
+    );
+  }
+
   // Tela de descanso
   if (state === 'rest') {
     const isPulsing = restTime <= 5;
@@ -545,7 +601,7 @@ export default function WorkoutPage() {
           </Button>
 
           <p className="text-sm text-gray-400 italic">
-            "A consistência é a chave do sucesso. Continue assim! 💪"
+            &ldquo;A consistência é a chave do sucesso. Continue assim! 💪&rdquo;
           </p>
         </div>
       </div>

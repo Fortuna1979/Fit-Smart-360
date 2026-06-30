@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Camera, ArrowLeft, CheckCircle, XCircle, Loader2, Upload, Dumbbell, Clock, Repeat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useRequireAuth } from '@/hooks/use-require-auth';
 
 interface Exercise {
   name: string;
@@ -28,6 +29,7 @@ interface Equipment {
 
 export default function ScanPage() {
   const router = useRouter();
+  const { isChecking } = useRequireAuth();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,20 +73,21 @@ export default function ScanPage() {
         setStream(mediaStream);
         setCameraActive(true);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Erro ao acessar câmera:', err);
-      
+
+      const errorName = err instanceof Error ? err.name : '';
       let errorMessage = 'Não foi possível acessar a câmera.';
-      
-      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+
+      if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError') {
         errorMessage = 'Permissão de câmera negada. Por favor, permita o acesso à câmera nas configurações do navegador.';
-      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+      } else if (errorName === 'NotFoundError' || errorName === 'DevicesNotFoundError') {
         errorMessage = 'Nenhuma câmera encontrada no dispositivo.';
-      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+      } else if (errorName === 'NotReadableError' || errorName === 'TrackStartError') {
         errorMessage = 'Câmera está sendo usada por outro aplicativo.';
-      } else if (err.name === 'OverconstrainedError') {
+      } else if (errorName === 'OverconstrainedError') {
         errorMessage = 'Câmera não suporta as configurações solicitadas.';
-      } else if (err.name === 'SecurityError') {
+      } else if (errorName === 'SecurityError') {
         errorMessage = 'Acesso à câmera bloqueado por questões de segurança. Use HTTPS.';
       }
       
@@ -216,6 +219,14 @@ export default function ScanPage() {
     if (lower.includes('avançado') || lower.includes('avancado')) return 'bg-red-500/20 text-red-500';
     return 'bg-gray-500/20 text-gray-500';
   };
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <p className="text-gray-400">Carregando...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
