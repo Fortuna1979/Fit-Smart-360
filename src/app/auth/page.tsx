@@ -69,6 +69,7 @@ export default function AuthPage() {
           password: formData.password,
           options: {
             data: { name: formData.name },
+            emailRedirectTo: 'https://fit-smart-360.vercel.app/bem-vindo',
           },
         });
 
