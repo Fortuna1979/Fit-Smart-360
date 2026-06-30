@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Dumbbell, Mail, Lock, User, ArrowLeft, MailCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,8 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
+  const [signupEmail, setSignupEmail] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -81,7 +83,8 @@ export default function AuthPage() {
         if (data.session) {
           router.push('/onboarding');
         } else {
-          setInfoMessage('Cadastro realizado! Verifique seu e-mail para confirmar a conta antes de entrar.');
+          setSignupEmail(formData.email);
+          setEmailSent(true);
         }
       }
     } catch (error) {
@@ -98,6 +101,42 @@ export default function AuthPage() {
       [e.target.name]: e.target.value
     }));
   };
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(234,179,8,0.15),transparent_60%)]" />
+        <div className="relative w-full max-w-md text-center">
+          <div className="bg-gray-900 border border-gray-800 rounded-3xl p-10 shadow-2xl">
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <Dumbbell className="w-9 h-9 text-yellow-500" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
+                Fit Smart 360º
+              </span>
+            </div>
+            <div className="flex justify-center mb-6">
+              <div className="w-24 h-24 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center">
+                <MailCheck className="w-12 h-12 text-yellow-500" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold mb-3">Verifique seu e-mail</h1>
+            <p className="text-gray-400 mb-2">Enviamos um link de confirmação para:</p>
+            <p className="text-yellow-400 font-semibold mb-6">{signupEmail}</p>
+            <p className="text-gray-500 text-sm mb-8">
+              Clique no link do e-mail para ativar sua conta e acessar o Fit Smart 360º.
+              Verifique também a pasta de spam.
+            </p>
+            <Button
+              onClick={() => { setEmailSent(false); setIsLogin(true); }}
+              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-black font-bold py-6 rounded-2xl text-lg"
+            >
+              Já confirmei, fazer login
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
