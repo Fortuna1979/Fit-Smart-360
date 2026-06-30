@@ -7,7 +7,7 @@ import {
   AlertCircle, ArrowLeft, Trophy, Sparkles, X, Maximize2, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getActiveWorkout, getUserData, incrementWorkoutProgress, clearLocalStorage } from '@/lib/supabase-helpers';
+import { getActiveWorkout, getUserData, incrementWorkoutProgress } from '@/lib/supabase-helpers';
 import { useRequireAuth } from '@/hooks/use-require-auth';
 import { AdBanner } from '@/components/AdBanner';
 
@@ -53,8 +53,6 @@ export default function WorkoutPage() {
 
   useEffect(() => {
     if (!isChecking) {
-      // Limpar localStorage ao carregar a página
-      clearLocalStorage();
       loadWorkout();
       getUserData().then((userData) => {
         setIsFreePlan(!userData?.subscription_plan || userData.subscription_plan === 'free');
