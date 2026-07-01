@@ -7,68 +7,50 @@ export const runtime = 'nodejs';
 
 const PROMPT = `Você é um personal trainer especializado. Analise esta imagem e identifique se há um equipamento de academia/fitness.
 
-Se houver um equipamento, você DEVE retornar um JSON completo com PELO MENOS 3-5 EXERCÍCIOS DIFERENTES que podem ser realizados neste equipamento.
+Se houver um equipamento, retorne um JSON completo com PELO MENOS 3-5 EXERCÍCIOS DIFERENTES.
 
-IMPORTANTE: Gere exercícios variados, com diferentes níveis de dificuldade e variações de execução.
+IMPORTANTE: Identifique também a MARCA/FABRICANTE do equipamento (ex: Technogym, Life Fitness, Matrix, Precor, Nautilus, Cybex, Body Solid, Hammer Strength, etc). Se não conseguir identificar a marca com certeza, use null.
 
 Formato obrigatório:
 {
   "detected": true,
   "equipmentName": "Nome completo do equipamento",
+  "brand": "Technogym",
   "category": "Categoria (ex: Cardio, Musculação, Peso Livre, Funcional, etc)",
-  "muscleGroups": ["Grupo muscular principal", "Grupo muscular secundário", "Grupo muscular terciário"],
-  "description": "Descrição detalhada do equipamento, benefícios e como posicionar-se corretamente",
+  "muscleGroups": ["Grupo muscular principal", "Grupo muscular secundário"],
+  "description": "Descrição detalhada do equipamento e como posicionar-se corretamente",
   "exercises": [
     {
       "name": "Nome do exercício 1",
       "sets": "3-4",
       "reps": "10-12",
-      "rest": "60-90 segundos",
+      "rest": "60-90",
       "difficulty": "Iniciante/Intermediário/Avançado",
-      "description": "Instruções detalhadas de execução, postura correta, respiração e dicas de segurança"
-    },
-    {
-      "name": "Nome do exercício 2",
-      "sets": "3-4",
-      "reps": "8-10",
-      "rest": "90 segundos",
-      "difficulty": "Intermediário",
-      "description": "Instruções detalhadas..."
-    },
-    {
-      "name": "Nome do exercício 3 (variação)",
-      "sets": "3",
-      "reps": "12-15",
-      "rest": "60 segundos",
-      "difficulty": "Iniciante",
-      "description": "Instruções detalhadas..."
+      "description": "Instruções detalhadas de execução, postura correta, respiração e dicas de segurança",
+      "youtube_search_query": "Life Fitness leg press machine exercise proper form tutorial"
     }
   ],
-  "tips": [
-    "Dica de segurança 1",
-    "Dica de execução 2",
-    "Dica de progressão 3"
-  ],
-  "commonMistakes": [
-    "Erro comum 1 e como evitar",
-    "Erro comum 2 e como evitar"
-  ]
+  "tips": ["Dica de segurança 1", "Dica de execução 2"],
+  "commonMistakes": ["Erro comum 1 e como evitar"]
 }
+
+Para o campo youtube_search_query de cada exercício:
+- Se a marca foi identificada: inclua a marca + nome do equipamento em inglês + "exercise tutorial" (ex: "Technogym Leg Press exercise tutorial proper form")
+- Se a marca não foi identificada: use apenas o tipo de equipamento em inglês + "exercise tutorial" (ex: "leg press machine exercise tutorial proper form")
+- SEMPRE escreva a query em inglês para encontrar mais vídeos
 
 Se NÃO houver equipamento de academia na imagem, retorne:
 {
   "detected": false,
-  "message": "Nenhum equipamento de academia foi detectado na imagem. Por favor, tire uma foto de um equipamento de treino."
+  "message": "Nenhum equipamento de academia foi detectado na imagem."
 }
 
-REGRAS OBRIGATÓRIAS:
-1. SEMPRE gere NO MÍNIMO 3 exercícios diferentes
-2. Inclua variações (pegadas diferentes, ângulos, intensidades)
-3. Especifique séries, repetições, descanso e nível de dificuldade
-4. Dê instruções detalhadas de execução
-5. Inclua dicas de segurança e erros comuns
-
-Retorne APENAS o JSON, sem texto adicional ou markdown.`;
+REGRAS:
+1. Mínimo 3 exercícios diferentes com variações
+2. Séries, repetições, descanso e dificuldade em todos
+3. Instruções detalhadas de execução
+4. youtube_search_query em TODOS os exercícios, escrita em inglês
+5. Retorne APENAS o JSON, sem markdown.`;
 
 export async function POST(request: NextRequest) {
   try {

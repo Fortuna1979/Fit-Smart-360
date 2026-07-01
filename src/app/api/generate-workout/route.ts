@@ -4,7 +4,7 @@ import { GoogleGenAI } from '@google/genai';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-interface EquipmentInput { name: string; }
+interface EquipmentInput { name: string; brand?: string; }
 
 interface UserProfile {
   goal?: string; level?: string; age?: number; weight?: number; height?: number;
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const equipmentList = equipment.map(e => e.name).join(', ');
+    const equipmentList = equipment.map(e => e.brand ? `${e.name} (marca: ${e.brand})` : e.name).join(', ');
     const healthContext = userProfile ? buildHealthContext(userProfile) : '';
 
     const prompt = `Você é um personal trainer especializado. Crie um treino completo e seguro. Retorne APENAS JSON válido.
@@ -149,13 +149,16 @@ Formato JSON:
         "instructions": "Instrução detalhada de execução",
         "tips": "Dicas de segurança relevantes ao perfil do cliente",
         "musculo_alvo": "Músculo principal",
-        "dica_rapida": "Dica técnica de execução"
+        "dica_rapida": "Dica técnica de execução",
+        "youtube_search_query": "Technogym leg press exercise tutorial proper form"
       }
     ],
     "warmup": "Aquecimento recomendado",
     "cooldown": "Alongamento final"
   }
-}`;
+}
+
+Para youtube_search_query de cada exercício: escreva em INGLÊS incluindo a marca se disponível (ex: "Technogym leg press exercise tutorial", "Life Fitness cable row proper form", "barbell bench press technique"). Inglês maximiza os resultados de vídeos dos fabricantes.`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',

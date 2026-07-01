@@ -17,6 +17,7 @@ interface Exercise {
 
 interface Equipment {
   equipmentName: string;
+  brand?: string;
   category: string;
   muscleGroups: string[];
   description: string;

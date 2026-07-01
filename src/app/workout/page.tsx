@@ -23,6 +23,7 @@ interface Exercise {
   dica_rapida?: string;
   video_demo?: string;
   imageUrls?: string[];
+  youtube_search_query?: string;
 }
 
 interface WorkoutPlan {
@@ -206,16 +207,22 @@ export default function WorkoutPage() {
     router.push('/dashboard');
   };
 
-  // Componente de demonstração do exercício com imagens animadas
+  // Componente de demonstração: YouTube do fabricante + fallback em imagens
   const ExerciseDemo = () => {
+    const query = currentExercise.youtube_search_query;
     const imgs = currentExercise.imageUrls;
-    if (imgs && imgs.length > 0) {
-      return (
-        <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
-          <div className="relative aspect-video bg-gray-800">
+    const youtubeSearchUrl = query
+      ? `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`
+      : `https://www.youtube.com/results?search_query=${encodeURIComponent(currentExercise.name + ' exercise tutorial')}`;
+
+    return (
+      <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+        {/* Imagens demonstrativas do exercício */}
+        {imgs && imgs.length > 0 ? (
+          <div className="relative bg-gray-800" style={{ aspectRatio: '16/9' }}>
             {imgs.map((url, i) => (
               <img key={i} src={url} alt={`${currentExercise.name} pos ${i + 1}`}
-                className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${imageFrame === i ? 'opacity-100' : 'opacity-0'}`}
+                className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ${imageFrame === i ? 'opacity-100' : 'opacity-0'}`}
               />
             ))}
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
@@ -224,20 +231,28 @@ export default function WorkoutPage() {
               ))}
             </div>
           </div>
-          <div className="px-4 py-2 bg-gray-900/80 border-t border-gray-800">
-            <p className="text-xs text-gray-400 text-center">Demonstração do movimento — posição {imageFrame + 1} de {imgs.length}</p>
+        ) : (
+          <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+            <Dumbbell className="w-16 h-16 text-yellow-500/40 mb-3" />
+            <p className="text-gray-500 text-sm text-center px-4">{currentExercise.name}</p>
           </div>
-        </div>
-      );
-    }
-    return (
-      <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-          <Dumbbell className="w-20 h-20 text-yellow-500/40 mb-3" />
-          <p className="text-gray-400 text-sm text-center px-4">
-            Execute o exercício conforme as instruções abaixo
-          </p>
-        </div>
+        )}
+
+        {/* Botão para ver vídeo do fabricante no YouTube */}
+        <a
+          href={youtubeSearchUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-3 w-full px-4 py-3 bg-red-600/90 hover:bg-red-600 transition-colors border-t border-red-700"
+        >
+          <Play className="w-4 h-4 text-white fill-white" />
+          <span className="text-white font-semibold text-sm">
+            Ver vídeo do fabricante no YouTube
+          </span>
+          {query?.split(' ')[0] && (
+            <span className="text-red-200 text-xs">({query.split(' ')[0]})</span>
+          )}
+        </a>
       </div>
     );
   };
