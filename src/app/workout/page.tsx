@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Play, CheckCircle, Clock, Dumbbell, Target, 
-  AlertCircle, ArrowLeft, Trophy, Sparkles, X, Maximize2, Loader2
+import {
+  Play, CheckCircle, Clock, Dumbbell, Target,
+  AlertCircle, ArrowLeft, Trophy, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getActiveWorkout, getUserData, incrementWorkoutProgress } from '@/lib/supabase-helpers';
@@ -22,6 +22,7 @@ interface Exercise {
   musculo_alvo?: string;
   dica_rapida?: string;
   video_demo?: string;
+  imageUrls?: string[];
 }
 
 interface WorkoutPlan {
@@ -45,9 +46,7 @@ export default function WorkoutPage() {
   const [state, setState] = useState<WorkoutState>('exercise');
   const [restTime, setRestTime] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [exerciseVideoUrl, setExerciseVideoUrl] = useState<string>('');
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const [isLoadingVideo, setIsLoadingVideo] = useState(false);
+  const [imageFrame, setImageFrame] = useState(0);
   const [isFreePlan, setIsFreePlan] = useState(false);
   const [adTime, setAdTime] = useState(0);
 
@@ -95,80 +94,14 @@ export default function WorkoutPage() {
     }
   };
 
+  // Alternar entre imagem de início e fim do exercício (efeito de movimento)
   useEffect(() => {
-    // Buscar vídeo demonstrativo do exercício atual
-    if (workout && workout.exercises[currentExerciseIndex]) {
-      const exercise = workout.exercises[currentExerciseIndex];
-      fetchExerciseVideoWithAI(exercise);
-    }
+    setImageFrame(0);
+    const imgs = workout?.exercises[currentExerciseIndex]?.imageUrls;
+    if (!imgs || imgs.length < 2) return;
+    const interval = setInterval(() => setImageFrame(f => (f === 0 ? 1 : 0)), 1200);
+    return () => clearInterval(interval);
   }, [workout, currentExerciseIndex]);
-
-  // Função para buscar vídeo demonstrativo usando mapeamento de vídeos reais do YouTube
-  const fetchExerciseVideoWithAI = async (exercise: Exercise) => {
-    setIsLoadingVideo(true);
-    try {
-      // Mapear exercícios para vídeos demonstrativos reais e precisos do YouTube
-      const exerciseVideos: Record<string, string> = {
-        // Pernas - Vídeos demonstrativos reais
-        'agachamento': 'https://www.youtube.com/embed/ultWZbUMPL8?autoplay=1',
-        'leg press': 'https://www.youtube.com/embed/IZxyjW7MPJQ?autoplay=1',
-        'cadeira extensora': 'https://www.youtube.com/embed/YyvSfVjQeL0?autoplay=1',
-        'cadeira flexora': 'https://www.youtube.com/embed/1Tq3QdYUuHs?autoplay=1',
-        'stiff': 'https://www.youtube.com/embed/1uDiW5--rAE?autoplay=1',
-        'panturrilha': 'https://www.youtube.com/embed/JbyjNymZOt0?autoplay=1',
-        
-        // Peito - Vídeos demonstrativos reais
-        'supino': 'https://www.youtube.com/embed/rT7DgCr-3pg?autoplay=1',
-        'supino inclinado': 'https://www.youtube.com/embed/SrqOu55lrYU?autoplay=1',
-        'crucifixo': 'https://www.youtube.com/embed/eozdVDA78K0?autoplay=1',
-        'crossover': 'https://www.youtube.com/embed/taI4XduLpTk?autoplay=1',
-        
-        // Costas - Vídeos demonstrativos reais
-        'puxada': 'https://www.youtube.com/embed/CAwf7n6Luuc?autoplay=1',
-        'remada': 'https://www.youtube.com/embed/kBWAon7ItDw?autoplay=1',
-        'remada baixa': 'https://www.youtube.com/embed/UCXxvVItLoM?autoplay=1',
-        'barra fixa': 'https://www.youtube.com/embed/eGo4IYlbE5g?autoplay=1',
-        
-        // Ombros - Vídeos demonstrativos reais
-        'desenvolvimento': 'https://www.youtube.com/embed/qEwKCR5JCog?autoplay=1',
-        'elevação lateral': 'https://www.youtube.com/embed/3VcKaXpzqRo?autoplay=1',
-        'elevação frontal': 'https://www.youtube.com/embed/t7955W-XEJk?autoplay=1',
-        
-        // Braços - Vídeos demonstrativos reais
-        'rosca direta': 'https://www.youtube.com/embed/ykJmrZ5v0Oo?autoplay=1',
-        'rosca alternada': 'https://www.youtube.com/embed/sAq_ocpRh_I?autoplay=1',
-        'rosca martelo': 'https://www.youtube.com/embed/zC3nLlEvin4?autoplay=1',
-        'tríceps testa': 'https://www.youtube.com/embed/d_KZxkY_0cM?autoplay=1',
-        'tríceps corda': 'https://www.youtube.com/embed/2-LAMcpzODU?autoplay=1',
-        'tríceps francês': 'https://www.youtube.com/embed/nRiJVZDpdL0?autoplay=1',
-        
-        // Exercícios com peso corporal
-        'flexão': 'https://www.youtube.com/embed/IODxDxX7oi4?autoplay=1',
-        'avanço': 'https://www.youtube.com/embed/QOVaHwm-Q6U?autoplay=1',
-      };
-
-      const exerciseName = exercise.name.toLowerCase();
-      let videoUrl = '';
-
-      for (const [key, url] of Object.entries(exerciseVideos)) {
-        if (exerciseName.includes(key)) {
-          videoUrl = url;
-          break;
-        }
-      }
-
-      if (!videoUrl) {
-        videoUrl = 'https://www.youtube.com/embed/IODxDxX7oi4?autoplay=1';
-      }
-
-      setExerciseVideoUrl(videoUrl);
-    } catch (error) {
-      console.error('Erro ao buscar vídeo do exercício:', error);
-      setExerciseVideoUrl('');
-    } finally {
-      setIsLoadingVideo(false);
-    }
-  };
 
   useEffect(() => {
     // Cronômetro de descanso
@@ -273,65 +206,37 @@ export default function WorkoutPage() {
     router.push('/dashboard');
   };
 
-  // Modal de vídeo em tela cheia
-  const VideoModal = () => {
-    if (!showVideoModal) return null;
-
-    return (
-      <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4">
-        <div className="relative w-full max-w-5xl">
-          <button
-            onClick={() => setShowVideoModal(false)}
-            className="absolute -top-12 right-0 text-white hover:text-yellow-500 transition-colors z-10"
-          >
-            <X className="w-8 h-8" />
-          </button>
-
-          <div className="bg-gray-900 rounded-2xl overflow-hidden border-2 border-yellow-500/50 shadow-2xl">
-            <div className="aspect-video bg-black relative">
-              {isLoadingVideo ? (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                  <Loader2 className="w-16 h-16 text-yellow-500 animate-spin mb-4" />
-                  <p className="text-gray-400">Carregando demonstração...</p>
-                </div>
-              ) : exerciseVideoUrl ? (
-                <iframe
-                  src={exerciseVideoUrl}
-                  title={`Demonstração: ${currentExercise.name}`}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 p-6">
-                  <Play className="w-24 h-24 text-yellow-500 mb-4" />
-                  <p className="text-gray-400 text-center text-lg">
-                    Vídeo demonstrativo<br/>
-                    <span className="text-yellow-500 font-semibold">{currentExercise.name}</span>
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            <div className="bg-gray-900 p-6 border-t border-gray-800">
-              <h3 className="text-2xl font-bold text-yellow-500 mb-2">{currentExercise.name}</h3>
-              <p className="text-gray-300 mb-4">{currentExercise.description}</p>
-              {currentExercise.equipamento && (
-                <div className="flex items-center gap-2 mb-3 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 w-fit">
-                  <Dumbbell className="w-4 h-4 text-yellow-500" />
-                  <p className="text-sm text-gray-300">
-                    Equipamento: {currentExercise.equipamento}
-                  </p>
-                </div>
-              )}
-              {currentExercise.dica_rapida && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
-                  <p className="text-sm font-semibold text-yellow-500 mb-1">⚡ Dica Técnica:</p>
-                  <p className="text-white">{currentExercise.dica_rapida}</p>
-                </div>
-              )}
+  // Componente de demonstração do exercício com imagens animadas
+  const ExerciseDemo = () => {
+    const imgs = currentExercise.imageUrls;
+    if (imgs && imgs.length > 0) {
+      return (
+        <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="relative aspect-video bg-gray-800">
+            {imgs.map((url, i) => (
+              <img key={i} src={url} alt={`${currentExercise.name} pos ${i + 1}`}
+                className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${imageFrame === i ? 'opacity-100' : 'opacity-0'}`}
+              />
+            ))}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {imgs.map((_, i) => (
+                <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${imageFrame === i ? 'bg-yellow-500' : 'bg-gray-600'}`} />
+              ))}
             </div>
           </div>
+          <div className="px-4 py-2 bg-gray-900/80 border-t border-gray-800">
+            <p className="text-xs text-gray-400 text-center">Demonstração do movimento — posição {imageFrame + 1} de {imgs.length}</p>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+          <Dumbbell className="w-20 h-20 text-yellow-500/40 mb-3" />
+          <p className="text-gray-400 text-sm text-center px-4">
+            Execute o exercício conforme as instruções abaixo
+          </p>
         </div>
       </div>
     );
@@ -341,8 +246,6 @@ export default function WorkoutPage() {
   if (state === 'exercise') {
     return (
       <div className="min-h-screen bg-black text-white">
-        <VideoModal />
-
         <header className="bg-gray-900 border-b border-gray-800 p-4">
           <div className="flex items-center justify-between">
             <Button
@@ -361,48 +264,8 @@ export default function WorkoutPage() {
           </div>
         </header>
 
-        <div className="p-6 space-y-6">
-          <button
-            onClick={() => setShowVideoModal(true)}
-            className="w-full bg-gray-900 border-2 border-yellow-500/30 hover:border-yellow-500 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group"
-          >
-            <div className="aspect-video bg-gray-800 relative">
-              {isLoadingVideo ? (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                  <Loader2 className="w-16 h-16 text-yellow-500 animate-spin mb-4" />
-                  <p className="text-gray-400 text-sm">Carregando demonstração...</p>
-                </div>
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-                  <Dumbbell className="w-24 h-24 text-yellow-500/40 mb-4 group-hover:text-yellow-500 transition-colors" />
-                  <p className="text-gray-400 text-center text-sm">
-                    Vídeo demonstrativo<br/>
-                    <span className="text-yellow-500 font-semibold">{currentExercise.name}</span>
-                  </p>
-                </div>
-              )}
-              
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors flex items-center justify-center">
-                <div className="bg-yellow-500 rounded-full p-6 group-hover:scale-110 transition-transform shadow-2xl">
-                  <Play className="w-12 h-12 text-black fill-black" />
-                </div>
-              </div>
-
-              <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
-                <Maximize2 className="w-3 h-3 text-yellow-500" />
-                <p className="text-xs text-yellow-500 font-semibold">
-                  Clique para ver demonstração completa
-                </p>
-              </div>
-
-              {exerciseVideoUrl && !isLoadingVideo && (
-                <div className="absolute top-3 right-3 bg-red-600/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
-                  <Play className="w-3 h-3 text-white fill-white" />
-                  <p className="text-xs text-white font-semibold">YouTube</p>
-                </div>
-              )}
-            </div>
-          </button>
+        <div className="p-4 sm:p-6 space-y-5">
+          <ExerciseDemo />
 
           <div className="space-y-4">
             <div>

@@ -60,6 +60,29 @@ export interface UserData {
   uses_glp1_medication?: boolean;
   health_data_consent_at?: string;
   subscription_plan?: SubscriptionPlan;
+  // Anamnese expandida
+  anamnese_type?: 'summary' | 'full';
+  // PAR-Q
+  par_q_heart_condition?: boolean;
+  par_q_chest_pain?: boolean;
+  par_q_dizziness?: boolean;
+  // Histórico médico
+  has_chronic_conditions?: boolean;
+  takes_continuous_medication?: boolean;
+  medication_name?: string;
+  has_family_disease_history?: boolean;
+  // Lesões
+  has_past_injuries?: boolean;
+  injury_details?: string;
+  has_joint_pain?: boolean;
+  joint_pain_location?: string;
+  // Estilo de vida
+  daily_sitting_hours?: number;
+  sleep_quality?: string;
+  stress_level?: string;
+  smokes?: boolean;
+  drinks_alcohol?: boolean;
+  time_without_training?: string;
   created_at?: string;
   updated_at?: string;
 }
