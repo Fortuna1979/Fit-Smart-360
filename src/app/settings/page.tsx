@@ -77,7 +77,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
-      <header className="bg-gradient-to-b from-gray-900 to-black border-b border-gray-800 p-6">
+      <header className="bg-gradient-to-b from-gray-900 to-black border-b border-gray-800 p-4">
         <div className="flex items-center gap-3">
           <Button
             onClick={() => router.push('/dashboard')}
@@ -91,7 +91,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <div className="p-6 max-w-md mx-auto space-y-6">
+      <div className="p-4 max-w-md mx-auto space-y-4 sm:space-y-6">
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">

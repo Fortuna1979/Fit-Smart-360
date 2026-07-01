@@ -65,14 +65,14 @@ export default function LandingPage() {
               <span className="text-sm text-yellow-500 font-medium">Treino Inteligente com IA</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Seu treino, do seu jeito,<br />
               <span className="bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
                 com os aparelhos que você tem
               </span>
             </h1>
             
-            <p className="text-xl text-gray-200 mb-10 max-w-2xl">
+            <p className="text-base sm:text-xl text-gray-200 mb-8 sm:mb-10 max-w-2xl">
               Fotografe os equipamentos da sua academia e receba treinos personalizados 
               criados por IA, adaptados ao seu objetivo e condicionamento físico.
             </p>
@@ -81,7 +81,7 @@ export default function LandingPage() {
               <Button
                 onClick={() => router.push('/auth')}
                 size="lg"
-                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-lg px-8 py-6 shadow-2xl shadow-yellow-500/20"
+                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 shadow-2xl shadow-yellow-500/20"
               >
                 Começar Agora
               </Button>
@@ -89,7 +89,7 @@ export default function LandingPage() {
                 onClick={() => setShowPricing(true)}
                 size="lg"
                 variant="outline"
-                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 font-semibold text-lg px-8 py-6 backdrop-blur-sm"
+                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 font-semibold text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 backdrop-blur-sm"
               >
                 Ver Planos
               </Button>
@@ -116,18 +116,18 @@ export default function LandingPage() {
 
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">
               Transforme seu corpo,<br />
               <span className="text-yellow-500">onde você estiver</span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-base sm:text-xl text-gray-300 max-w-2xl mx-auto">
               Milhares de pessoas já estão alcançando seus objetivos com treinos inteligentes
             </p>
           </div>
 
           {/* Grid de Imagens de Treino */}
           <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="relative h-80 rounded-2xl overflow-hidden group">
+            <div className="relative h-52 sm:h-80 rounded-2xl overflow-hidden group">
               <div 
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                 style={{
@@ -141,7 +141,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="relative h-80 rounded-2xl overflow-hidden group">
+            <div className="relative h-52 sm:h-80 rounded-2xl overflow-hidden group">
               <div 
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                 style={{
@@ -155,7 +155,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="relative h-80 rounded-2xl overflow-hidden group">
+            <div className="relative h-52 sm:h-80 rounded-2xl overflow-hidden group">
               <div 
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                 style={{
@@ -175,14 +175,14 @@ export default function LandingPage() {
       {/* Features Grid */}
       <section className="py-20 px-4 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-16">
+          <h2 className="text-2xl sm:text-4xl font-bold text-center mb-10 sm:mb-16">
             Tudo que você precisa para{' '}
             <span className="text-yellow-500">evoluir</span>
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-5 sm:p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
               <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6">
                 <Dumbbell className="w-7 h-7 text-yellow-500" />
               </div>
@@ -194,7 +194,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-5 sm:p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
               <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6">
                 <Dumbbell className="w-7 h-7 text-yellow-500" />
               </div>
@@ -206,7 +206,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-5 sm:p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
               <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6">
                 <TrendingUp className="w-7 h-7 text-yellow-500" />
               </div>
@@ -218,7 +218,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 4 */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-5 sm:p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
               <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6">
                 <Apple className="w-7 h-7 text-yellow-500" />
               </div>
@@ -230,7 +230,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 5 */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-5 sm:p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
               <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6">
                 <Droplet className="w-7 h-7 text-yellow-500" />
               </div>
@@ -242,7 +242,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 6 */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
+            <div className="bg-gray-800/50 border border-gray-700 rounded-2xl p-5 sm:p-8 hover:border-yellow-500/50 transition-all hover:transform hover:scale-105">
               <div className="w-14 h-14 bg-yellow-500/10 rounded-xl flex items-center justify-center mb-6">
                 <Crown className="w-7 h-7 text-yellow-500" />
               </div>
@@ -257,7 +257,7 @@ export default function LandingPage() {
       </section>
 
       {/* Section de Motivação com Background */}
-      <section className="relative py-32 px-4 overflow-hidden">
+      <section className="relative py-16 sm:py-32 px-4 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -269,11 +269,11 @@ export default function LandingPage() {
         </div>
 
         <div className="container mx-auto text-center relative z-10">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
+          <h2 className="text-2xl sm:text-5xl md:text-6xl font-bold mb-6">
             Não espere o momento perfeito.<br />
             <span className="text-yellow-500">Comece agora.</span>
           </h2>
-          <p className="text-2xl text-gray-300 mb-10 max-w-3xl mx-auto">
+          <p className="text-base sm:text-2xl text-gray-300 mb-6 sm:mb-10 max-w-3xl mx-auto">
             Cada treino é um passo em direção à melhor versão de você mesmo
           </p>
         </div>
@@ -282,7 +282,7 @@ export default function LandingPage() {
       {/* Pricing Modal */}
       {showPricing && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-3xl p-8 max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-gray-900 border border-gray-700 rounded-3xl p-4 sm:p-8 max-w-lg sm:max-w-5xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-3xl font-bold">Escolha seu plano</h2>
               <Button
@@ -296,7 +296,7 @@ export default function LandingPage() {
 
             <div className="grid md:grid-cols-3 gap-6">
               {/* Plano Gratuito */}
-              <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8">
+              <div className="bg-gray-800 border border-gray-700 rounded-2xl p-5 sm:p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold mb-2">Gratuito</h3>
                   <div className="flex items-baseline justify-center gap-2">
@@ -334,7 +334,7 @@ export default function LandingPage() {
               </div>
 
               {/* Plano Básico */}
-              <div className="bg-gray-800 border border-gray-700 rounded-2xl p-8">
+              <div className="bg-gray-800 border border-gray-700 rounded-2xl p-5 sm:p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold mb-2">Básico</h3>
                   <div className="flex items-baseline justify-center gap-2">
@@ -368,7 +368,7 @@ export default function LandingPage() {
               </div>
 
               {/* Plano Premium */}
-              <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-500 rounded-2xl p-8 relative">
+              <div className="bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border-2 border-yellow-500 rounded-2xl p-5 sm:p-8 relative">
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-black px-4 py-1 rounded-full text-sm font-bold">
                   MAIS POPULAR
                 </div>
@@ -416,7 +416,7 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border-y border-yellow-500/20">
         <div className="container mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-6">
             Pronto para transformar<br />seu treino?
           </h2>
           <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
@@ -426,7 +426,7 @@ export default function LandingPage() {
           <Button
             onClick={() => setShowPricing(true)}
             size="lg"
-            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-lg px-10 py-6"
+            className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-base sm:text-lg px-6 py-4 sm:px-10 sm:py-6"
           >
             Ver Planos
           </Button>
@@ -439,7 +439,7 @@ export default function LandingPage() {
           <p className="mb-4">
             © 2024 Fit Smart 360º. Todos os direitos reservados.
           </p>
-          <div className="flex justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-4">
             <button className="hover:text-yellow-500 transition-colors">Termos de Uso</button>
             <button
               onClick={() => router.push('/privacidade')}

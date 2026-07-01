@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </header>
 
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-20 sm:pt-24 pb-12 sm:pb-16 px-4">
         <div className="container mx-auto max-w-3xl space-y-8 text-gray-300">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">Política de Privacidade</h1>
@@ -66,7 +66,7 @@ export default function PrivacyPolicyPage() {
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-yellow-500">3. Seus direitos (LGPD)</h2>
             <p>De acordo com a LGPD, você tem direito a:</p>
-            <ul className="list-disc pl-6 space-y-1">
+            <ul className="list-disc pl-4 sm:pl-6 space-y-1">
               <li>Confirmar a existência de tratamento dos seus dados;</li>
               <li>Acessar os dados que temos sobre você;</li>
               <li>Corrigir dados incompletos, inexatos ou desatualizados;</li>

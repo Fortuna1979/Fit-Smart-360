@@ -12,7 +12,7 @@ export default function BemVindoPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(234,179,8,0.15),transparent_60%)]" />
 
       <div className="relative w-full max-w-md text-center">
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-10 shadow-2xl">
+        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 sm:p-10 shadow-2xl">
 
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
@@ -46,7 +46,7 @@ export default function BemVindoPage() {
           </p>
 
           {/* Destaques */}
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
             {[
               {
                 img: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=300&h=300&fit=crop&q=80',

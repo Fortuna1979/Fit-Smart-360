@@ -168,7 +168,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 sm:p-8 shadow-2xl">
           {/* Step 1: Dados Pessoais */}
           {step === 1 && (
             <div className="space-y-6">
@@ -176,7 +176,7 @@ export default function OnboardingPage() {
                 <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <User className="w-8 h-8 text-yellow-500" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">Vamos nos conhecer!</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">Vamos nos conhecer!</h2>
                 <p className="text-gray-400">Conte um pouco sobre você</p>
               </div>
 
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
               <div className="space-y-3">
                 <Label>Sexo</Label>
                 <RadioGroup value={formData.gender} onValueChange={(value) => handleChange('gender', value)}>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <label className={`flex items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all ${
                       formData.gender === 'masculino' ? 'border-yellow-500 bg-yellow-500/10' : 'border-gray-700 hover:border-gray-600'
                     }`}>
@@ -241,7 +241,7 @@ export default function OnboardingPage() {
                 <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Scale className="w-8 h-8 text-yellow-500" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">Suas medidas</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">Suas medidas</h2>
                 <p className="text-gray-400">Precisamos saber seu peso e altura</p>
               </div>
 
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
                 <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Target className="w-8 h-8 text-yellow-500" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">Qual seu objetivo?</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">Qual seu objetivo?</h2>
                 <p className="text-gray-400">Vamos criar treinos focados no que você quer</p>
               </div>
 
@@ -339,7 +339,7 @@ export default function OnboardingPage() {
                 <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Activity className="w-8 h-8 text-yellow-500" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">Frequência semanal</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">Frequência semanal</h2>
                 <p className="text-gray-400">Quantos dias por semana você pode treinar?</p>
               </div>
 
@@ -371,7 +371,7 @@ export default function OnboardingPage() {
                 <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <AlertCircle className="w-8 h-8 text-yellow-500" />
                 </div>
-                <h2 className="text-3xl font-bold mb-2">Informações importantes</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2">Informações importantes</h2>
                 <p className="text-gray-400">Isso nos ajuda a personalizar ainda mais seu treino</p>
               </div>
 
@@ -475,7 +475,7 @@ export default function OnboardingPage() {
           )}
 
           {/* Navigation Buttons */}
-          <div className="flex gap-3 mt-8">
+          <div className="flex gap-3 mt-6 sm:mt-8">
             {step > 1 && (
               <Button
                 onClick={handleBack}

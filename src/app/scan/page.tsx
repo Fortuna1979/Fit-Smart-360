@@ -250,7 +250,7 @@ export default function ScanPage() {
         <div className="container mx-auto max-w-4xl">
           {/* Instruções */}
           <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border border-yellow-500/30 rounded-2xl p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-3 flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 flex items-center gap-2">
               <Camera className="w-6 h-6 text-yellow-500" />
               Como funciona
             </h2>
@@ -264,7 +264,7 @@ export default function ScanPage() {
 
           {/* Área de Captura */}
           {!capturedImage && (
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-8">
+            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8">
               <h3 className="text-xl font-bold mb-6 text-center">Capturar Equipamento</h3>
 
               {/* Vídeo da Câmera */}
@@ -366,7 +366,7 @@ export default function ScanPage() {
 
           {/* Análise em Progresso */}
           {isAnalyzing && (
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-12 text-center">
+            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 sm:p-12 text-center">
               <Loader2 className="w-12 h-12 text-yellow-500 animate-spin mx-auto mb-4" />
               <p className="text-xl text-gray-300">Analisando equipamento...</p>
               <p className="text-sm text-gray-500 mt-2">Gerando exercícios personalizados...</p>
@@ -375,7 +375,7 @@ export default function ScanPage() {
 
           {/* Resultado da Análise */}
           {capturedImage && !isAnalyzing && (
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8 mb-8">
+            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 sm:p-8 mb-6 sm:mb-8">
               <img
                 src={capturedImage}
                 alt="Equipamento capturado"

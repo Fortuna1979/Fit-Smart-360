@@ -155,11 +155,11 @@ export default function AuthPage() {
         </Button>
 
         {/* Card */}
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 sm:p-8 shadow-2xl">
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <Dumbbell className="w-10 h-10 text-yellow-500" />
-            <span className="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
+            <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
               Fit Smart 360º
             </span>
           </div>
