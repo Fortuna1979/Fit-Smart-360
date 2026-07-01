@@ -1,4 +1,5 @@
-import { getSupabaseClient, UserData, Equipment, WorkoutPlan, WorkoutProgress, NutritionPlan, HydrationLog } from './supabase';
+import { getSupabaseClient, UserData, Equipment, WorkoutPlan, WorkoutProgress, NutritionPlan, HydrationLog, UserAchievement, ActivityFeed, Territory } from './supabase';
+import { ACHIEVEMENTS } from './achievements';
 
 function calculateStreaks(history: string[]): { streakCurrent: number; streakBest: number } {
   if (!history.length) return { streakCurrent: 0, streakBest: 0 };
@@ -506,6 +507,203 @@ export const upsertHydrationLog = async (updates: Partial<HydrationLog>, date?: 
     console.error('Erro ao salvar hidratação:', error);
     throw error;
   }
+};
+
+// ============================================
+// CONQUISTAS (ACHIEVEMENTS)
+// ============================================
+
+export const getUserAchievements = async (): Promise<UserAchievement[]> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return [];
+  const userId = await getUserId();
+  if (!userId) return [];
+  try {
+    const { data } = await supabase.from('user_achievements').select('*').eq('user_id', userId);
+    return (data || []) as UserAchievement[];
+  } catch { return []; }
+};
+
+export const awardAchievement = async (achievementKey: string): Promise<void> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const userId = await getUserId();
+  if (!userId) return;
+  try {
+    await supabase.from('user_achievements')
+      .upsert({ user_id: userId, achievement_key: achievementKey }, { onConflict: 'user_id,achievement_key', ignoreDuplicates: true });
+  } catch { /* ignore duplicates */ }
+};
+
+export const checkAndAwardAchievements = async (
+  progress: { days?: number; streak_current?: number; territory_count?: number; has_calistenia?: boolean }
+): Promise<string[]> => {
+  const earned = await getUserAchievements();
+  const earnedKeys = new Set(earned.map(a => a.achievement_key));
+  const newAchievements: string[] = [];
+
+  for (const ach of ACHIEVEMENTS) {
+    if (earnedKeys.has(ach.key)) continue;
+    const unlocked = (() => {
+      switch (ach.key) {
+        case 'primeiro_treino': return (progress.days || 0) >= 1;
+        case 'calistenia_master': return progress.has_calistenia === true;
+        case 'tres_consecutivos': return (progress.streak_current || 0) >= 3;
+        case 'sete_consecutivos': return (progress.streak_current || 0) >= 7;
+        case 'dez_treinos': return (progress.days || 0) >= 10;
+        case 'trinta_treinos': return (progress.days || 0) >= 30;
+        case 'cinquenta_treinos': return (progress.days || 0) >= 50;
+        case 'cem_treinos': return (progress.days || 0) >= 100;
+        case 'primeiro_territorio': return (progress.territory_count || 0) >= 1;
+        case 'cinco_territorios': return (progress.territory_count || 0) >= 5;
+        case 'vinte_territorios': return (progress.territory_count || 0) >= 20;
+        default: return false;
+      }
+    })();
+    if (unlocked) {
+      await awardAchievement(ach.key);
+      newAchievements.push(ach.key);
+    }
+  }
+  return newAchievements;
+};
+
+// ============================================
+// SOCIAL FEED
+// ============================================
+
+export const postToFeed = async (
+  workoutName: string, exercisesCount: number, duration: string, workoutType = 'equipment'
+): Promise<void> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const userId = await getUserId();
+  if (!userId) return;
+  try {
+    const userData = await getUserData();
+    if (!userData?.public_profile) return;
+    const name = userData.username || userData.name || 'Atleta';
+    await supabase.from('activity_feed').insert([{
+      user_id: userId, user_name: name, workout_name: workoutName,
+      exercises_count: exercisesCount, duration, workout_type: workoutType,
+    }]);
+  } catch { /* feed post is non-critical */ }
+};
+
+export const getSocialFeed = async (limit = 30): Promise<ActivityFeed[]> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return [];
+  const userId = await getUserId();
+  try {
+    const { data: feed } = await supabase
+      .from('activity_feed').select('*')
+      .order('created_at', { ascending: false }).limit(limit);
+    if (!feed) return [];
+
+    const activityIds = feed.map(f => f.id);
+    const { data: kudos } = await supabase.from('kudos').select('activity_id, user_id').in('activity_id', activityIds);
+    const kudosMap: Record<string, { count: number; hasKudos: boolean }> = {};
+    for (const k of (kudos || [])) {
+      if (!kudosMap[k.activity_id]) kudosMap[k.activity_id] = { count: 0, hasKudos: false };
+      kudosMap[k.activity_id].count++;
+      if (k.user_id === userId) kudosMap[k.activity_id].hasKudos = true;
+    }
+
+    return feed.map(f => ({
+      ...f,
+      kudos_count: kudosMap[f.id]?.count || 0,
+      user_has_kudos: kudosMap[f.id]?.hasKudos || false,
+    })) as ActivityFeed[];
+  } catch { return []; }
+};
+
+export const toggleKudos = async (activityId: string, currentlyHasKudos: boolean): Promise<void> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const userId = await getUserId();
+  if (!userId) return;
+  try {
+    if (currentlyHasKudos) {
+      await supabase.from('kudos').delete().eq('activity_id', activityId).eq('user_id', userId);
+    } else {
+      await supabase.from('kudos').upsert({ activity_id: activityId, user_id: userId }, { onConflict: 'activity_id,user_id', ignoreDuplicates: true });
+    }
+  } catch { /* ignore */ }
+};
+
+export const updatePublicProfile = async (isPublic: boolean, username: string): Promise<void> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const userId = await getUserId();
+  if (!userId) return;
+  try {
+    await supabase.from('user_data').update({ public_profile: isPublic, username }).eq('user_id', userId);
+  } catch { /* ignore */ }
+};
+
+export const getLeaderboard = async () => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return [];
+  try {
+    const { data } = await supabase
+      .from('user_data')
+      .select('name, username, territory_count')
+      .eq('public_profile', true)
+      .order('territory_count', { ascending: false })
+      .limit(20);
+    return data || [];
+  } catch { return []; }
+};
+
+// ============================================
+// TERRITÓRIOS
+// ============================================
+
+export const claimTerritory = async (lat: number, lng: number): Promise<{ success: boolean; isNew: boolean; gridKey: string }> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return { success: false, isNew: false, gridKey: '' };
+  const userId = await getUserId();
+  if (!userId) return { success: false, isNew: false, gridKey: '' };
+  try {
+    const userData = await getUserData();
+    const userName = userData?.username || userData?.name || 'Atleta';
+    const gridKey = `${Math.floor(lat * 400)}_${Math.floor(lng * 400)}`;
+
+    const { data: existing } = await supabase.from('territories').select('*').eq('grid_key', gridKey).single();
+    const isNew = !existing;
+    const isAlreadyMine = existing?.user_id === userId;
+
+    await supabase.from('territories').upsert({
+      grid_key: gridKey, user_id: userId, user_name: userName,
+      claimed_at: new Date().toISOString(),
+      total_claims: (existing?.total_claims || 0) + (isAlreadyMine ? 0 : 1),
+    }, { onConflict: 'grid_key' });
+
+    if (!isAlreadyMine) {
+      const newCount = (userData?.territory_count || 0) + 1;
+      await supabase.from('user_data').update({ territory_count: newCount }).eq('user_id', userId);
+      await checkAndAwardAchievements({ territory_count: newCount });
+    }
+
+    return { success: true, isNew: !isAlreadyMine, gridKey };
+  } catch (e) {
+    console.error('Erro ao dominar território:', e);
+    return { success: false, isNew: false, gridKey: '' };
+  }
+};
+
+export const getNearbyTerritories = async (lat: number, lng: number, radius = 8): Promise<Territory[]> => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return [];
+  try {
+    const centerX = Math.floor(lat * 400);
+    const centerY = Math.floor(lng * 400);
+    const { data } = await supabase.from('territories').select('*');
+    return ((data || []) as Territory[]).filter(t => {
+      const [tx, ty] = t.grid_key.split('_').map(Number);
+      return Math.abs(tx - centerX) <= radius && Math.abs(ty - centerY) <= radius;
+    });
+  } catch { return []; }
 };
 
 // ============================================

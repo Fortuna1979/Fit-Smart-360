@@ -83,6 +83,10 @@ export interface UserData {
   smokes?: boolean;
   drinks_alcohol?: boolean;
   time_without_training?: string;
+  // Social/gamification
+  public_profile?: boolean;
+  username?: string;
+  territory_count?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -153,4 +157,32 @@ export interface HydrationLog {
   reminders_enabled: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface UserAchievement {
+  id?: string;
+  user_id: string;
+  achievement_key: string;
+  earned_at?: string;
+}
+
+export interface ActivityFeed {
+  id?: string;
+  user_id: string;
+  user_name: string;
+  workout_name: string;
+  exercises_count: number;
+  duration?: string;
+  workout_type?: string;
+  created_at?: string;
+  kudos_count?: number;
+  user_has_kudos?: boolean;
+}
+
+export interface Territory {
+  grid_key: string;
+  user_id?: string;
+  user_name: string;
+  claimed_at?: string;
+  total_claims: number;
 }

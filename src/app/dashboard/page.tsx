@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
+import {
   Dumbbell, Camera, TrendingUp, Apple, Droplet, Settings,
-  Play, Calendar, Award, Zap
+  Play, Calendar, Award, Zap, Users, MapPin, PersonStanding
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculateBMI, translateGoal, translateFitnessLevel } from '@/lib/utils';
@@ -390,12 +390,12 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={changeWorkout}
-            className="bg-gray-800 border border-gray-700 rounded-2xl p-6 text-left hover:border-yellow-500/50 transition-all"
+            onClick={() => router.push('/calistenia')}
+            className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-6 text-left hover:scale-105 transition-transform"
           >
-            <Play className="w-8 h-8 text-yellow-500 mb-3" />
-            <h3 className="font-bold text-lg mb-1">Treinar</h3>
-            <p className="text-sm text-gray-400">Alternar treino</p>
+            <PersonStanding className="w-8 h-8 text-white mb-3" />
+            <h3 className="font-bold text-white text-lg mb-1">Calistenia</h3>
+            <p className="text-sm text-white/80">Treino sem equipamento</p>
           </button>
         </div>
 
@@ -403,7 +403,12 @@ export default function DashboardPage() {
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Treino de Hoje</h2>
-            <Calendar className="w-5 h-5 text-gray-400" />
+            <div className="flex items-center gap-2">
+              <button onClick={changeWorkout} className="text-xs text-yellow-500 hover:text-yellow-400 border border-yellow-500/30 rounded-lg px-2 py-1">
+                Trocar
+              </button>
+              <Calendar className="w-5 h-5 text-gray-400" />
+            </div>
           </div>
           
           {todayWorkout ? (
@@ -503,6 +508,24 @@ export default function DashboardPage() {
             <h3 className="font-semibold mb-1">Conquistas</h3>
             <p className="text-xs text-gray-400">Medalhas e níveis</p>
           </button>
+
+          <button
+            onClick={() => router.push('/social')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-green-500/50 transition-all active:scale-95"
+          >
+            <Users className="w-6 h-6 text-green-400 mb-2" />
+            <h3 className="font-semibold mb-1">Social</h3>
+            <p className="text-xs text-gray-400">Feed e ranking</p>
+          </button>
+
+          <button
+            onClick={() => router.push('/territorio')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-orange-500/50 transition-all active:scale-95"
+          >
+            <MapPin className="w-6 h-6 text-orange-400 mb-2" />
+            <h3 className="font-semibold mb-1">Território</h3>
+            <p className="text-xs text-gray-400">Dominar áreas GPS</p>
+          </button>
         </div>
 
         {/* Motivational Quote */}
@@ -516,27 +539,31 @@ export default function DashboardPage() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-4 py-3">
+      <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-2 py-2">
         <div className="flex justify-around items-center">
-          <button className="flex flex-col items-center gap-1 text-yellow-500">
-            <Dumbbell className="w-6 h-6" />
-            <span className="text-xs font-medium">Início</span>
+          <button className="flex flex-col items-center gap-0.5 text-yellow-500 px-1">
+            <Dumbbell className="w-5 h-5" />
+            <span className="text-[10px] font-medium">Início</span>
           </button>
-          <button onClick={() => router.push('/progresso')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-500">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs">Progresso</span>
+          <button onClick={() => router.push('/progresso')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-yellow-500 px-1">
+            <TrendingUp className="w-5 h-5" />
+            <span className="text-[10px]">Progresso</span>
           </button>
-          <button onClick={() => router.push('/nutricao')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-green-400">
-            <Apple className="w-6 h-6" />
-            <span className="text-xs">Nutrição</span>
+          <button onClick={() => router.push('/social')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-green-400 px-1">
+            <Users className="w-5 h-5" />
+            <span className="text-[10px]">Social</span>
           </button>
-          <button onClick={() => router.push('/hidratacao')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-400">
-            <Droplet className="w-6 h-6" />
-            <span className="text-xs">Água</span>
+          <button onClick={() => router.push('/territorio')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-orange-400 px-1">
+            <MapPin className="w-5 h-5" />
+            <span className="text-[10px]">Território</span>
           </button>
-          <button onClick={() => router.push('/settings')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-white">
-            <Settings className="w-6 h-6" />
-            <span className="text-xs">Mais</span>
+          <button onClick={() => router.push('/conquistas')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-purple-400 px-1">
+            <Award className="w-5 h-5" />
+            <span className="text-[10px]">Medalhas</span>
+          </button>
+          <button onClick={() => router.push('/settings')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-white px-1">
+            <Settings className="w-5 h-5" />
+            <span className="text-[10px]">Mais</span>
           </button>
         </div>
       </nav>

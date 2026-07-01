@@ -7,7 +7,7 @@ import {
   AlertCircle, ArrowLeft, Trophy, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getActiveWorkout, getUserData, incrementWorkoutProgress } from '@/lib/supabase-helpers';
+import { getActiveWorkout, getUserData, incrementWorkoutProgress, postToFeed, checkAndAwardAchievements, getWorkoutProgress } from '@/lib/supabase-helpers';
 import { useRequireAuth } from '@/hooks/use-require-auth';
 import { AdBanner } from '@/components/AdBanner';
 
@@ -192,10 +192,21 @@ export default function WorkoutPage() {
   // Função para completar treino
   const completeWorkout = async () => {
     setState('completed');
-    
+
     try {
-      // Salvar progresso no Supabase
       await incrementWorkoutProgress();
+      const workoutType = sessionStorage.getItem('workout_type') || 'equipment';
+      const isCalistenia = workoutType === 'calistenia';
+      if (workout) {
+        await postToFeed(workout.name, workout.exercises.length, workout.duration, workoutType);
+      }
+      const [progress, userDataForAch] = await Promise.all([getWorkoutProgress(), getUserData()]);
+      await checkAndAwardAchievements({
+        days: progress?.days,
+        streak_current: progress?.streak_current,
+        territory_count: userDataForAch?.territory_count,
+        has_calistenia: isCalistenia,
+      });
     } catch (error) {
       console.error('Erro ao salvar progresso:', error);
     }
@@ -204,6 +215,7 @@ export default function WorkoutPage() {
   // Função para voltar ao dashboard
   const returnToDashboard = () => {
     sessionStorage.removeItem('active_workout');
+    sessionStorage.removeItem('workout_type');
     router.push('/dashboard');
   };
 
