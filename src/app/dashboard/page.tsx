@@ -469,39 +469,39 @@ export default function DashboardPage() {
         {/* Menu Grid */}
         <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => router.push('/progress')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-yellow-500/50 transition-all"
+            onClick={() => router.push('/progresso')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-yellow-500/50 transition-all active:scale-95"
           >
             <TrendingUp className="w-6 h-6 text-yellow-500 mb-2" />
             <h3 className="font-semibold mb-1">Progresso</h3>
-            <p className="text-xs text-gray-400">Ver evolução</p>
+            <p className="text-xs text-gray-400">Gráficos e evolução</p>
           </button>
 
           <button
-            onClick={() => router.push('/nutrition')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-yellow-500/50 transition-all"
+            onClick={() => router.push('/nutricao')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-green-500/50 transition-all active:scale-95"
           >
-            <Apple className="w-6 h-6 text-yellow-500 mb-2" />
+            <Apple className="w-6 h-6 text-green-500 mb-2" />
             <h3 className="font-semibold mb-1">Nutrição</h3>
-            <p className="text-xs text-gray-400">Plano alimentar</p>
+            <p className="text-xs text-gray-400">Plano alimentar IA</p>
           </button>
 
           <button
-            onClick={() => router.push('/hydration')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-yellow-500/50 transition-all"
+            onClick={() => router.push('/hidratacao')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-blue-500/50 transition-all active:scale-95"
           >
-            <Droplet className="w-6 h-6 text-yellow-500 mb-2" />
+            <Droplet className="w-6 h-6 text-blue-400 mb-2" />
             <h3 className="font-semibold mb-1">Hidratação</h3>
-            <p className="text-xs text-gray-400">Lembretes de água</p>
+            <p className="text-xs text-gray-400">Meta e lembretes</p>
           </button>
 
           <button
-            onClick={() => router.push('/achievements')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-yellow-500/50 transition-all"
+            onClick={() => router.push('/conquistas')}
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-purple-500/50 transition-all active:scale-95"
           >
-            <Award className="w-6 h-6 text-yellow-500 mb-2" />
+            <Award className="w-6 h-6 text-purple-400 mb-2" />
             <h3 className="font-semibold mb-1">Conquistas</h3>
-            <p className="text-xs text-gray-400">Suas medalhas</p>
+            <p className="text-xs text-gray-400">Medalhas e níveis</p>
           </button>
         </div>
 
@@ -522,15 +522,19 @@ export default function DashboardPage() {
             <Dumbbell className="w-6 h-6" />
             <span className="text-xs font-medium">Início</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-gray-400">
+          <button onClick={() => router.push('/progresso')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-yellow-500">
             <TrendingUp className="w-6 h-6" />
             <span className="text-xs">Progresso</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-gray-400">
+          <button onClick={() => router.push('/nutricao')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-green-400">
             <Apple className="w-6 h-6" />
             <span className="text-xs">Nutrição</span>
           </button>
-          <button className="flex flex-col items-center gap-1 text-gray-400">
+          <button onClick={() => router.push('/hidratacao')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-400">
+            <Droplet className="w-6 h-6" />
+            <span className="text-xs">Água</span>
+          </button>
+          <button onClick={() => router.push('/settings')} className="flex flex-col items-center gap-1 text-gray-400 hover:text-white">
             <Settings className="w-6 h-6" />
             <span className="text-xs">Mais</span>
           </button>

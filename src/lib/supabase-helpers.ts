@@ -1,4 +1,22 @@
-import { getSupabaseClient, UserData, Equipment, WorkoutPlan, WorkoutProgress } from './supabase';
+import { getSupabaseClient, UserData, Equipment, WorkoutPlan, WorkoutProgress, NutritionPlan, HydrationLog } from './supabase';
+
+function calculateStreaks(history: string[]): { streakCurrent: number; streakBest: number } {
+  if (!history.length) return { streakCurrent: 0, streakBest: 0 };
+  const sorted = [...new Set(history)].sort();
+  let streakBest = 0, current = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    if (i === 0) { current = 1; }
+    else {
+      const diff = (new Date(sorted[i]).getTime() - new Date(sorted[i - 1]).getTime()) / 86400000;
+      current = diff === 1 ? current + 1 : 1;
+    }
+    streakBest = Math.max(streakBest, current);
+  }
+  const last = new Date(sorted[sorted.length - 1]); last.setHours(0,0,0,0);
+  const yday = new Date(); yday.setHours(0,0,0,0); yday.setDate(yday.getDate() - 1);
+  const streakCurrent = last.getTime() >= yday.getTime() ? current : 0;
+  return { streakCurrent, streakBest };
+}
 
 // Obter o ID do usuário autenticado no Supabase (auth.uid())
 export const getUserId = async (): Promise<string | null> => {
@@ -392,23 +410,100 @@ export const getWorkoutProgress = async () => {
 
 export const incrementWorkoutProgress = async () => {
   const supabase = getSupabaseClient();
-  if (!supabase) {
-    console.warn('Supabase não configurado. Progresso não incrementado.');
-    return null;
-  }
-
+  if (!supabase) return null;
   try {
     const current = await getWorkoutProgress();
-    
-    const newProgress = {
-      days: (current?.days || 0) + 1,
+    const today = new Date().toISOString().split('T')[0];
+    const history: string[] = current?.workout_history || [];
+    if (!history.includes(today)) history.push(today);
+    const { streakCurrent, streakBest } = calculateStreaks(history);
+    return await saveWorkoutProgress({
+      days: history.length,
       achievements: (current?.achievements || 0) + 1,
-      last_workout: new Date().toISOString()
-    };
-
-    return await saveWorkoutProgress(newProgress);
+      last_workout: new Date().toISOString(),
+      workout_history: history,
+      streak_current: streakCurrent,
+      streak_best: Math.max(streakBest, current?.streak_best || 0),
+    });
   } catch (error) {
     console.error('Erro ao incrementar progresso:', error);
+    throw error;
+  }
+};
+
+// ============================================
+// NUTRIÇÃO
+// ============================================
+
+export const saveNutritionPlan = async (plan: Omit<NutritionPlan, 'id' | 'user_id' | 'created_at'>) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const userId = await getUserId();
+  if (!userId) return null;
+  try {
+    // Remove plano anterior e insere novo
+    await supabase.from('nutrition_plans').delete().eq('user_id', userId);
+    const { data, error } = await supabase.from('nutrition_plans')
+      .insert([{ ...plan, user_id: userId }]).select().single();
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Erro ao salvar plano nutricional:', error);
+    throw error;
+  }
+};
+
+export const getNutritionPlan = async () => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const userId = await getUserId();
+  if (!userId) return null;
+  try {
+    const { data, error } = await supabase.from('nutrition_plans')
+      .select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).single();
+    if (error && error.code !== 'PGRST116') throw error;
+    return data;
+  } catch (error) {
+    console.error('Erro ao buscar plano nutricional:', error);
+    return null;
+  }
+};
+
+// ============================================
+// HIDRATAÇÃO
+// ============================================
+
+export const getHydrationLog = async (date?: string) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const userId = await getUserId();
+  if (!userId) return null;
+  const today = date || new Date().toISOString().split('T')[0];
+  try {
+    const { data, error } = await supabase.from('hydration_logs')
+      .select('*').eq('user_id', userId).eq('date', today).single();
+    if (error && error.code !== 'PGRST116') throw error;
+    return data as HydrationLog | null;
+  } catch (error) {
+    console.error('Erro ao buscar hidratação:', error);
+    return null;
+  }
+};
+
+export const upsertHydrationLog = async (updates: Partial<HydrationLog>, date?: string) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
+  const userId = await getUserId();
+  if (!userId) return null;
+  const today = date || new Date().toISOString().split('T')[0];
+  try {
+    const { data, error } = await supabase.from('hydration_logs')
+      .upsert({ user_id: userId, date: today, ...updates, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id,date' }).select().single();
+    if (error) throw error;
+    return data as HydrationLog;
+  } catch (error) {
+    console.error('Erro ao salvar hidratação:', error);
     throw error;
   }
 };

@@ -124,6 +124,33 @@ export interface WorkoutProgress {
   days: number;
   achievements: number;
   last_workout?: string;
+  streak_current?: number;
+  streak_best?: number;
+  total_minutes?: number;
+  workout_history?: string[];
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface NutritionPlan {
+  id?: string;
+  user_id: string;
+  budget_level: string;
+  dietary_restrictions: string[];
+  meal_frequency: number;
+  daily_calories?: number;
+  plan: Record<string, unknown>;
+  created_at?: string;
+}
+
+export interface HydrationLog {
+  id?: string;
+  user_id: string;
+  date: string;
+  glasses_drunk: number;
+  daily_goal_glasses: number;
+  reminder_interval_hours: number;
+  reminders_enabled: boolean;
   created_at?: string;
   updated_at?: string;
 }
