@@ -24,13 +24,26 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Fit Smart 360º - Treino Inteligente",
-  description: "Treinos personalizados com IA baseados nos equipamentos disponíveis",
+  title: "Fit Smart 360° - Treino Inteligente",
+  description: "Treinos personalizados com IA baseados nos seus equipamentos",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "Fit Smart 360º",
+    statusBarStyle: "black-translucent",
+    title: "Fit Smart 360°",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    other: [
+      { rel: "icon", url: "/icon-192.png", sizes: "192x192" },
+    ],
   },
 };
 
@@ -45,7 +58,12 @@ export default function RootLayout({
         <Script src="/lasy-bridge.js" strategy="beforeInteractive" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="mobile-web-app-capable" content="yes" />
         {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
           <Script
             async
