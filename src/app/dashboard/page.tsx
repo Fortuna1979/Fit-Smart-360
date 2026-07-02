@@ -58,6 +58,7 @@ export default function DashboardPage() {
   const [todayWorkout, setTodayWorkout] = useState<WorkoutPlan | null>(null);
   const [workoutDay, setWorkoutDay] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [isChanging, setIsChanging] = useState(false);
 
   useEffect(() => {
     if (!isChecking) {
@@ -295,19 +296,20 @@ export default function DashboardPage() {
 
   // Função para alternar treino
   const changeWorkout = async () => {
+    if (isChanging) return;
+    setIsChanging(true);
     const newDay = workoutDay === 1 ? 2 : 1;
     setWorkoutDay(newDay);
-    
     try {
       await updateWorkoutDay(newDay);
-      // Salvar no sessionStorage
       sessionStorage.setItem('workout_day', newDay.toString());
       await generateTodayWorkout(newDay);
     } catch (error) {
       console.error('Erro ao alternar treino:', error);
-      // Fallback para sessionStorage
       sessionStorage.setItem('workout_day', newDay.toString());
       await generateTodayWorkout(newDay);
+    } finally {
+      setIsChanging(false);
     }
   };
 
@@ -404,8 +406,24 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Treino de Hoje</h2>
             <div className="flex items-center gap-2">
-              <button onClick={changeWorkout} className="text-xs text-yellow-500 hover:text-yellow-400 border border-yellow-500/30 rounded-lg px-2 py-1">
-                Trocar
+              <button
+                onClick={changeWorkout}
+                disabled={isChanging}
+                className={`text-xs border rounded-lg px-2 py-1 flex items-center gap-1 transition-all active:scale-95 ${
+                  isChanging
+                    ? 'text-yellow-500/50 border-yellow-500/20 cursor-not-allowed'
+                    : 'text-yellow-500 hover:text-yellow-400 border-yellow-500/30 hover:border-yellow-500/60 hover:bg-yellow-500/10'
+                }`}
+              >
+                {isChanging ? (
+                  <>
+                    <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                    </svg>
+                    Trocando...
+                  </>
+                ) : 'Trocar'}
               </button>
               <Calendar className="w-5 h-5 text-gray-400" />
             </div>
