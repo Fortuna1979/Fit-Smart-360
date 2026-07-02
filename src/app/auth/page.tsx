@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dumbbell, Mail, Lock, User, ArrowLeft, MailCheck } from 'lucide-react';
+import InstallPrompt from '@/components/InstallPrompt';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -331,6 +332,7 @@ export default function AuthPage() {
           </button>
         </p>
       </div>
+      <InstallPrompt />
     </div>
   );
 }

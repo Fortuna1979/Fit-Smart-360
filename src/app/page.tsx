@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dumbbell, Zap, TrendingUp, Apple, Droplet, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import InstallPrompt from '@/components/InstallPrompt';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -451,6 +452,7 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+      <InstallPrompt />
     </div>
   );
 }
