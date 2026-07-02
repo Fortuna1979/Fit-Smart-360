@@ -111,8 +111,8 @@ export default function AuthPage() {
           <div className="bg-gray-900 border border-gray-800 rounded-3xl p-10 shadow-2xl">
             <div className="flex items-center justify-center gap-2 mb-8">
               <Dumbbell className="w-9 h-9 text-yellow-500" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
-                Fit Smart 360º
+              <span className="font-heading text-4xl bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent tracking-wide">
+                Fit Smart 360°
               </span>
             </div>
             <div className="flex justify-center mb-6">
@@ -160,8 +160,8 @@ export default function AuthPage() {
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <Dumbbell className="w-10 h-10 text-yellow-500" />
-            <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
-              Fit Smart 360º
+            <span className="font-heading text-4xl bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent tracking-wide">
+              Fit Smart 360°
             </span>
           </div>
 

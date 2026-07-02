@@ -29,8 +29,8 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Dumbbell className="w-8 h-8 text-yellow-500" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
-              Fit Smart 360º
+            <span className="font-heading text-4xl bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent tracking-wide">
+              Fit Smart 360°
             </span>
           </div>
           <div className="flex items-center gap-4">

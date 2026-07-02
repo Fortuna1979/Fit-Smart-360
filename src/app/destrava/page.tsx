@@ -173,7 +173,7 @@ export default function DestravaPage() {
           <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <span className="text-lg font-black tracking-tight text-[#FC4C02]">Destrava</span>
+          <span className="font-heading text-3xl text-[#FC4C02] tracking-wide">Destrava</span>
         </header>
 
         <div className="flex-1 flex flex-col items-center justify-center p-6 gap-8">
@@ -187,15 +187,15 @@ export default function DestravaPage() {
 
           <div className="w-full grid grid-cols-3 bg-gray-900 rounded-2xl overflow-hidden">
             <div className="p-5 text-center">
-              <p className="text-2xl font-black tabular-nums">{formatTime(elapsed)}</p>
+              <p className="font-stats text-2xl font-black tabular-nums">{formatTime(elapsed)}</p>
               <p className="text-xs text-gray-500 mt-1">Tempo</p>
             </div>
             <div className="p-5 text-center border-x border-gray-800">
-              <p className="text-2xl font-black tabular-nums">{distance.toFixed(2).replace('.', ',')}</p>
+              <p className="font-stats text-2xl font-black tabular-nums">{distance.toFixed(2).replace('.', ',')}</p>
               <p className="text-xs text-gray-500 mt-1">Distância (km)</p>
             </div>
             <div className="p-5 text-center">
-              <p className="text-2xl font-black tabular-nums">{formatPace(distance, elapsed)}</p>
+              <p className="font-stats text-2xl font-black tabular-nums">{formatPace(distance, elapsed)}</p>
               <p className="text-xs text-gray-500 mt-1">Ritmo</p>
             </div>
           </div>
@@ -228,7 +228,7 @@ export default function DestravaPage() {
           <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <span className="text-2xl font-black tracking-tight text-[#FC4C02]">Destrava</span>
+          <span className="font-heading text-4xl text-[#FC4C02] tracking-wide">Destrava</span>
         </header>
       )}
 
@@ -285,17 +285,17 @@ export default function DestravaPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 px-4 py-4 gap-2">
           <div>
-            <p className="text-3xl font-black tabular-nums leading-none">{formatTime(elapsed)}</p>
+            <p className="font-stats text-3xl font-black tabular-nums leading-none">{formatTime(elapsed)}</p>
             <p className="text-xs text-gray-500 mt-1">Tempo</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-black tabular-nums leading-none">
+            <p className="font-stats text-3xl font-black tabular-nums leading-none">
               {distance.toFixed(2).replace('.', ',')}
             </p>
             <p className="text-xs text-gray-500 mt-1">Distância (km)</p>
           </div>
           <div className="text-right">
-            <p className="text-3xl font-black tabular-nums leading-none">
+            <p className="font-stats text-3xl font-black tabular-nums leading-none">
               {(status === 'recording' || status === 'paused') ? formatPace(distance, elapsed) : "--'--\""}
             </p>
             <p className="text-xs text-gray-500 mt-1">Ritmo</p>

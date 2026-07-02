@@ -318,17 +318,17 @@ export default function WorkoutPage() {
             <div className="bg-gradient-to-br from-gray-900 to-gray-800 border-2 border-yellow-500/20 rounded-2xl p-6 shadow-xl">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-center flex-1">
-                  <p className="text-5xl font-bold text-yellow-500 mb-1">{currentSet}</p>
+                  <p className="font-stats text-5xl font-bold text-yellow-500 mb-1">{currentSet}</p>
                   <p className="text-xs text-gray-400 uppercase tracking-wide">Série Atual</p>
                 </div>
                 <div className="text-gray-600 text-3xl font-light">/</div>
                 <div className="text-center flex-1">
-                  <p className="text-5xl font-bold text-white mb-1">{totalSets}</p>
+                  <p className="font-stats text-5xl font-bold text-white mb-1">{totalSets}</p>
                   <p className="text-xs text-gray-400 uppercase tracking-wide">Total</p>
                 </div>
               </div>
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-center">
-                <p className="text-2xl font-bold text-yellow-500">
+                <p className="font-stats text-2xl font-bold text-yellow-500">
                   {currentExercise.reps} repetições
                 </p>
               </div>
