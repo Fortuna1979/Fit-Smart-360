@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dumbbell, Camera, TrendingUp, Apple, Droplet, Settings,
-  Play, Calendar, Award, Zap, Users, MapPin, PersonStanding
+  Play, Calendar, Award, Zap, PersonStanding, Activity
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculateBMI, translateGoal, translateFitnessLevel } from '@/lib/utils';
@@ -530,21 +530,12 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => router.push('/social')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-green-500/50 transition-all active:scale-95"
-          >
-            <Users className="w-6 h-6 text-green-400 mb-2" />
-            <h3 className="font-semibold mb-1">Social</h3>
-            <p className="text-xs text-gray-400">Feed e ranking</p>
-          </button>
-
-          <button
-            onClick={() => router.push('/territorio')}
+            onClick={() => router.push('/destrava')}
             className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-orange-500/50 transition-all active:scale-95"
           >
-            <MapPin className="w-6 h-6 text-orange-400 mb-2" />
-            <h3 className="font-semibold mb-1">Território</h3>
-            <p className="text-xs text-gray-400">Dominar áreas GPS</p>
+            <Activity className="w-6 h-6 text-[#FC4C02] mb-2" />
+            <h3 className="font-semibold mb-1">Destrava</h3>
+            <p className="text-xs text-gray-400">GPS · Corrida · Caminhada</p>
           </button>
         </div>
 
@@ -569,13 +560,9 @@ export default function DashboardPage() {
             <TrendingUp className="w-5 h-5" />
             <span className="text-[10px]">Progresso</span>
           </button>
-          <button onClick={() => router.push('/social')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-green-400 px-1">
-            <Users className="w-5 h-5" />
-            <span className="text-[10px]">Social</span>
-          </button>
-          <button onClick={() => router.push('/territorio')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-orange-400 px-1">
-            <MapPin className="w-5 h-5" />
-            <span className="text-[10px]">Território</span>
+          <button onClick={() => router.push('/destrava')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-[#FC4C02] px-1">
+            <Activity className="w-5 h-5" />
+            <span className="text-[10px]">Destrava</span>
           </button>
           <button onClick={() => router.push('/conquistas')} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-purple-400 px-1">
             <Award className="w-5 h-5" />
