@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Droplets, Plus, Minus, Bell, BellOff, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,20 +23,30 @@ export default function HidratacaoPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!isChecking) init();
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isChecking]);
+
+  const sendToSW = (message: object) => {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(message);
+    }
+  };
 
   const init = async () => {
     const [userData, logData] = await Promise.all([getUserData(), getHydrationLog()]);
     const goal = calcGoalGlasses(userData?.weight);
     setGoalGlasses(logData?.daily_goal_glasses || goal);
     setGlasses(logData?.glasses_drunk || 0);
-    setRemindersEnabled(logData?.reminders_enabled || false);
-    setReminderInterval(logData?.reminder_interval_hours || 2);
+    const enabled = logData?.reminders_enabled || false;
+    const interval = logData?.reminder_interval_hours || 2;
+    setRemindersEnabled(enabled);
+    setReminderInterval(interval);
+    // Re-ativa o lembrete no SW ao abrir o app (caso o SW tenha sido reiniciado)
+    if (enabled) {
+      sendToSW({ type: 'ENABLE_REMINDERS', intervalHours: interval });
+    }
     setLoading(false);
   };
 
@@ -64,23 +74,21 @@ export default function HidratacaoPage() {
     const next = !remindersEnabled;
     if (next) {
       const perm = await Notification.requestPermission();
-      if (perm !== 'granted') { alert('Permita notificações nas configurações do navegador para ativar os lembretes.'); return; }
-      intervalRef.current = setInterval(() => {
-        new Notification('💧 Hora de beber água!', { body: 'Você precisa se manter hidratado para um melhor desempenho.', icon: '/icon.svg' });
-      }, reminderInterval * 60 * 60 * 1000);
+      if (perm !== 'granted') {
+        alert('Permita notificações nas configurações do navegador para ativar os lembretes.');
+        return;
+      }
+      sendToSW({ type: 'ENABLE_REMINDERS', intervalHours: reminderInterval });
     } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      sendToSW({ type: 'DISABLE_REMINDERS' });
     }
     setRemindersEnabled(next);
     await save({ reminders_enabled: next });
   };
 
   const saveSettings = async () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
     if (remindersEnabled) {
-      intervalRef.current = setInterval(() => {
-        new Notification('💧 Hora de beber água!', { body: 'Mantenha-se hidratado!', icon: '/icon.svg' });
-      }, reminderInterval * 60 * 60 * 1000);
+      sendToSW({ type: 'UPDATE_REMINDER_INTERVAL', intervalHours: reminderInterval });
     }
     await save({ daily_goal_glasses: goalGlasses, reminder_interval_hours: reminderInterval });
     setShowSettings(false);

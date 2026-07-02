@@ -96,19 +96,21 @@ export default function DashboardPage() {
   };
 
   // Função para gerar treino do dia baseado em equipamentos do Supabase
-  const generateTodayWorkout = async (day: number) => {
+  const generateTodayWorkout = async (day: number, skipCache = false) => {
     try {
-      // Tentar carregar treino salvo do Supabase
-      const savedWorkout = await getCurrentWorkout(day);
-      if (savedWorkout) {
-        setTodayWorkout({
-          name: savedWorkout.name,
-          type: savedWorkout.type,
-          duration: savedWorkout.duration,
-          exercises: savedWorkout.exercises,
-          equipments: savedWorkout.equipments || []
-        });
-        return;
+      // Tentar carregar treino salvo do Supabase (ignorado quando usuário clica em Trocar)
+      if (!skipCache) {
+        const savedWorkout = await getCurrentWorkout(day);
+        if (savedWorkout) {
+          setTodayWorkout({
+            name: savedWorkout.name,
+            type: savedWorkout.type,
+            duration: savedWorkout.duration,
+            exercises: savedWorkout.exercises,
+            equipments: savedWorkout.equipments || []
+          });
+          return;
+        }
       }
 
       // Carregar equipamentos do Supabase
@@ -303,7 +305,7 @@ export default function DashboardPage() {
     try {
       await updateWorkoutDay(newDay);
       sessionStorage.setItem('workout_day', newDay.toString());
-      await generateTodayWorkout(newDay);
+      await generateTodayWorkout(newDay, true);
     } catch (error) {
       console.error('Erro ao alternar treino:', error);
       sessionStorage.setItem('workout_day', newDay.toString());
@@ -393,11 +395,11 @@ export default function DashboardPage() {
 
           <button
             onClick={() => router.push('/calistenia')}
-            className="bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-6 text-left hover:scale-105 transition-transform"
+            className="bg-gray-800 border border-gray-700 hover:border-yellow-500/40 rounded-2xl p-6 text-left hover:scale-105 transition-all active:scale-95"
           >
-            <PersonStanding className="w-8 h-8 text-white mb-3" />
+            <PersonStanding className="w-8 h-8 text-yellow-500 mb-3" />
             <h3 className="font-bold text-white text-lg mb-1">Calistenia</h3>
-            <p className="text-sm text-white/80">Treino sem equipamento</p>
+            <p className="text-sm text-gray-400">Treino sem equipamento</p>
           </button>
         </div>
 

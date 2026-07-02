@@ -2,19 +2,61 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, Play } from 'lucide-react';
+import {
+  ArrowLeft, Loader2, Play, Zap, Dumbbell, MoveVertical,
+  Target, Flame, Activity, ArrowDownUp
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getUserData, saveWorkoutPlan } from '@/lib/supabase-helpers';
 import { useRequireAuth } from '@/hooks/use-require-auth';
+import type { LucideIcon } from 'lucide-react';
 
-const MUSCLE_GROUPS = [
-  { id: 'corpo_inteiro', label: 'Corpo Inteiro', icon: '🏃', desc: 'Cardio + força, circuito completo', color: 'from-yellow-500 to-orange-500' },
-  { id: 'peito', label: 'Peito', icon: '💪', desc: 'Flexões, peitoral, tríceps', color: 'from-red-500 to-rose-600' },
-  { id: 'costas', label: 'Costas', icon: '🔙', desc: 'Dorsal, remada, bíceps', color: 'from-blue-500 to-blue-700' },
-  { id: 'pernas', label: 'Pernas', icon: '🦵', desc: 'Agachamentos, glúteos, panturrilha', color: 'from-green-500 to-green-700' },
-  { id: 'ombros', label: 'Ombros', icon: '🎯', desc: 'Deltoides, trapézio', color: 'from-purple-500 to-purple-700' },
-  { id: 'core', label: 'Core', icon: '⚡', desc: 'Abdominais, oblíquos, lombar', color: 'from-cyan-500 to-cyan-700' },
-  { id: 'bracos', label: 'Braços', icon: '💥', desc: 'Bíceps, tríceps, antebraço', color: 'from-pink-500 to-pink-700' },
+interface MuscleGroup {
+  id: string;
+  label: string;
+  Icon: LucideIcon;
+  iconColor: string;
+  iconBg: string;
+  desc: string;
+  span2?: boolean;
+}
+
+const MUSCLE_GROUPS: MuscleGroup[] = [
+  {
+    id: 'corpo_inteiro', label: 'Corpo Inteiro', Icon: Activity,
+    iconColor: 'text-yellow-400', iconBg: 'bg-yellow-500/15',
+    desc: 'Cardio + força, circuito completo', span2: true,
+  },
+  {
+    id: 'peito', label: 'Peito', Icon: Dumbbell,
+    iconColor: 'text-orange-400', iconBg: 'bg-orange-500/15',
+    desc: 'Flexões, peitoral, tríceps',
+  },
+  {
+    id: 'costas', label: 'Costas', Icon: ArrowDownUp,
+    iconColor: 'text-blue-400', iconBg: 'bg-blue-500/15',
+    desc: 'Dorsal, remada, bíceps',
+  },
+  {
+    id: 'pernas', label: 'Pernas', Icon: MoveVertical,
+    iconColor: 'text-green-400', iconBg: 'bg-green-500/15',
+    desc: 'Agachamentos, glúteos, panturrilha',
+  },
+  {
+    id: 'ombros', label: 'Ombros', Icon: Target,
+    iconColor: 'text-purple-400', iconBg: 'bg-purple-500/15',
+    desc: 'Deltoides, trapézio',
+  },
+  {
+    id: 'core', label: 'Core', Icon: Zap,
+    iconColor: 'text-cyan-400', iconBg: 'bg-cyan-500/15',
+    desc: 'Abdominais, oblíquos, lombar',
+  },
+  {
+    id: 'bracos', label: 'Braços', Icon: Flame,
+    iconColor: 'text-pink-400', iconBg: 'bg-pink-500/15',
+    desc: 'Bíceps, tríceps, antebraço',
+  },
 ];
 
 export default function CalisteniasPage() {
@@ -75,39 +117,38 @@ export default function CalisteniasPage() {
             <h1 className="text-lg font-bold">Calistenia</h1>
             <p className="text-xs text-gray-500">Treino sem equipamentos — qualquer lugar</p>
           </div>
-          <span className="ml-auto text-2xl">🤸</span>
+          <Activity className="ml-auto w-6 h-6 text-yellow-500" />
         </div>
       </header>
 
       <div className="p-4 space-y-5 max-w-lg mx-auto">
 
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4">
-          <p className="text-sm text-blue-300">
-            🌍 Perfeito para viagens, quartos de hotel, parques — treino completo usando apenas seu peso corporal. A IA vai montar um plano do zero adaptado ao seu nível.
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+          <p className="text-sm text-gray-300 leading-relaxed">
+            Perfeito para viagens, quartos de hotel e parques — treino completo usando apenas seu peso corporal. A IA monta um plano adaptado ao seu nível.
           </p>
         </div>
 
         <div>
           <h2 className="font-bold text-base mb-3">Qual grupo muscular quer trabalhar?</h2>
           <div className="grid grid-cols-2 gap-3">
-            {MUSCLE_GROUPS.map(g => (
+            {MUSCLE_GROUPS.map(({ id, label, Icon, iconColor, iconBg, desc, span2 }) => (
               <button
-                key={g.id}
-                onClick={() => setSelected(g.id)}
-                className={`relative rounded-2xl p-4 text-left border-2 transition-all active:scale-95 overflow-hidden ${
-                  selected === g.id ? 'border-yellow-500 shadow-lg shadow-yellow-500/20' : 'border-gray-800 hover:border-gray-700'
-                } ${g.id === 'corpo_inteiro' ? 'col-span-2' : ''}`}
+                key={id}
+                onClick={() => setSelected(id)}
+                className={`relative rounded-2xl p-4 text-left border-2 transition-all active:scale-95 ${
+                  selected === id
+                    ? 'border-yellow-500 bg-yellow-500/5 shadow-lg shadow-yellow-500/10'
+                    : 'border-gray-800 bg-gray-900 hover:border-gray-600'
+                } ${span2 ? 'col-span-2' : ''}`}
               >
-                {selected === g.id && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${g.color} opacity-10`} />
-                )}
-                <div className="relative z-10">
-                  <span className="text-3xl block mb-2">{g.icon}</span>
-                  <p className="font-bold text-sm">{g.label}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{g.desc}</p>
+                <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center mb-3`}>
+                  <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
-                {selected === g.id && (
-                  <div className="absolute top-2 right-2 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
+                <p className="font-bold text-sm text-white">{label}</p>
+                <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                {selected === id && (
+                  <div className="absolute top-3 right-3 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center">
                     <span className="text-black text-xs font-bold">✓</span>
                   </div>
                 )}
@@ -125,7 +166,7 @@ export default function CalisteniasPage() {
         <Button
           onClick={generate}
           disabled={!selected || generating}
-          className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold py-6 rounded-2xl text-base disabled:opacity-40"
+          className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-6 rounded-2xl text-base disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {generating ? (
             <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Gerando treino com IA...</>
@@ -135,10 +176,10 @@ export default function CalisteniasPage() {
         </Button>
 
         {generating && (
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2 pb-4">
             <div className="flex justify-center gap-1">
               {[0, 1, 2].map(i => (
-                <div key={i} className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
+                <div key={i} className="w-2 h-2 bg-yellow-500 rounded-full animate-bounce" style={{ animationDelay: `${i * 150}ms` }} />
               ))}
             </div>
             <p className="text-xs text-gray-500">A IA está montando seu treino personalizado...</p>
