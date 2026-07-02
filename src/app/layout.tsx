@@ -56,6 +56,13 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <Script src="/lasy-bridge.js" strategy="beforeInteractive" />
+        {/* Captura o evento de instalação PWA antes do React hidretar */}
+        <Script id="pwa-capture" strategy="beforeInteractive">{`
+          window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            window.__pwaPrompt = e;
+          });
+        `}</Script>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />

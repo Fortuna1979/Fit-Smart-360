@@ -360,18 +360,18 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
-            <p className="text-xs text-gray-400 mb-1">IMC</p>
-            <p className="text-lg font-bold text-yellow-500">{bmi}</p>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
+            <p className="text-[10px] text-gray-400 mb-0.5">IMC</p>
+            <p className="text-base font-bold text-yellow-500 truncate">{bmi}</p>
           </div>
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
-            <p className="text-xs text-gray-400 mb-1">Nível</p>
-            <p className="text-lg font-bold">{translateFitnessLevel(userData.fitness_level || 'iniciante')}</p>
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
+            <p className="text-[10px] text-gray-400 mb-0.5">Nível</p>
+            <p className="text-xs font-bold leading-tight">{translateFitnessLevel(userData.fitness_level || 'iniciante')}</p>
           </div>
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-3">
-            <p className="text-xs text-gray-400 mb-1">Objetivo</p>
-            <p className="text-lg font-bold">{translateGoal(userData.goal)}</p>
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
+            <p className="text-[10px] text-gray-400 mb-0.5">Objetivo</p>
+            <p className="text-xs font-bold leading-tight">{translateGoal(userData.goal)}</p>
           </div>
         </div>
       </header>

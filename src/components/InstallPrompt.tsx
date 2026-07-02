@@ -37,7 +37,14 @@ export default function InstallPrompt() {
     setPlatform(plat);
 
     if (plat === 'android') {
-      // Android: espera o evento do navegador
+      // Verifica se o evento já foi capturado antes do React montar
+      const already = (window as unknown as { __pwaPrompt?: unknown }).__pwaPrompt;
+      if (already) {
+        setDeferredPrompt(already);
+        setTimeout(() => setShow(true), 3000);
+        return;
+      }
+      // Caso ainda não tenha disparado, escuta normalmente
       const handler = (e: Event) => {
         e.preventDefault();
         setDeferredPrompt(e);
