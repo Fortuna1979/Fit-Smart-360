@@ -66,7 +66,7 @@ export default function LandingPage() {
               <span className="text-sm text-yellow-500 font-medium">Treino Inteligente com IA</span>
             </div>
             
-            <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="font-heading text-5xl sm:text-7xl md:text-9xl mb-6 leading-none tracking-wide">
               Seu treino, do seu jeito,<br />
               <span className="bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
                 com os aparelhos que você tem

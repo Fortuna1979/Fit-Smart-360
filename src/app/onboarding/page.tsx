@@ -181,7 +181,7 @@ export default function OnboardingPage() {
               <ClipboardList className="w-8 h-8 text-yellow-500" />
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">Anamnese Fitness</h1>
+          <h1 className="font-heading text-3xl sm:text-4xl text-center mb-4">Anamnese Fitness</h1>
           <p className="text-gray-400 text-sm sm:text-base leading-relaxed text-center mb-6">
             Para montar um projeto de treino <strong className="text-white">seguro e eficaz</strong>, vamos fazer uma triagem com perguntas sobre seu histórico de saúde, rotina e objetivos. Isso permite <span className="text-yellow-500">individualizar a prescrição e prevenir lesões</span>.
           </p>

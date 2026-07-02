@@ -367,7 +367,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
             <p className="text-[10px] text-gray-400 mb-0.5">IMC</p>
-            <p className="text-base font-bold text-yellow-500 truncate">{bmi}</p>
+            <p className="font-stats text-base font-bold text-yellow-500 truncate">{bmi}</p>
           </div>
           <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
             <p className="text-[10px] text-gray-400 mb-0.5">Nível</p>
@@ -406,7 +406,7 @@ export default function DashboardPage() {
         {/* Today's Workout */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Treino de Hoje</h2>
+            <h2 className="font-heading text-2xl">Treino de Hoje</h2>
             <div className="flex items-center gap-2">
               <button
                 onClick={changeWorkout}

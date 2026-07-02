@@ -242,7 +242,7 @@ export default function ScanPage() {
             <ArrowLeft className="w-5 h-5 mr-2" />
             Voltar
           </Button>
-          <h1 className="text-xl font-bold text-yellow-500">Escanear Equipamento</h1>
+          <h1 className="font-heading text-2xl text-yellow-500">Escanear Equipamento</h1>
           <div className="w-20" /> {/* Spacer */}
         </div>
       </header>

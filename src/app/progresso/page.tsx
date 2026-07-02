@@ -102,7 +102,7 @@ export default function ProgressoPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Meu Progresso</h1>
+            <h1 className="font-heading text-2xl">Meu Progresso</h1>
             <p className="text-xs text-gray-500">Histórico e evolução</p>
           </div>
           <TrendingUp className="w-6 h-6 text-yellow-500 ml-auto" />
@@ -116,7 +116,7 @@ export default function ProgressoPage() {
           {stats.map(({ icon: Icon, label, value, color, bg }) => (
             <div key={label} className={`rounded-2xl border p-4 ${bg}`}>
               <Icon className={`w-5 h-5 ${color} mb-2`} />
-              <p className={`text-2xl font-bold ${color}`}>{value}</p>
+              <p className={`font-stats text-2xl font-bold ${color}`}>{value}</p>
               <p className="text-xs text-gray-400 mt-0.5">{label}</p>
             </div>
           ))}

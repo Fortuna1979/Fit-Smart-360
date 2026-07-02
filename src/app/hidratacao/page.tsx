@@ -117,7 +117,7 @@ export default function HidratacaoPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Hidratação</h1>
+            <h1 className="font-heading text-2xl">Hidratação</h1>
             <p className="text-xs text-gray-500">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</p>
           </div>
           <button onClick={() => setShowSettings(!showSettings)} className="ml-auto text-gray-400 hover:text-white">
@@ -138,7 +138,7 @@ export default function HidratacaoPage() {
                 <button onClick={() => setGoalGlasses(g => Math.max(4, g - 1))} className="w-10 h-10 border border-gray-700 rounded-xl flex items-center justify-center hover:border-yellow-500">
                   <Minus className="w-4 h-4" />
                 </button>
-                <span className="text-2xl font-bold text-yellow-500 w-12 text-center">{goalGlasses}</span>
+                <span className="font-stats text-2xl font-bold text-yellow-500 w-12 text-center">{goalGlasses}</span>
                 <button onClick={() => setGoalGlasses(g => Math.min(20, g + 1))} className="w-10 h-10 border border-gray-700 rounded-xl flex items-center justify-center hover:border-yellow-500">
                   <Plus className="w-4 h-4" />
                 </button>
@@ -173,7 +173,7 @@ export default function HidratacaoPage() {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
               <Droplets className="w-8 h-8 mb-1" style={{ color: waterColor }} />
-              <p className="text-4xl font-bold">{glasses}</p>
+              <p className="font-stats text-4xl font-bold">{glasses}</p>
               <p className="text-gray-400 text-sm">de {goalGlasses} copos</p>
               <p className="text-xs text-gray-600 mt-1">{Math.round(pct)}%</p>
             </div>
@@ -181,11 +181,11 @@ export default function HidratacaoPage() {
 
           <div className="flex gap-8 mt-4 text-center">
             <div>
-              <p className="text-xl font-bold" style={{ color: waterColor }}>{mlDrunk}ml</p>
+              <p className="font-stats text-xl font-bold" style={{ color: waterColor }}>{mlDrunk}ml</p>
               <p className="text-xs text-gray-500">consumido</p>
             </div>
             <div>
-              <p className="text-xl font-bold text-gray-500">{mlGoal}ml</p>
+              <p className="font-stats text-xl font-bold text-gray-500">{mlGoal}ml</p>
               <p className="text-xs text-gray-500">meta</p>
             </div>
           </div>

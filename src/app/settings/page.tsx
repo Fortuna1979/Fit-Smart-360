@@ -87,7 +87,7 @@ export default function SettingsPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold">Configurações</h1>
+          <h1 className="font-heading text-2xl">Configurações</h1>
         </div>
       </header>
 

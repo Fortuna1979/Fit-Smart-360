@@ -114,7 +114,7 @@ export default function CalisteniasPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Calistenia</h1>
+            <h1 className="font-heading text-2xl">Calistenia</h1>
             <p className="text-xs text-gray-500">Treino sem equipamentos — qualquer lugar</p>
           </div>
           <Activity className="ml-auto w-6 h-6 text-yellow-500" />

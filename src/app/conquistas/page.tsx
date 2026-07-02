@@ -185,7 +185,7 @@ export default function ConquistasPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Conquistas</h1>
+            <h1 className="font-heading text-2xl">Conquistas</h1>
             <p className="text-xs text-gray-500">{earnedCount} de {ACHIEVEMENTS.length} desbloqueadas</p>
           </div>
           <Award className="w-6 h-6 text-purple-400 ml-auto" />
@@ -202,7 +202,7 @@ export default function ConquistasPage() {
               <p className="text-xs text-gray-500">{totalDays} treinos · {earnedCount} medalhas</p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold text-purple-400">{earnedCount}</p>
+              <p className="font-stats text-3xl font-bold text-purple-400">{earnedCount}</p>
               <p className="text-xs text-gray-500">/ {ACHIEVEMENTS.length}</p>
             </div>
           </div>

@@ -30,7 +30,7 @@ export default function PrivacyPolicyPage() {
       <div className="pt-20 sm:pt-24 pb-12 sm:pb-16 px-4">
         <div className="container mx-auto max-w-3xl space-y-8 text-gray-300">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Política de Privacidade</h1>
+            <h1 className="font-heading text-4xl text-white mb-2">Política de Privacidade</h1>
             <p className="text-sm text-gray-500">Última atualização: junho de 2026</p>
           </div>
 

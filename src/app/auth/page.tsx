@@ -120,7 +120,7 @@ export default function AuthPage() {
                 <MailCheck className="w-12 h-12 text-yellow-500" />
               </div>
             </div>
-            <h1 className="text-2xl font-bold mb-3">Verifique seu e-mail</h1>
+            <h1 className="font-heading text-3xl mb-3">Verifique seu e-mail</h1>
             <p className="text-gray-400 mb-2">Enviamos um link de confirmação para:</p>
             <p className="text-yellow-400 font-semibold mb-6">{signupEmail}</p>
             <p className="text-gray-500 text-sm mb-8">
@@ -167,7 +167,7 @@ export default function AuthPage() {
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-2">
+            <h1 className="font-heading text-3xl mb-2">
               {isLogin ? 'Bem-vindo de volta!' : 'Crie sua conta'}
             </h1>
             <p className="text-gray-400">

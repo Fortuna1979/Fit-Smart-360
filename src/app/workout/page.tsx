@@ -296,7 +296,7 @@ export default function WorkoutPage() {
 
           <div className="space-y-4">
             <div>
-              <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
+              <h1 className="font-heading text-4xl mb-3 bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
                 {currentExercise.name}
               </h1>
               {currentExercise.equipamento && (
@@ -392,12 +392,12 @@ export default function WorkoutPage() {
         <div className="text-center space-y-8">
           <div>
             <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Descanso</h2>
+            <h2 className="font-heading text-3xl mb-2">Descanso</h2>
             <p className="text-gray-400">Prepare-se para a próxima série</p>
           </div>
 
           <div className="relative">
-            <div className={`text-8xl font-bold transition-all duration-300 ${
+            <div className={`font-stats text-8xl font-bold transition-all duration-300 ${
               isPulsing ? 'text-yellow-500 scale-110' : 'text-white'
             }`}>
               {restTime}
@@ -449,7 +449,7 @@ export default function WorkoutPage() {
           </div>
 
           <div>
-            <h1 className="text-4xl font-bold mb-3">Parabéns!</h1>
+            <h1 className="font-heading text-5xl mb-3">Parabéns!</h1>
             <p className="text-xl text-gray-300 mb-2">Treino Concluído 🎉</p>
             <p className="text-gray-400">
               Você completou {workout.exercises.length} exercícios

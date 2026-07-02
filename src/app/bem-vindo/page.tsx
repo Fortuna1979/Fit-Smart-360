@@ -17,7 +17,7 @@ export default function BemVindoPage() {
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <Dumbbell className="w-9 h-9 text-yellow-500" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent">
+            <span className="font-heading text-4xl bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent tracking-wide">
               Fit Smart 360º
             </span>
           </div>
@@ -35,7 +35,7 @@ export default function BemVindoPage() {
           </div>
 
           {/* Título */}
-          <h1 className="text-3xl font-bold mb-3">
+          <h1 className="font-heading text-4xl mb-3">
             Seja bem-vindo!
           </h1>
           <p className="text-xl font-semibold bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent mb-4">

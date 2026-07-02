@@ -123,7 +123,7 @@ export default function NutricaoPage() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Plano Nutricional</h1>
+            <h1 className="font-heading text-2xl">Plano Nutricional</h1>
             <p className="text-xs text-gray-500">Gerado pela IA com seu perfil</p>
           </div>
           <Apple className="w-6 h-6 text-green-500 ml-auto" />
@@ -179,7 +179,7 @@ export default function NutricaoPage() {
                 {[3, 4, 5].map(n => (
                   <button key={n} onClick={() => setMealFrequency(n)}
                     className={`p-4 border-2 rounded-2xl text-center transition-all ${mealFrequency === n ? 'border-yellow-500 bg-yellow-500/10' : 'border-gray-800 hover:border-gray-700'}`}>
-                    <p className="text-2xl font-bold text-yellow-500">{n}</p>
+                    <p className="font-stats text-2xl font-bold text-yellow-500">{n}</p>
                     <p className="text-xs text-gray-400">refeições</p>
                   </button>
                 ))}
@@ -209,7 +209,7 @@ export default function NutricaoPage() {
             {/* Calories + Macros */}
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
               <div className="text-center mb-4">
-                <p className="text-4xl font-bold text-yellow-500">{plan.daily_calories}</p>
+                <p className="font-stats text-4xl font-bold text-yellow-500">{plan.daily_calories}</p>
                 <p className="text-sm text-gray-400">kcal por dia</p>
                 <p className="text-xs text-blue-400 mt-1">💧 {plan.water_liters}L de água/dia</p>
               </div>
@@ -231,7 +231,7 @@ export default function NutricaoPage() {
                   { label: 'Gorduras', g: plan.fats_g, color: 'text-green-400' },
                 ].map(m => (
                   <div key={m.label} className="text-center">
-                    <p className={`text-lg font-bold ${m.color}`}>{m.g}g</p>
+                    <p className={`font-stats text-lg font-bold ${m.color}`}>{m.g}g</p>
                     <p className="text-xs text-gray-500">{m.label}</p>
                   </div>
                 ))}
