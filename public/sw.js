@@ -1,5 +1,5 @@
 // Service Worker para PWA - Fit Smart 360º
-const CACHE_NAME = 'fit-smart-v4';
+const CACHE_NAME = 'fit-smart-v5';
 const urlsToCache = [
   '/',
   '/dashboard',
