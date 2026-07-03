@@ -51,6 +51,7 @@ export default function WorkoutPage() {
   const [imageFrame, setImageFrame] = useState(0);
   const [isFreePlan, setIsFreePlan] = useState(false);
   const [adTime, setAdTime] = useState(0);
+  const [resolvedVideoIds, setResolvedVideoIds] = useState<Record<number, string | null>>({});
 
   useEffect(() => {
     if (!isChecking) {
@@ -141,6 +142,24 @@ export default function WorkoutPage() {
     return () => clearInterval(interval);
   }, [state, adTime]);
 
+  // Busca videoId on-the-fly quando não veio junto com o exercício
+  useEffect(() => {
+    if (!workout) return;
+    const idx = currentExerciseIndex;
+    const ex = workout.exercises[idx];
+    if (!ex) return;
+    if (ex.videoId || resolvedVideoIds[idx] !== undefined) return;
+    if (!ex.youtube_search_query) {
+      setResolvedVideoIds(prev => ({ ...prev, [idx]: null }));
+      return;
+    }
+    fetch(`/api/youtube-video?q=${encodeURIComponent(ex.youtube_search_query)}`)
+      .then(r => r.json())
+      .then(({ videoId }) => setResolvedVideoIds(prev => ({ ...prev, [idx]: videoId ?? null })))
+      .catch(() => setResolvedVideoIds(prev => ({ ...prev, [idx]: null })));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentExerciseIndex, workout]);
+
   if (isChecking || !workout) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -219,22 +238,6 @@ export default function WorkoutPage() {
     sessionStorage.removeItem('workout_type');
     router.push('/dashboard');
   };
-
-  // Busca videoId on-the-fly quando não veio junto com o exercício
-  const [resolvedVideoIds, setResolvedVideoIds] = useState<Record<number, string | null>>({});
-
-  useEffect(() => {
-    const idx = currentExerciseIndex;
-    const ex = workout?.exercises[idx];
-    if (!ex) return;
-    if (ex.videoId || resolvedVideoIds[idx] !== undefined) return;
-    if (!ex.youtube_search_query) { setResolvedVideoIds(prev => ({ ...prev, [idx]: null })); return; }
-
-    fetch(`/api/youtube-video?q=${encodeURIComponent(ex.youtube_search_query)}`)
-      .then(r => r.json())
-      .then(({ videoId }) => setResolvedVideoIds(prev => ({ ...prev, [idx]: videoId ?? null })))
-      .catch(() => setResolvedVideoIds(prev => ({ ...prev, [idx]: null })));
-  }, [currentExerciseIndex, workout, resolvedVideoIds]);
 
   // Componente de demonstração: vídeo embutido do YouTube ou fallback em imagens
   const ExerciseDemo = () => {
