@@ -13,6 +13,8 @@ interface Exercise {
   rest: string;
   difficulty: string;
   description: string;
+  youtube_search_query?: string;
+  videoId?: string;
 }
 
 interface Equipment {

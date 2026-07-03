@@ -52,6 +52,20 @@ REGRAS:
 4. youtube_search_query em TODOS os exercícios, escrita em inglês
 5. Retorne APENAS o JSON, sem markdown.`;
 
+async function searchYouTube(query: string): Promise<string | null> {
+  const key = process.env.YOUTUBE_API_KEY;
+  if (!key) return null;
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoDuration=short&maxResults=1&relevanceLanguage=en&safeSearch=strict&key=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.items?.[0]?.id?.videoId as string) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Validar se a chave API está configurada
@@ -124,6 +138,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Erro ao processar resposta da IA' },
         { status: 500 }
+      );
+    }
+
+    // Buscar videoId do YouTube para cada exercício em paralelo
+    if (result.detected && result.exercises?.length) {
+      await Promise.all(
+        result.exercises.map(async (ex: { youtube_search_query?: string; videoId?: string }) => {
+          if (ex.youtube_search_query) {
+            ex.videoId = await searchYouTube(ex.youtube_search_query) ?? undefined;
+          }
+        })
       );
     }
 

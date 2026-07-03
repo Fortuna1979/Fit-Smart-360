@@ -27,6 +27,20 @@ interface FreeExercise {
   images: string[]; primaryMuscles: string[];
 }
 
+async function searchYouTube(query: string): Promise<string | null> {
+  const key = process.env.YOUTUBE_API_KEY;
+  if (!key) return null;
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoDuration=short&maxResults=1&relevanceLanguage=en&safeSearch=strict&key=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.items?.[0]?.id?.videoId as string) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 let exerciseDBCache: FreeExercise[] | null = null;
 
 async function getExerciseDB(): Promise<FreeExercise[]> {
@@ -171,14 +185,17 @@ Para youtube_search_query de cada exercício: escreva em INGLÊS incluindo a mar
     if (!jsonMatch) throw new Error('Resposta inválida da IA');
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // Enriquecer exercícios com imagens demonstrativas
+    // Enriquecer exercícios com imagens demonstrativas e videoId do YouTube
     if (parsed.workout?.exercises?.length) {
       const db = await getExerciseDB();
-      if (db.length > 0) {
-        for (const ex of parsed.workout.exercises) {
-          ex.imageUrls = findExerciseImages(db, ex.name);
-        }
-      }
+      await Promise.all(
+        parsed.workout.exercises.map(async (ex: { name: string; imageUrls?: string[]; youtube_search_query?: string; videoId?: string }) => {
+          if (db.length > 0) ex.imageUrls = findExerciseImages(db, ex.name);
+          if (ex.youtube_search_query) {
+            ex.videoId = await searchYouTube(ex.youtube_search_query) ?? undefined;
+          }
+        })
+      );
     }
 
     return NextResponse.json(parsed);
