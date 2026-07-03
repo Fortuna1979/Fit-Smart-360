@@ -220,10 +220,38 @@ export default function WorkoutPage() {
     router.push('/dashboard');
   };
 
+  // Busca videoId on-the-fly quando não veio junto com o exercício
+  const [resolvedVideoIds, setResolvedVideoIds] = useState<Record<number, string | null>>({});
+
+  useEffect(() => {
+    const idx = currentExerciseIndex;
+    const ex = workout?.exercises[idx];
+    if (!ex) return;
+    if (ex.videoId || resolvedVideoIds[idx] !== undefined) return;
+    if (!ex.youtube_search_query) { setResolvedVideoIds(prev => ({ ...prev, [idx]: null })); return; }
+
+    fetch(`/api/youtube-video?q=${encodeURIComponent(ex.youtube_search_query)}`)
+      .then(r => r.json())
+      .then(({ videoId }) => setResolvedVideoIds(prev => ({ ...prev, [idx]: videoId ?? null })))
+      .catch(() => setResolvedVideoIds(prev => ({ ...prev, [idx]: null })));
+  }, [currentExerciseIndex, workout, resolvedVideoIds]);
+
   // Componente de demonstração: vídeo embutido do YouTube ou fallback em imagens
   const ExerciseDemo = () => {
-    const videoId = currentExercise.videoId;
+    const videoId = currentExercise.videoId ?? resolvedVideoIds[currentExerciseIndex];
     const imgs = currentExercise.imageUrls;
+    const loading = !currentExercise.videoId && resolvedVideoIds[currentExerciseIndex] === undefined && !!currentExercise.youtube_search_query;
+
+    if (loading) {
+      return (
+        <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+            <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mb-3" />
+            <p className="text-gray-500 text-sm">Carregando vídeo...</p>
+          </div>
+        </div>
+      );
+    }
 
     if (videoId) {
       return (
