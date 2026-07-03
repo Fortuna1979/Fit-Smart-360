@@ -177,7 +177,7 @@ Para youtube_search_query de cada exercício: escreva em INGLÊS incluindo a mar
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: prompt,
-      config: { responseMimeType: 'application/json', temperature: 0.7 },
+      config: { responseMimeType: 'application/json', temperature: 0.7, thinkingConfig: { thinkingBudget: 0 } },
     });
 
     const content = response.text || '{}';

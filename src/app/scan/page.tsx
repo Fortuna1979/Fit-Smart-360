@@ -188,7 +188,7 @@ export default function ScanPage() {
       }
     } catch (err) {
       console.error('Erro na análise:', err);
-      setError('Erro ao analisar imagem. Verifique se a OPENAI_API_KEY está configurada.');
+      setError('Erro ao analisar imagem. Tente novamente ou use uma foto com melhor iluminação.');
     } finally {
       setIsAnalyzing(false);
     }
