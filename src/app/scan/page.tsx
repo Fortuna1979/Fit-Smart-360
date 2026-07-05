@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Camera, ArrowLeft, CheckCircle, XCircle, Loader2, Upload, Dumbbell, Clock, Repeat } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRequireAuth } from '@/hooks/use-require-auth';
+import { saveEquipment } from '@/lib/supabase-helpers';
 
 interface Exercise {
   name: string;
@@ -195,14 +196,30 @@ export default function ScanPage() {
   };
 
   // Adicionar equipamento à lista
-  const addEquipment = () => {
+  const addEquipment = async () => {
     if (equipment) {
       const updatedList = [...scannedEquipments, equipment];
       setScannedEquipments(updatedList);
-      
-      // Salvar no localStorage
       localStorage.setItem('scanned_equipments', JSON.stringify(updatedList));
-      
+
+      // Salvar no Supabase para o dashboard poder usar os exercícios
+      try {
+        await saveEquipment({
+          user_id: '',
+          equipment_name: equipment.equipmentName,
+          category: equipment.category,
+          muscle_groups: equipment.muscleGroups,
+          description: equipment.description,
+          detected: equipment.detected,
+          image_url: equipment.imageUrl,
+          exercises: equipment.exercises,
+          tips: equipment.tips,
+          common_mistakes: equipment.commonMistakes,
+        });
+      } catch (e) {
+        console.error('Erro ao salvar equipamento no Supabase:', e);
+      }
+
       resetScan();
     }
   };

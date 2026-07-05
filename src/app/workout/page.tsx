@@ -149,11 +149,8 @@ export default function WorkoutPage() {
     const ex = workout.exercises[idx];
     if (!ex) return;
     if (ex.videoId || resolvedVideoIds[idx] !== undefined) return;
-    if (!ex.youtube_search_query) {
-      setResolvedVideoIds(prev => ({ ...prev, [idx]: null }));
-      return;
-    }
-    fetch(`/api/youtube-video?q=${encodeURIComponent(ex.youtube_search_query)}`)
+    const query = ex.youtube_search_query || `${ex.name} exercise tutorial proper form`;
+    fetch(`/api/youtube-video?q=${encodeURIComponent(query)}`)
       .then(r => r.json())
       .then(({ videoId }) => setResolvedVideoIds(prev => ({ ...prev, [idx]: videoId ?? null })))
       .catch(() => setResolvedVideoIds(prev => ({ ...prev, [idx]: null })));
