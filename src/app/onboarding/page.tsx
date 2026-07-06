@@ -559,11 +559,18 @@ export default function OnboardingPage() {
                     <YesNo value={formData.usesGLP1Medication} onChange={v => handle('usesGLP1Medication', v)} />
                   </RadioGroup>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-gray-800/50 border border-gray-700 rounded-xl">
-                  <Checkbox id="consent" checked={consentGiven} onCheckedChange={c => setConsentGiven(c === true)} className="mt-0.5" />
+                <div className="flex items-start gap-3 p-4 bg-gray-800/50 border border-yellow-500/30 rounded-xl">
+                  <Checkbox id="consent" checked={consentGiven} onCheckedChange={c => setConsentGiven(c === true)} className="mt-0.5 shrink-0" />
                   <Label htmlFor="consent" className="text-sm text-gray-300 font-normal leading-relaxed cursor-pointer">
-                    Concordo com o uso dos meus dados de saúde para personalizar meu treino, conforme a{' '}
-                    <button type="button" onClick={() => router.push('/privacidade')} className="text-yellow-500 hover:underline">Política de Privacidade</button>.
+                    <span className="font-semibold text-white block mb-1">Consentimento para dados de saúde (LGPD art. 11)</span>
+                    Concordo que o Fit Smart 360° trate os dados de saúde informados neste questionário
+                    — incluindo condições cardíacas (PAR-Q), doenças crônicas, medicamentos, lesões,
+                    histórico familiar, cirurgia bariátrica, uso de GLP-1 e hábitos de vida — exclusivamente
+                    para personalizar e garantir a segurança dos meus treinos. Posso revogar este
+                    consentimento a qualquer momento excluindo minha conta. Declaro ter lido a{' '}
+                    <button type="button" onClick={() => router.push('/privacidade')} className="text-yellow-500 hover:underline">
+                      Política de Privacidade
+                    </button>.
                   </Label>
                 </div>
                 {isStepValid() && (

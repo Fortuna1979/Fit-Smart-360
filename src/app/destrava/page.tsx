@@ -49,6 +49,7 @@ export default function DestravaPage() {
   const router = useRouter();
   const { isChecking } = useRequireAuth();
 
+  const [gpsConsent, setGpsConsent] = useState<boolean | null>(null);
   const [status, setStatus] = useState<Status>('idle');
   const [elapsed, setElapsed] = useState(0);
   const [distance, setDistance] = useState(0);
@@ -57,6 +58,16 @@ export default function DestravaPage() {
   const [activityType, setActivityType] = useState<ActivityType>('Corrida');
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('destrava_gps_consent');
+    setGpsConsent(stored === 'true');
+  }, []);
+
+  const acceptGpsConsent = () => {
+    localStorage.setItem('destrava_gps_consent', 'true');
+    setGpsConsent(true);
+  };
 
   const statusRef = useRef<Status>('idle');
   const watchIdRef = useRef<number | null>(null);
@@ -159,11 +170,69 @@ export default function DestravaPage() {
 
   const activityCfg = ACTIVITY_TYPES.find(a => a.label === activityType)!;
 
-  if (isChecking) return (
+  if (isChecking || gpsConsent === null) return (
     <div className="h-screen bg-black flex items-center justify-center">
       <div className="w-8 h-8 border-2 border-[#FC4C02] border-t-transparent rounded-full animate-spin" />
     </div>
   );
+
+  // ── Modal de consentimento GPS (LGPD art. 11) ───────────────────
+  if (!gpsConsent) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-3xl p-6 space-y-5">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="font-heading text-2xl text-[#FC4C02]">Destrava</h1>
+          </div>
+          <div className="w-16 h-16 bg-[#FC4C02]/15 rounded-2xl flex items-center justify-center mx-auto">
+            <Activity className="w-8 h-8 text-[#FC4C02]" />
+          </div>
+          <div className="text-center">
+            <h2 className="text-xl font-bold mb-2">Acesso à localização GPS</h2>
+            <p className="text-sm text-gray-400 leading-relaxed">
+              O Destrava usa o GPS do seu dispositivo para medir distância, ritmo e traçar sua
+              rota durante corridas, caminhadas e pedaladas.
+            </p>
+          </div>
+          <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 space-y-2 text-sm text-gray-300">
+            <p className="font-semibold text-white">O que fazemos com sua localização:</p>
+            <ul className="space-y-1 list-disc pl-4">
+              <li>Calcular distância e ritmo durante o treino</li>
+              <li>Exibir seu trajeto no mapa durante a atividade</li>
+              <li>Registrar células de território conquistado (~250m de precisão)</li>
+            </ul>
+            <p className="font-semibold text-white mt-2">O que NÃO fazemos:</p>
+            <ul className="space-y-1 list-disc pl-4">
+              <li>Não rastreamos sua localização em segundo plano</li>
+              <li>Não compartilhamos coordenadas exatas com terceiros</li>
+            </ul>
+          </div>
+          <p className="text-xs text-gray-500 text-center">
+            Você pode revogar esse consentimento a qualquer momento nas configurações do seu
+            dispositivo. Para saber mais, leia nossa{' '}
+            <button onClick={() => router.push('/privacidade')} className="text-yellow-500 hover:underline">
+              Política de Privacidade
+            </button>.
+          </p>
+          <button
+            onClick={acceptGpsConsent}
+            className="w-full bg-[#FC4C02] hover:bg-[#e04400] text-white font-bold py-4 rounded-2xl transition-colors"
+          >
+            Entendi e aceito — iniciar Destrava
+          </button>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="w-full text-gray-400 hover:text-white text-sm py-2"
+          >
+            Voltar sem aceitar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── Tela de resumo ──────────────────────────────────────────────
   if (status === 'completed') {

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Camera, LogOut, Mail, Trash2, User } from 'lucide-react';
+import { ArrowLeft, Camera, Download, LogOut, Mail, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -28,6 +28,7 @@ export default function SettingsPage() {
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -87,6 +88,31 @@ export default function SettingsPage() {
     } finally {
       setIsUploadingPhoto(false);
       if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
+
+  const handleExport = async () => {
+    const supabase = getSupabaseClient();
+    if (!supabase) return;
+    setIsExporting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      const res = await fetch('/api/export-my-data', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) throw new Error('Falha na exportação');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fitsmart360-meus-dados-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Erro ao exportar dados:', e);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -201,6 +227,16 @@ export default function SettingsPage() {
             <span>{email}</span>
           </div>
         </div>
+
+        <Button
+          onClick={handleExport}
+          disabled={isExporting}
+          variant="outline"
+          className="w-full border-gray-700 text-gray-300 hover:bg-gray-800 disabled:opacity-60"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          {isExporting ? 'Exportando...' : 'Exportar meus dados'}
+        </Button>
 
         <Button
           onClick={handleLogout}
