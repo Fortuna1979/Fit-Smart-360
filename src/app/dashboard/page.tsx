@@ -16,6 +16,7 @@ import {
   updateWorkoutDay
 } from '@/lib/supabase-helpers';
 import { useRequireAuth } from '@/hooks/use-require-auth';
+import { getSupabaseClient } from '@/lib/supabase';
 import type { UserData, Equipment as EquipmentRow } from '@/lib/supabase';
 
 interface Exercise {
@@ -55,6 +56,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { isChecking } = useRequireAuth();
   const [userData, setUserData] = useState<UserData | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [todayWorkout, setTodayWorkout] = useState<WorkoutPlan | null>(null);
   const [workoutDay, setWorkoutDay] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,6 +80,14 @@ export default function DashboardPage() {
       } else {
         router.push('/onboarding');
         return;
+      }
+
+      // Carregar foto de perfil do metadata de autenticação
+      const supabase = getSupabaseClient();
+      if (supabase) {
+        const { data: authData } = await supabase.auth.getUser();
+        const url = authData.user?.user_metadata?.avatar_url as string | undefined;
+        if (url) setAvatarUrl(url);
       }
 
       // Carregar dia do treino do sessionStorage
@@ -345,8 +355,11 @@ export default function DashboardPage() {
       <header className="bg-gradient-to-b from-gray-900 to-black border-b border-gray-800 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center font-bold text-black text-lg">
-              {userData.name.charAt(0).toUpperCase()}
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-yellow-500 flex items-center justify-center font-bold text-black text-lg shrink-0">
+              {avatarUrl
+                ? <img src={avatarUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+                : userData.name.charAt(0).toUpperCase()
+              }
             </div>
             <div>
               <h1 className="text-xl font-bold">Olá, {userData.name.split(' ')[0]}!</h1>
@@ -365,15 +378,15 @@ export default function DashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5 text-center">
             <p className="text-[10px] text-gray-400 mb-0.5">IMC</p>
             <p className="font-stats text-base font-bold text-yellow-500 truncate">{bmi}</p>
           </div>
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5 text-center">
             <p className="text-[10px] text-gray-400 mb-0.5">Nível</p>
             <p className="text-xs font-bold leading-tight">{translateFitnessLevel(userData.fitness_level || 'iniciante')}</p>
           </div>
-          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5">
+          <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-2.5 text-center">
             <p className="text-[10px] text-gray-400 mb-0.5">Objetivo</p>
             <p className="text-xs font-bold leading-tight">{translateGoal(userData.goal)}</p>
           </div>
@@ -513,7 +526,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => router.push('/progresso')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-yellow-500/50 transition-all active:scale-95"
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center hover:border-yellow-500/50 transition-all active:scale-95"
           >
             <TrendingUp className="w-6 h-6 text-yellow-500 mb-2" />
             <h3 className="font-semibold mb-1">Progresso</h3>
@@ -522,7 +535,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => router.push('/nutricao')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-green-500/50 transition-all active:scale-95"
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center hover:border-green-500/50 transition-all active:scale-95"
           >
             <Apple className="w-6 h-6 text-green-500 mb-2" />
             <h3 className="font-semibold mb-1">Nutrição</h3>
@@ -531,7 +544,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => router.push('/hidratacao')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-blue-500/50 transition-all active:scale-95"
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center hover:border-blue-500/50 transition-all active:scale-95"
           >
             <Droplet className="w-6 h-6 text-blue-400 mb-2" />
             <h3 className="font-semibold mb-1">Hidratação</h3>
@@ -540,7 +553,7 @@ export default function DashboardPage() {
 
           <button
             onClick={() => router.push('/conquistas')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-purple-500/50 transition-all active:scale-95"
+            className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col items-center text-center hover:border-purple-500/50 transition-all active:scale-95"
           >
             <Award className="w-6 h-6 text-purple-400 mb-2" />
             <h3 className="font-semibold mb-1">Conquistas</h3>
