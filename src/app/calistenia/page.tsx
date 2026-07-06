@@ -90,7 +90,8 @@ export default function CalisteniasPage() {
       if (!res.ok) throw new Error('Falha na geração');
       const { plan } = await res.json();
 
-      await saveWorkoutPlan({ ...plan, workout_day: 0, is_active: true });
+      // type: 'upper' para passar o check constraint do banco (upper|lower)
+      await saveWorkoutPlan({ ...plan, type: 'upper' as 'upper', workout_day: 0, is_active: true });
       sessionStorage.setItem('active_workout', JSON.stringify(plan));
       sessionStorage.setItem('workout_type', 'calistenia');
       router.push('/workout');
