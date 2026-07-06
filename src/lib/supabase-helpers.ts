@@ -141,6 +141,18 @@ export const saveEquipment = async (equipment: Omit<Equipment, 'id' | 'user_id' 
   }
 };
 
+export const deleteEquipment = async (equipmentName: string) => {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const userId = await getUserId();
+  if (!userId) return;
+  await supabase
+    .from('scanned_equipments')
+    .delete()
+    .eq('user_id', userId)
+    .eq('equipment_name', equipmentName);
+};
+
 export const getEquipments = async () => {
   const supabase = getSupabaseClient();
   if (!supabase) {

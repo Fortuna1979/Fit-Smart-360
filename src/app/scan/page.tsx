@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, ArrowLeft, CheckCircle, XCircle, Loader2, Upload, Dumbbell, Clock, Repeat } from 'lucide-react';
+import { Camera, ArrowLeft, CheckCircle, XCircle, Loader2, Upload, Dumbbell, Clock, Repeat, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRequireAuth } from '@/hooks/use-require-auth';
-import { saveEquipment } from '@/lib/supabase-helpers';
+import { saveEquipment, deleteEquipment } from '@/lib/supabase-helpers';
 
 interface Exercise {
   name: string;
@@ -221,6 +221,18 @@ export default function ScanPage() {
       }
 
       resetScan();
+    }
+  };
+
+  // Excluir equipamento da lista
+  const removeEquipment = async (equipmentName: string) => {
+    const updatedList = scannedEquipments.filter(eq => eq.equipmentName !== equipmentName);
+    setScannedEquipments(updatedList);
+    localStorage.setItem('scanned_equipments', JSON.stringify(updatedList));
+    try {
+      await deleteEquipment(equipmentName);
+    } catch (e) {
+      console.error('Erro ao excluir equipamento:', e);
     }
   };
 
@@ -580,7 +592,16 @@ export default function ScanPage() {
                         />
                       )}
                       <div className="flex-1">
-                        <h4 className="font-bold text-yellow-500 text-lg">{eq.equipmentName}</h4>
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="font-bold text-yellow-500 text-lg">{eq.equipmentName}</h4>
+                          <button
+                            onClick={() => removeEquipment(eq.equipmentName)}
+                            className="text-gray-500 hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-400/10 shrink-0"
+                            title="Excluir equipamento"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
                         <p className="text-sm text-gray-400 mb-2">{eq.category}</p>
                         <div className="flex flex-wrap gap-1">
                           {eq.muscleGroups.slice(0, 3).map((muscle, i) => (
