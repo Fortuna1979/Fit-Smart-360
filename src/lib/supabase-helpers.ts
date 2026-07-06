@@ -141,7 +141,7 @@ export const saveEquipment = async (equipment: Omit<Equipment, 'id' | 'user_id' 
   }
 };
 
-export const deleteEquipment = async (equipmentName: string) => {
+export const deleteEquipmentByName = async (equipmentName: string) => {
   const supabase = getSupabaseClient();
   if (!supabase) return;
   const userId = await getUserId();

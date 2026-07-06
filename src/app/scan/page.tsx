@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Camera, ArrowLeft, CheckCircle, XCircle, Loader2, Upload, Dumbbell, Clock, Repeat, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRequireAuth } from '@/hooks/use-require-auth';
-import { saveEquipment, deleteEquipment } from '@/lib/supabase-helpers';
+import { saveEquipment, deleteEquipmentByName } from '@/lib/supabase-helpers';
 
 interface Exercise {
   name: string;
@@ -205,7 +205,6 @@ export default function ScanPage() {
       // Salvar no Supabase para o dashboard poder usar os exercícios
       try {
         await saveEquipment({
-          user_id: '',
           equipment_name: equipment.equipmentName,
           category: equipment.category,
           muscle_groups: equipment.muscleGroups,
@@ -230,7 +229,7 @@ export default function ScanPage() {
     setScannedEquipments(updatedList);
     localStorage.setItem('scanned_equipments', JSON.stringify(updatedList));
     try {
-      await deleteEquipment(equipmentName);
+      await deleteEquipmentByName(equipmentName);
     } catch (e) {
       console.error('Erro ao excluir equipamento:', e);
     }

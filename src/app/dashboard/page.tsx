@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Dumbbell, Camera, TrendingUp, Apple, Droplet, Settings,
-  Play, Calendar, Award, Zap, PersonStanding, Activity
+  Play, Calendar, Award, Zap, PersonStanding, Activity, List
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { calculateBMI, translateGoal, translateFitnessLevel } from '@/lib/utils';
@@ -383,23 +383,32 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="p-4 space-y-4">
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           <button
             onClick={() => router.push('/scan')}
-            className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-6 text-left hover:scale-105 transition-transform"
+            className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-3 text-left hover:scale-105 transition-transform active:scale-95"
           >
-            <Camera className="w-8 h-8 text-black mb-3" />
-            <h3 className="font-bold text-black text-lg mb-1">Escanear</h3>
-            <p className="text-sm text-black/80">Adicionar equipamentos</p>
+            <Camera className="w-6 h-6 text-black mb-2" />
+            <h3 className="font-bold text-black text-sm mb-0.5">Escanear</h3>
+            <p className="text-xs text-black/70">Nova foto</p>
+          </button>
+
+          <button
+            onClick={() => router.push('/meus-equipamentos')}
+            className="bg-gray-800 border border-yellow-500/40 rounded-2xl p-3 text-left hover:scale-105 transition-all active:scale-95"
+          >
+            <List className="w-6 h-6 text-yellow-500 mb-2" />
+            <h3 className="font-bold text-white text-sm mb-0.5">Meus Equip.</h3>
+            <p className="text-xs text-gray-400">Ver e excluir</p>
           </button>
 
           <button
             onClick={() => router.push('/calistenia')}
-            className="bg-gray-800 border border-gray-700 hover:border-yellow-500/40 rounded-2xl p-6 text-left hover:scale-105 transition-all active:scale-95"
+            className="bg-gray-800 border border-gray-700 hover:border-yellow-500/40 rounded-2xl p-3 text-left hover:scale-105 transition-all active:scale-95"
           >
-            <PersonStanding className="w-8 h-8 text-yellow-500 mb-3" />
-            <h3 className="font-bold text-white text-lg mb-1">Calistenia</h3>
-            <p className="text-sm text-gray-400">Treino sem equipamento</p>
+            <PersonStanding className="w-6 h-6 text-yellow-500 mb-2" />
+            <h3 className="font-bold text-white text-sm mb-0.5">Calistenia</h3>
+            <p className="text-xs text-gray-400">Sem equipamento</p>
           </button>
         </div>
 
