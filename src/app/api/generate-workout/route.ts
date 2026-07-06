@@ -27,6 +27,18 @@ interface FreeExercise {
   images: string[]; primaryMuscles: string[];
 }
 
+async function searchWorkoutX(exerciseEnglishName: string): Promise<string | null> {
+  const key = process.env.WORKOUTX_API_KEY;
+  if (!key) return null;
+  try {
+    const url = `https://api.workoutxapp.com/v1/exercises/name/${encodeURIComponent(exerciseEnglishName)}?limit=1`;
+    const res = await fetch(url, { headers: { 'X-WorkoutX-Key': key } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.data?.[0]?.gifUrl as string) ?? null;
+  } catch { return null; }
+}
+
 async function searchYouTube(query: string): Promise<string | null> {
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) return null;
@@ -164,7 +176,8 @@ Formato JSON:
         "tips": "Dicas de segurança relevantes ao perfil do cliente",
         "musculo_alvo": "Músculo principal",
         "dica_rapida": "Dica técnica de execução",
-        "youtube_search_query": "Technogym leg press exercise tutorial proper form"
+        "exercise_english_name": "Standard English exercise name for database lookup (e.g. 'Leg Press', 'Bicep Curl', 'Lat Pulldown')",
+        "youtube_search_query": "leg press machine exercise tutorial proper form"
       }
     ],
     "warmup": "Aquecimento recomendado",
@@ -172,7 +185,8 @@ Formato JSON:
   }
 }
 
-Para youtube_search_query de cada exercício: escreva em INGLÊS incluindo a marca se disponível (ex: "Technogym leg press exercise tutorial", "Life Fitness cable row proper form", "barbell bench press technique"). Inglês maximiza os resultados de vídeos dos fabricantes.`;
+Para youtube_search_query: foque no MOVIMENTO, NUNCA na marca. Ex: "leg press machine exercise tutorial proper form", "barbell bench press technique guide", "cable row exercise form". JAMAIS inclua marcas como Technogym, Life Fitness, Matrix, etc.
+Para exercise_english_name: nome padrão em inglês conforme bases de dados de fitness (ex: "Leg Press", "Bench Press", "Cable Row", "Lat Pulldown").`;
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -189,11 +203,14 @@ Para youtube_search_query de cada exercício: escreva em INGLÊS incluindo a mar
     if (parsed.workout?.exercises?.length) {
       const db = await getExerciseDB();
       await Promise.all(
-        parsed.workout.exercises.map(async (ex: { name: string; imageUrls?: string[]; youtube_search_query?: string; videoId?: string }) => {
+        parsed.workout.exercises.map(async (ex: { name: string; imageUrls?: string[]; youtube_search_query?: string; videoId?: string; exercise_english_name?: string; gifUrl?: string }) => {
           if (db.length > 0) ex.imageUrls = findExerciseImages(db, ex.name);
-          if (ex.youtube_search_query) {
-            ex.videoId = await searchYouTube(ex.youtube_search_query) ?? undefined;
-          }
+          const [gifUrl, videoId] = await Promise.all([
+            ex.exercise_english_name ? searchWorkoutX(ex.exercise_english_name) : Promise.resolve(null),
+            ex.youtube_search_query ? searchYouTube(ex.youtube_search_query) : Promise.resolve(null),
+          ]);
+          if (gifUrl) ex.gifUrl = gifUrl;
+          if (videoId) ex.videoId = videoId;
         })
       );
     }

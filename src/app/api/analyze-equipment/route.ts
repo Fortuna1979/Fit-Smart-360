@@ -21,13 +21,14 @@ Formato obrigatório:
   "description": "Descrição detalhada do equipamento e como posicionar-se corretamente",
   "exercises": [
     {
-      "name": "Nome do exercício 1",
+      "name": "Nome do exercício em português",
+      "exercise_english_name": "Standard English exercise name for database lookup (e.g. 'Leg Press', 'Bicep Curl', 'Lat Pulldown', 'Chest Press')",
       "sets": "3-4",
       "reps": "10-12",
       "rest": "60-90",
       "difficulty": "Iniciante/Intermediário/Avançado",
       "description": "Instruções detalhadas de execução, postura correta, respiração e dicas de segurança",
-      "youtube_search_query": "Life Fitness leg press machine exercise proper form tutorial"
+      "youtube_search_query": "leg press machine exercise tutorial proper form"
     }
   ],
   "tips": ["Dica de segurança 1", "Dica de execução 2"],
@@ -35,9 +36,12 @@ Formato obrigatório:
 }
 
 Para o campo youtube_search_query de cada exercício:
-- Se a marca foi identificada: inclua a marca + nome do equipamento em inglês + "exercise tutorial" (ex: "Technogym Leg Press exercise tutorial proper form")
-- Se a marca não foi identificada: use apenas o tipo de equipamento em inglês + "exercise tutorial" (ex: "leg press machine exercise tutorial proper form")
-- SEMPRE escreva a query em inglês para encontrar mais vídeos
+- Foque no MOVIMENTO, NUNCA na marca/fabricante do equipamento
+- Use: [tipo genérico do equipamento em inglês] + [nome do exercício] + "exercise tutorial proper form"
+- Exemplos corretos: "leg press machine exercise tutorial proper form", "cable bicep curl proper form guide", "lat pulldown machine exercise technique", "chest press machine exercise guide"
+- JAMAIS inclua marcas como Technogym, Life Fitness, Matrix, Cybex, Hammer Strength, etc.
+
+Para exercise_english_name: escreva o nome padrão do exercício em inglês conforme usado em bases de dados de fitness (ex: "Leg Press", "Bicep Curl", "Lat Pulldown", "Chest Press", "Shoulder Press", "Tricep Pushdown")
 
 Se NÃO houver equipamento de academia na imagem, retorne:
 {
@@ -49,8 +53,20 @@ REGRAS:
 1. Mínimo 3 exercícios diferentes com variações
 2. Séries, repetições, descanso e dificuldade em todos
 3. Instruções detalhadas de execução
-4. youtube_search_query em TODOS os exercícios, escrita em inglês
+4. youtube_search_query e exercise_english_name em TODOS os exercícios
 5. Retorne APENAS o JSON, sem markdown.`;
+
+async function searchWorkoutX(exerciseEnglishName: string): Promise<string | null> {
+  const key = process.env.WORKOUTX_API_KEY;
+  if (!key) return null;
+  try {
+    const url = `https://api.workoutxapp.com/v1/exercises/name/${encodeURIComponent(exerciseEnglishName)}?limit=1`;
+    const res = await fetch(url, { headers: { 'X-WorkoutX-Key': key } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.data?.[0]?.gifUrl as string) ?? null;
+  } catch { return null; }
+}
 
 async function searchYouTube(query: string): Promise<string | null> {
   const key = process.env.YOUTUBE_API_KEY;
@@ -142,13 +158,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Buscar videoId do YouTube para cada exercício em paralelo
+    // Buscar GIF (WorkoutX) e videoId (YouTube) para cada exercício em paralelo
     if (result.detected && result.exercises?.length) {
       await Promise.all(
-        result.exercises.map(async (ex: { youtube_search_query?: string; videoId?: string }) => {
-          if (ex.youtube_search_query) {
-            ex.videoId = await searchYouTube(ex.youtube_search_query) ?? undefined;
-          }
+        result.exercises.map(async (ex: { youtube_search_query?: string; videoId?: string; exercise_english_name?: string; gifUrl?: string }) => {
+          const [gifUrl, videoId] = await Promise.all([
+            ex.exercise_english_name ? searchWorkoutX(ex.exercise_english_name) : Promise.resolve(null),
+            ex.youtube_search_query ? searchYouTube(ex.youtube_search_query) : Promise.resolve(null),
+          ]);
+          if (gifUrl) ex.gifUrl = gifUrl;
+          if (videoId) ex.videoId = videoId;
         })
       );
     }

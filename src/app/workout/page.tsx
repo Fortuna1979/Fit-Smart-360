@@ -25,6 +25,8 @@ interface Exercise {
   imageUrls?: string[];
   youtube_search_query?: string;
   videoId?: string;
+  gifUrl?: string;
+  exercise_english_name?: string;
 }
 
 interface WorkoutPlan {
@@ -236,17 +238,32 @@ export default function WorkoutPage() {
     router.push('/dashboard');
   };
 
-  // Componente de demonstração: vídeo embutido do YouTube ou fallback em imagens
+  // Componente de demonstração: GIF WorkoutX → YouTube → imagens estáticas
   const ExerciseDemo = () => {
+    const gifUrl = currentExercise.gifUrl;
     const videoId = currentExercise.videoId ?? resolvedVideoIds[currentExerciseIndex];
     const imgs = currentExercise.imageUrls;
-    const loading = !currentExercise.videoId && resolvedVideoIds[currentExerciseIndex] === undefined && !!currentExercise.youtube_search_query;
+    const loading = !gifUrl && !currentExercise.videoId && resolvedVideoIds[currentExerciseIndex] === undefined && !!currentExercise.youtube_search_query;
+
+    if (gifUrl) {
+      return (
+        <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="flex items-center justify-center bg-gray-900 min-h-[200px] p-2">
+            <img
+              src={gifUrl}
+              alt={currentExercise.name}
+              className="max-w-full max-h-72 object-contain rounded-xl"
+            />
+          </div>
+        </div>
+      );
+    }
 
     if (loading) {
       return (
         <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
           <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-            <Loader2 className="w-10 h-10 text-yellow-500 animate-spin mb-3" />
+            <div className="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-3" />
             <p className="text-gray-500 text-sm">Carregando vídeo...</p>
           </div>
         </div>
