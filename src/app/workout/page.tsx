@@ -53,6 +53,8 @@ export default function WorkoutPage() {
   const [imageFrame, setImageFrame] = useState(0);
   const [isFreePlan, setIsFreePlan] = useState(false);
   const [adTime, setAdTime] = useState(0);
+  const [adTotalTime, setAdTotalTime] = useState(0);
+  const [adMessage, setAdMessage] = useState<{ icon: string; text: string; sub: string } | null>(null);
   const [resolvedVideoIds, setResolvedVideoIds] = useState<Record<number, string | null>>({});
 
   useEffect(() => {
@@ -190,6 +192,20 @@ export default function WorkoutPage() {
         setCurrentSet(1);
 
         if (showAd) {
+          const msgs = [
+            { icon: '💧', text: 'Beba água agora!', sub: 'Hidratação melhora a performance em até 20%' },
+            { icon: '💧', text: 'Aproveite e se hidrate', sub: 'Cada gole conta para sua recuperação' },
+            { icon: '🍌', text: 'Hora de reabastecer', sub: 'Uma fruta ou castanhas recarregam sua energia' },
+            { icon: '🍎', text: 'Coma algo leve', sub: 'Seu corpo precisa de combustível para continuar' },
+            { icon: '🧘', text: 'Respire fundo', sub: 'Oxigênio é combustível — inspire pelo nariz, expire pela boca' },
+            { icon: '🔥', text: 'Você já fez a parte mais difícil', sub: 'Começar é o maior obstáculo — você venceu' },
+            { icon: '💪', text: 'A dor de hoje é a força de amanhã', sub: 'Cada série te deixa mais perto do seu objetivo' },
+            { icon: '⚡', text: 'Disciplina constrói resultados', sub: 'Não é sobre perfeição — é sobre consistência' },
+            { icon: '🎯', text: 'Foco no próximo exercício', sub: 'Visualize a execução perfeita antes de começar' },
+            { icon: '🏆', text: 'Seu futuro eu agradece', sub: 'Cada repetição é um investimento em você mesmo' },
+          ];
+          setAdMessage(msgs[Math.floor(Math.random() * msgs.length)]);
+          setAdTotalTime(restSeconds);
           setAdTime(restSeconds);
           setState('ad');
         } else {
@@ -407,14 +423,54 @@ export default function WorkoutPage() {
 
   // Tela de anúncio (plano gratuito, a cada 2 exercícios)
   if (state === 'ad') {
+    const progress = adTotalTime > 0 ? adTime / adTotalTime : 0;
+    const radius = 54;
+    const circumference = 2 * Math.PI * radius;
+    const dashOffset = circumference * (1 - progress);
+
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6">
-        <div className="text-center space-y-6">
-          <div>
-            <h2 className="text-xl font-bold mb-1">Continuando em {adTime}s...</h2>
-            <p className="text-gray-400 text-sm">Seu próximo exercício já vai começar</p>
+      <div className="min-h-screen bg-black text-white flex flex-col">
+        {/* Topo com contexto */}
+        <div className="pt-10 px-6 text-center">
+          <p className="text-xs text-gray-500 uppercase tracking-widest mb-1">Intervalo entre exercícios</p>
+          <p className="text-sm text-gray-400">
+            Este tempo é exatamente o seu descanso programado
+          </p>
+        </div>
+
+        {/* Contador circular */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6">
+          <div className="relative w-36 h-36">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
+              <circle cx="64" cy="64" r={radius} fill="none" stroke="#1f2937" strokeWidth="8" />
+              <circle
+                cx="64" cy="64" r={radius} fill="none"
+                stroke="#eab308" strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={dashOffset}
+                style={{ transition: 'stroke-dashoffset 1s linear' }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="font-stats text-4xl font-bold text-yellow-500">{adTime}</span>
+              <span className="text-xs text-gray-400">seg</span>
+            </div>
           </div>
 
+          {/* Mensagem da vez */}
+          {adMessage && (
+            <div className="w-full max-w-sm bg-gray-900 border border-yellow-500/20 rounded-2xl p-5 text-center space-y-2">
+              <span className="text-4xl">{adMessage.icon}</span>
+              <p className="text-lg font-bold text-white">{adMessage.text}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">{adMessage.sub}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Banner de anúncio na base */}
+        <div className="pb-8 px-6">
+          <p className="text-xs text-gray-600 text-center mb-3">Publicidade — assine para remover</p>
           <AdBanner />
         </div>
       </div>
