@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Dumbbell, LogOut, Mail, Trash2, User } from 'lucide-react';
+import { ArrowLeft, Camera, LogOut, Mail, Trash2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -17,32 +17,82 @@ import {
 } from '@/components/ui/alert-dialog';
 import { getSupabaseClient } from '@/lib/supabase';
 import { useRequireAuth } from '@/hooks/use-require-auth';
+import { getUserId } from '@/lib/supabase-helpers';
 
 export default function SettingsPage() {
   const router = useRouter();
   const { isChecking } = useRequireAuth();
   const [email, setEmail] = useState<string | null>(null);
   const [name, setName] = useState<string | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isChecking) return;
-
     const supabase = getSupabaseClient();
     if (!supabase) return;
-
     supabase.auth.getUser().then(({ data }) => {
       setEmail(data.user?.email ?? null);
       setName((data.user?.user_metadata?.name as string) ?? null);
+      setPhotoUrl((data.user?.user_metadata?.avatar_url as string) ?? null);
     });
   }, [isChecking]);
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setPhotoError('Foto muito grande. Máximo 5MB.');
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    setPhotoError(null);
+
+    try {
+      const supabase = getSupabaseClient();
+      if (!supabase) throw new Error('Supabase não disponível');
+
+      const userId = await getUserId();
+      if (!userId) throw new Error('Usuário não autenticado');
+
+      const ext = file.name.split('.').pop() ?? 'jpg';
+      const path = `${userId}/avatar.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      });
+
+      if (updateError) throw updateError;
+
+      setPhotoUrl(publicUrl);
+    } catch (err) {
+      console.error('Erro ao enviar foto:', err);
+      setPhotoError('Não foi possível enviar a foto. Tente novamente.');
+    } finally {
+      setIsUploadingPhoto(false);
+      if (photoInputRef.current) photoInputRef.current.value = '';
+    }
+  };
 
   const handleLogout = async () => {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-
     setIsLoggingOut(true);
     await supabase.auth.signOut();
     router.push('/');
@@ -51,10 +101,8 @@ export default function SettingsPage() {
   const handleDeleteAccount = async () => {
     const supabase = getSupabaseClient();
     if (!supabase) return;
-
     setIsDeleting(true);
     setDeleteError(null);
-
     const { error } = await supabase.rpc('delete_own_account');
     if (error) {
       console.error('Erro ao excluir conta:', error);
@@ -62,7 +110,6 @@ export default function SettingsPage() {
       setIsDeleting(false);
       return;
     }
-
     await supabase.auth.signOut();
     router.push('/');
   };
@@ -74,6 +121,8 @@ export default function SettingsPage() {
       </div>
     );
   }
+
+  const initial = name?.charAt(0).toUpperCase() ?? '?';
 
   return (
     <div className="min-h-screen bg-black text-white pb-20">
@@ -92,16 +141,54 @@ export default function SettingsPage() {
       </header>
 
       <div className="p-4 max-w-md mx-auto space-y-4 sm:space-y-6">
+        {/* Perfil */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
-              <Dumbbell className="w-6 h-6 text-black" />
+          {/* Avatar com botão de câmera */}
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-yellow-500 flex items-center justify-center">
+                {photoUrl ? (
+                  <img src={photoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-2xl font-bold text-black">{initial}</span>
+                )}
+              </div>
+              <button
+                onClick={() => photoInputRef.current?.click()}
+                disabled={isUploadingPhoto}
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-yellow-500 rounded-full flex items-center justify-center border-2 border-black hover:bg-yellow-400 transition-colors disabled:opacity-50"
+                title="Trocar foto"
+              >
+                {isUploadingPhoto ? (
+                  <div className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-3.5 h-3.5 text-black" />
+                )}
+              </button>
+              <input
+                ref={photoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+              />
             </div>
             <div>
-              <p className="font-bold">{name || 'Minha conta'}</p>
+              <p className="font-bold text-lg">{name || 'Minha conta'}</p>
               <p className="text-sm text-gray-400">Fit Smart 360º</p>
+              <button
+                onClick={() => photoInputRef.current?.click()}
+                disabled={isUploadingPhoto}
+                className="text-xs text-yellow-500 hover:text-yellow-400 mt-1 disabled:opacity-50"
+              >
+                {isUploadingPhoto ? 'Enviando foto...' : photoUrl ? 'Trocar foto' : 'Adicionar foto'}
+              </button>
             </div>
           </div>
+
+          {photoError && (
+            <p className="text-xs text-red-400">{photoError}</p>
+          )}
 
           {name && (
             <div className="flex items-center gap-3 text-gray-300">

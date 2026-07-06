@@ -384,40 +384,36 @@ export default function DashboardPage() {
       <div className="p-4 space-y-4">
         {/* Quick Actions — 2 colunas × 2 linhas */}
         <div className="grid grid-cols-2 gap-2">
-          {/* Coluna esquerda topo */}
           <button
             onClick={() => router.push('/scan')}
-            className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-4 text-left hover:scale-105 transition-transform active:scale-95"
+            className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-4 flex flex-col items-center text-center hover:scale-105 transition-transform active:scale-95"
           >
             <Camera className="w-6 h-6 text-black mb-2" />
             <h3 className="font-bold text-black text-sm mb-0.5">Escanear</h3>
             <p className="text-xs text-black/70">Adicionar equip.</p>
           </button>
 
-          {/* Coluna direita topo */}
           <button
             onClick={() => router.push('/calistenia')}
-            className="bg-gray-800 border border-gray-700 hover:border-yellow-500/40 rounded-2xl p-4 text-left hover:scale-105 transition-all active:scale-95"
+            className="bg-gray-800 border border-gray-700 hover:border-yellow-500/40 rounded-2xl p-4 flex flex-col items-center text-center hover:scale-105 transition-all active:scale-95"
           >
             <PersonStanding className="w-6 h-6 text-yellow-500 mb-2" />
             <h3 className="font-bold text-white text-sm mb-0.5">Calistenia</h3>
             <p className="text-xs text-gray-400">Sem equipamento</p>
           </button>
 
-          {/* Coluna esquerda baixo */}
           <button
             onClick={() => router.push('/meus-equipamentos')}
-            className="bg-gray-800 border border-yellow-500/40 rounded-2xl p-4 text-left hover:scale-105 transition-all active:scale-95"
+            className="bg-gray-800 border border-yellow-500/40 rounded-2xl p-4 flex flex-col items-center text-center hover:scale-105 transition-all active:scale-95"
           >
             <List className="w-6 h-6 text-yellow-500 mb-2" />
             <h3 className="font-bold text-white text-sm mb-0.5">Meus Equip.</h3>
             <p className="text-xs text-gray-400">Ver e excluir</p>
           </button>
 
-          {/* Coluna direita baixo */}
           <button
             onClick={() => router.push('/destrava')}
-            className="bg-gray-800 border border-gray-700 hover:border-orange-500/40 rounded-2xl p-4 text-left hover:scale-105 transition-all active:scale-95"
+            className="bg-gray-800 border border-gray-700 hover:border-orange-500/40 rounded-2xl p-4 flex flex-col items-center text-center hover:scale-105 transition-all active:scale-95"
           >
             <Activity className="w-6 h-6 text-[#FC4C02] mb-2" />
             <h3 className="font-bold text-white text-sm mb-0.5">Destrava</h3>
@@ -551,14 +547,6 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-400">Medalhas e níveis</p>
           </button>
 
-          <button
-            onClick={() => router.push('/destrava')}
-            className="bg-gray-900 border border-gray-800 rounded-xl p-4 text-left hover:border-orange-500/50 transition-all active:scale-95"
-          >
-            <Activity className="w-6 h-6 text-[#FC4C02] mb-2" />
-            <h3 className="font-semibold mb-1">Destrava</h3>
-            <p className="text-xs text-gray-400">GPS · Corrida · Caminhada</p>
-          </button>
         </div>
 
         {/* Motivational Quote */}
