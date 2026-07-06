@@ -9,6 +9,30 @@ interface FreeExercise {
   images: string[]; primaryMuscles: string[];
 }
 
+async function searchWorkoutX(exerciseEnglishName: string): Promise<string | null> {
+  const key = process.env.WORKOUTX_API_KEY;
+  if (!key) return null;
+  try {
+    const url = `https://api.workoutxapp.com/v1/exercises/name/${encodeURIComponent(exerciseEnglishName)}?limit=1`;
+    const res = await fetch(url, { headers: { 'X-WorkoutX-Key': key } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.data?.[0]?.gifUrl as string) ?? null;
+  } catch { return null; }
+}
+
+async function searchYouTube(query: string): Promise<string | null> {
+  const key = process.env.YOUTUBE_API_KEY;
+  if (!key) return null;
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoDuration=short&maxResults=1&relevanceLanguage=en&safeSearch=strict&key=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.items?.[0]?.id?.videoId as string) ?? null;
+  } catch { return null; }
+}
+
 let exerciseDBCache: FreeExercise[] | null = null;
 
 async function getExerciseDB(): Promise<FreeExercise[]> {
@@ -100,6 +124,7 @@ Retorne JSON puro (sem markdown):
       "description": "execução correta do exercício",
       "musculo_alvo": "músculo principal",
       "dica_rapida": "dica técnica essencial",
+      "exercise_english_name": "Standard English exercise name, e.g. 'Push Up', 'Squat', 'Plank'",
       "youtube_search_query": "exercise name in English calisthenics tutorial"
     }
   ]
@@ -119,10 +144,17 @@ Retorne JSON puro (sem markdown):
     const plan = JSON.parse(cleaned);
 
     const db = await getExerciseDB();
-    plan.exercises = plan.exercises.map((ex: { name: string; [key: string]: unknown }) => ({
-      ...ex,
-      imageUrls: findExerciseImages(db, ex.name),
-    }));
+    await Promise.all(
+      plan.exercises.map(async (ex: { name: string; exercise_english_name?: string; youtube_search_query?: string; gifUrl?: string; videoId?: string; imageUrls?: string[]; [key: string]: unknown }) => {
+        if (db.length > 0) ex.imageUrls = findExerciseImages(db, ex.name);
+        const [gifUrl, videoId] = await Promise.all([
+          ex.exercise_english_name ? searchWorkoutX(ex.exercise_english_name) : Promise.resolve(null),
+          ex.youtube_search_query ? searchYouTube(ex.youtube_search_query) : Promise.resolve(null),
+        ]);
+        if (gifUrl) ex.gifUrl = gifUrl;
+        if (videoId) ex.videoId = videoId;
+      })
+    );
 
     return NextResponse.json({ plan });
   } catch (e) {
