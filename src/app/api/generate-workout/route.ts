@@ -209,7 +209,10 @@ Para exercise_english_name: nome padrão em inglês conforme bases de dados de f
             ex.exercise_english_name ? searchWorkoutX(ex.exercise_english_name) : Promise.resolve(null),
             ex.youtube_search_query ? searchYouTube(ex.youtube_search_query) : Promise.resolve(null),
           ]);
-          if (gifUrl) ex.gifUrl = gifUrl;
+          if (gifUrl) {
+            const m = (gifUrl as string).match(/\/gifs\/(\d+)\.gif/);
+            ex.gifUrl = m ? `/api/gif-proxy?id=${m[1]}` : gifUrl;
+          }
           if (videoId) ex.videoId = videoId;
         })
       );

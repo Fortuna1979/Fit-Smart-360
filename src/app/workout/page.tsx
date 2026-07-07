@@ -56,10 +56,13 @@ export default function WorkoutPage() {
   const [adTotalTime, setAdTotalTime] = useState(0);
   const [adMessage, setAdMessage] = useState<{ icon: string; text: string; sub: string } | null>(null);
   const [resolvedVideoIds, setResolvedVideoIds] = useState<Record<number, string | null>>({});
+  const [isCalistenia, setIsCalistenia] = useState(false);
+  const [gifLoadError, setGifLoadError] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     if (!isChecking) {
       loadWorkout();
+      setIsCalistenia(sessionStorage.getItem('workout_type') === 'calistenia');
       getUserData().then((userData) => {
         setIsFreePlan(!userData?.subscription_plan || userData.subscription_plan === 'free');
       });
@@ -146,9 +149,9 @@ export default function WorkoutPage() {
     return () => clearInterval(interval);
   }, [state, adTime]);
 
-  // Busca videoId on-the-fly quando não veio junto com o exercício
+  // Busca videoId on-the-fly apenas para treinos com equipamento (não calistenia)
   useEffect(() => {
-    if (!workout) return;
+    if (!workout || isCalistenia) return;
     const idx = currentExerciseIndex;
     const ex = workout.exercises[idx];
     if (!ex) return;
@@ -159,7 +162,7 @@ export default function WorkoutPage() {
       .then(({ videoId }) => setResolvedVideoIds(prev => ({ ...prev, [idx]: videoId ?? null })))
       .catch(() => setResolvedVideoIds(prev => ({ ...prev, [idx]: null })));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentExerciseIndex, workout]);
+  }, [currentExerciseIndex, workout, isCalistenia]);
 
   if (isChecking || !workout) {
     return (
@@ -172,7 +175,17 @@ export default function WorkoutPage() {
     );
   }
 
+  if (!workout.exercises || workout.exercises.length === 0) {
+    router.push('/dashboard');
+    return null;
+  }
+
   const currentExercise = workout.exercises[currentExerciseIndex];
+  if (!currentExercise) {
+    router.push('/dashboard');
+    return null;
+  }
+
   const totalSets = parseInt(currentExercise.sets) || 3;
   const restSeconds = parseInt(currentExercise.rest) || 60;
 
@@ -254,14 +267,59 @@ export default function WorkoutPage() {
     router.push('/dashboard');
   };
 
-  // Componente de demonstração: GIF WorkoutX → YouTube → imagens estáticas
-  const ExerciseDemo = () => {
+  // Renderiza mídia do exercício (função, não componente — evita remontagem a cada render)
+  const renderExerciseMedia = () => {
     const gifUrl = currentExercise.gifUrl;
     const videoId = currentExercise.videoId ?? resolvedVideoIds[currentExerciseIndex];
     const imgs = currentExercise.imageUrls;
+
+    const staticFallback = (
+      <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+        {imgs && imgs.length > 0 ? (
+          <div className="relative bg-gray-800" style={{ aspectRatio: '16/9' }}>
+            {imgs.map((url, i) => (
+              <img key={i} src={url} alt={`${currentExercise.name} pos ${i + 1}`}
+                className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ${imageFrame === i ? 'opacity-100' : 'opacity-0'}`}
+              />
+            ))}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {imgs.map((_, i) => (
+                <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${imageFrame === i ? 'bg-yellow-500' : 'bg-gray-600'}`} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
+            <Dumbbell className="w-16 h-16 text-yellow-500/40 mb-3" />
+            <p className="text-gray-500 text-sm text-center px-4">{currentExercise.name}</p>
+          </div>
+        )}
+      </div>
+    );
+
+    // Calistenia: somente GIF, sem vídeo
+    if (isCalistenia) {
+      if (gifUrl && !gifLoadError[currentExerciseIndex]) {
+        return (
+          <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-center bg-gray-900 min-h-[200px] p-2">
+              <img
+                src={gifUrl}
+                alt={currentExercise.name}
+                className="max-w-full max-h-72 object-contain rounded-xl"
+                onError={() => setGifLoadError(prev => ({ ...prev, [currentExerciseIndex]: true }))}
+              />
+            </div>
+          </div>
+        );
+      }
+      return staticFallback;
+    }
+
+    // Treino com equipamento: GIF → vídeo → imagens estáticas
     const loading = !gifUrl && !currentExercise.videoId && resolvedVideoIds[currentExerciseIndex] === undefined && !!currentExercise.youtube_search_query;
 
-    if (gifUrl) {
+    if (gifUrl && !gifLoadError[currentExerciseIndex]) {
       return (
         <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
           <div className="flex items-center justify-center bg-gray-900 min-h-[200px] p-2">
@@ -269,6 +327,7 @@ export default function WorkoutPage() {
               src={gifUrl}
               alt={currentExercise.name}
               className="max-w-full max-h-72 object-contain rounded-xl"
+              onError={() => setGifLoadError(prev => ({ ...prev, [currentExerciseIndex]: true }))}
             />
           </div>
         </div>
@@ -300,29 +359,7 @@ export default function WorkoutPage() {
       );
     }
 
-    return (
-      <div className="w-full bg-gray-900 border-2 border-yellow-500/30 rounded-2xl overflow-hidden shadow-2xl">
-        {imgs && imgs.length > 0 ? (
-          <div className="relative bg-gray-800" style={{ aspectRatio: '16/9' }}>
-            {imgs.map((url, i) => (
-              <img key={i} src={url} alt={`${currentExercise.name} pos ${i + 1}`}
-                className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ${imageFrame === i ? 'opacity-100' : 'opacity-0'}`}
-              />
-            ))}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-              {imgs.map((_, i) => (
-                <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${imageFrame === i ? 'bg-yellow-500' : 'bg-gray-600'}`} />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="aspect-video flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 via-gray-900 to-black">
-            <Dumbbell className="w-16 h-16 text-yellow-500/40 mb-3" />
-            <p className="text-gray-500 text-sm text-center px-4">{currentExercise.name}</p>
-          </div>
-        )}
-      </div>
-    );
+    return staticFallback;
   };
 
   // Tela de exercício
@@ -348,7 +385,7 @@ export default function WorkoutPage() {
         </header>
 
         <div className="p-4 sm:p-6 space-y-5">
-          <ExerciseDemo />
+          {renderExerciseMedia()}
 
           <div className="space-y-4">
             <div>

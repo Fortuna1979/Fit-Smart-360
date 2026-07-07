@@ -51,6 +51,10 @@ export default function DestravaPage() {
 
   const [gpsConsent, setGpsConsent] = useState<boolean | null>(null);
   const [status, setStatus] = useState<Status>('idle');
+  const [isDay, setIsDay] = useState(() => {
+    const h = new Date().getHours(), m = new Date().getMinutes();
+    return h < 18 || (h === 18 && m < 30);
+  });
   const [elapsed, setElapsed] = useState(0);
   const [distance, setDistance] = useState(0);
   const [position, setPosition] = useState<[number, number] | null>(null);
@@ -62,6 +66,16 @@ export default function DestravaPage() {
   useEffect(() => {
     const stored = localStorage.getItem('destrava_gps_consent');
     setGpsConsent(stored === 'true');
+  }, []);
+
+  // Atualiza tema claro/escuro a cada minuto
+  useEffect(() => {
+    const check = () => {
+      const h = new Date().getHours(), m = new Date().getMinutes();
+      setIsDay(h < 18 || (h === 18 && m < 30));
+    };
+    const interval = setInterval(check, 60000);
+    return () => clearInterval(interval);
   }, []);
 
   const acceptGpsConsent = () => {
@@ -289,12 +303,34 @@ export default function DestravaPage() {
   }
 
   // ── Tela de gravação ────────────────────────────────────────────
+  const T = isDay ? {
+    page:      'bg-white text-gray-900',
+    headerBtn: 'text-gray-500 hover:text-gray-900',
+    backBtn:   'bg-white/80 text-gray-700',
+    panel:     'bg-gray-50 border-gray-200',
+    recBar:    'border-gray-200',
+    recLabel:  'text-gray-700',
+    iconBtn:   'bg-gray-100',
+    iconLabel: 'text-gray-500',
+    finishBtn: 'bg-gray-200 text-gray-900',
+  } : {
+    page:      'bg-black text-white',
+    headerBtn: 'text-gray-400 hover:text-white',
+    backBtn:   'bg-gray-900/80 text-white',
+    panel:     'bg-gray-950 border-gray-800',
+    recBar:    'border-gray-800',
+    recLabel:  'text-gray-300',
+    iconBtn:   'bg-gray-800',
+    iconLabel: 'text-gray-400',
+    finishBtn: 'bg-gray-800 text-white',
+  };
+
   return (
-    <div className="h-screen bg-black text-white flex flex-col overflow-hidden">
+    <div className={`h-screen ${T.page} flex flex-col overflow-hidden`}>
       {/* Header — só no idle */}
       {status === 'idle' && (
         <header className="flex items-center gap-3 px-4 pt-4 pb-2 z-10">
-          <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white">
+          <button onClick={() => router.push('/dashboard')} className={T.headerBtn}>
             <ArrowLeft className="w-5 h-5" />
           </button>
           <span className="font-heading text-4xl text-[#FC4C02] tracking-wide">Destrava</span>
@@ -315,9 +351,9 @@ export default function DestravaPage() {
         {(status === 'recording' || status === 'paused') && (
           <button
             onClick={() => router.push('/dashboard')}
-            className="absolute top-3 left-3 z-20 w-10 h-10 bg-gray-900/80 rounded-full flex items-center justify-center backdrop-blur-sm"
+            className={`absolute top-3 left-3 z-20 w-10 h-10 ${T.backBtn} rounded-full flex items-center justify-center backdrop-blur-sm`}
           >
-            <ChevronDown className="w-5 h-5 text-white" />
+            <ChevronDown className="w-5 h-5" />
           </button>
         )}
 
@@ -332,7 +368,7 @@ export default function DestravaPage() {
       )}
 
       {/* Painel inferior */}
-      <div className="bg-gray-950 border-t border-gray-800 flex-shrink-0">
+      <div className={`${T.panel} border-t flex-shrink-0`}>
         {/* Barra de status Parado */}
         {status === 'paused' && (
           <div className="bg-yellow-500 px-4 py-2 flex items-center justify-between">
@@ -343,8 +379,8 @@ export default function DestravaPage() {
 
         {/* Nome da atividade durante gravação */}
         {status === 'recording' && (
-          <div className="px-4 py-2 flex items-center justify-between border-b border-gray-800">
-            <span className="text-sm font-semibold text-gray-300">{activityType}</span>
+          <div className={`px-4 py-2 flex items-center justify-between border-b ${T.recBar}`}>
+            <span className={`text-sm font-semibold ${T.recLabel}`}>{activityType}</span>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-[#FC4C02] animate-pulse" />
             </div>
@@ -380,10 +416,10 @@ export default function DestravaPage() {
                 onClick={() => setShowTypePicker(true)}
                 className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
               >
-                <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center">
+                <div className={`w-14 h-14 rounded-full ${T.iconBtn} flex items-center justify-center`}>
                   <activityCfg.Icon className={`w-7 h-7 ${activityCfg.color}`} />
                 </div>
-                <span className="text-xs text-gray-400">{activityType}</span>
+                <span className={`text-xs ${T.iconLabel}`}>{activityType}</span>
               </button>
 
               {/* Botão gravar */}
@@ -401,7 +437,7 @@ export default function DestravaPage() {
 
               {/* Placeholder rota */}
               <div className="flex flex-col items-center gap-1.5 opacity-25">
-                <div className="w-14 h-14 rounded-full bg-gray-800 flex items-center justify-center">
+                <div className={`w-14 h-14 rounded-full ${T.iconBtn} flex items-center justify-center`}>
                   <Activity className="w-6 h-6 text-gray-400" />
                 </div>
                 <span className="text-xs text-gray-500">Rota</span>
@@ -431,9 +467,9 @@ export default function DestravaPage() {
               </button>
               <button
                 onClick={finishActivity}
-                className="flex-1 py-4 rounded-full bg-gray-800 text-white font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                className={`flex-1 py-4 rounded-full ${T.finishBtn} font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform`}
               >
-                <Square className="w-5 h-5 fill-white" />
+                <Square className="w-5 h-5 fill-current" />
                 Concluir
               </button>
             </div>

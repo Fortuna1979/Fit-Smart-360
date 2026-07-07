@@ -92,6 +92,7 @@ export default function CalisteniasPage() {
 
       // type: 'upper' para passar o check constraint do banco (upper|lower)
       await saveWorkoutPlan({ ...plan, type: 'upper' as 'upper', workout_day: 0, is_active: true });
+      sessionStorage.removeItem('active_workout'); // limpa cache antigo antes de salvar o novo
       sessionStorage.setItem('active_workout', JSON.stringify(plan));
       sessionStorage.setItem('workout_type', 'calistenia');
       router.push('/workout');

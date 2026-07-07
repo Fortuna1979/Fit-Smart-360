@@ -188,6 +188,14 @@ export default function DashboardPage() {
         }
       });
 
+      // Se nenhum equipamento tem exercícios para o grupo muscular do dia, usar treino padrão
+      if (allExercises.length === 0) {
+        const defaultWorkout = getDefaultWorkout(day);
+        setTodayWorkout(defaultWorkout);
+        await saveWorkoutPlan({ ...defaultWorkout, workout_day: day, is_active: false });
+        return;
+      }
+
       // Criar plano de treino COMPLETO
       const workout: WorkoutPlan = {
         name: isLowerBody ? 'Treino A - Pernas e Glúteos' : 'Treino B - Braços e Peito',

@@ -146,12 +146,15 @@ Retorne JSON puro (sem markdown):
     const db = await getExerciseDB();
     await Promise.all(
       plan.exercises.map(async (ex: { name: string; exercise_english_name?: string; youtube_search_query?: string; gifUrl?: string; videoId?: string; imageUrls?: string[]; [key: string]: unknown }) => {
-        if (db.length > 0) ex.imageUrls = findExerciseImages(db, ex.name);
+        if (db.length > 0) ex.imageUrls = findExerciseImages(db, ex.exercise_english_name || ex.name);
         const [gifUrl, videoId] = await Promise.all([
           ex.exercise_english_name ? searchWorkoutX(ex.exercise_english_name) : Promise.resolve(null),
           ex.youtube_search_query ? searchYouTube(ex.youtube_search_query) : Promise.resolve(null),
         ]);
-        if (gifUrl) ex.gifUrl = gifUrl;
+        if (gifUrl) {
+          const m = (gifUrl as string).match(/\/gifs\/(\d+)\.gif/);
+          ex.gifUrl = m ? `/api/gif-proxy?id=${m[1]}` : gifUrl;
+        }
         if (videoId) ex.videoId = videoId;
       })
     );
