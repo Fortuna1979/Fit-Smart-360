@@ -21,6 +21,27 @@ async function searchWorkoutX(exerciseEnglishName: string): Promise<string | nul
   } catch { return null; }
 }
 
+async function searchExerciseDB(exerciseName: string): Promise<string | null> {
+  try {
+    const url = `https://oss.exercisedb.dev/api/v1/exercises?name=${encodeURIComponent(exerciseName.toLowerCase())}&limit=10`;
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const exercises: Array<{ name: string; gifUrl: string }> = data.data ?? [];
+    if (!exercises.length) return null;
+    const searchNorm = exerciseName.toLowerCase().replace(/-/g, ' ').trim();
+    const searchWords = searchNorm.split(/\s+/).filter(w => w.length > 2);
+    let best = exercises[0];
+    let bestScore = -Infinity;
+    for (const ex of exercises) {
+      const exNorm = ex.name.toLowerCase().replace(/-/g, ' ');
+      let score = exNorm === searchNorm ? 1000 : (searchWords.filter(w => exNorm.includes(w)).length / Math.max(searchWords.length, 1)) * 100 - ex.name.length * 0.5;
+      if (score > bestScore) { bestScore = score; best = ex; }
+    }
+    return best?.gifUrl ?? null;
+  } catch { return null; }
+}
+
 async function searchYouTube(query: string): Promise<string | null> {
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) return null;
@@ -147,10 +168,14 @@ Retorne JSON puro (sem markdown):
     await Promise.all(
       plan.exercises.map(async (ex: { name: string; exercise_english_name?: string; youtube_search_query?: string; gifUrl?: string; videoId?: string; imageUrls?: string[]; [key: string]: unknown }) => {
         if (db.length > 0) ex.imageUrls = findExerciseImages(db, ex.exercise_english_name || ex.name);
-        const [gifUrl, videoId] = await Promise.all([
+        const [wxGifUrl, videoId] = await Promise.all([
           ex.exercise_english_name ? searchWorkoutX(ex.exercise_english_name) : Promise.resolve(null),
           ex.youtube_search_query ? searchYouTube(ex.youtube_search_query) : Promise.resolve(null),
         ]);
+        let gifUrl = wxGifUrl;
+        if (!gifUrl && ex.exercise_english_name) {
+          gifUrl = await searchExerciseDB(ex.exercise_english_name);
+        }
         if (gifUrl) {
           const m = (gifUrl as string).match(/\/gifs\/(\d+)\.gif/);
           ex.gifUrl = m ? `/api/gif-proxy?id=${m[1]}` : gifUrl;
