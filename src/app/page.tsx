@@ -97,12 +97,13 @@ export default function LandingPage() {
             display: block;
             text-align: center;
             white-space: nowrap;
+            font-family: var(--font-anton), Impact, 'Arial Black', sans-serif;
             font-style: italic;
-            font-size: clamp(3.5rem, 15.5vw, 7rem);
-            letter-spacing: -0.01em;
+            font-size: clamp(4rem, 19vw, 8.5rem);
+            letter-spacing: 0.01em;
             line-height: 1;
             color: #fff;
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.85), 5px 5px 18px rgba(0,0,0,0.6);
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.9), 6px 6px 20px rgba(0,0,0,0.65);
             animation: runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
           }
           .slide-title {
@@ -170,7 +171,7 @@ export default function LandingPage() {
               <div className="absolute left-0 right-0 z-10"
                    style={{ top: '43%', transform: 'translateY(-50%)',
                             background: 'rgba(0,0,0,0.48)', overflow: 'hidden', clipPath: 'inset(0)' }}>
-                <h1 className="hero-title font-heading">FIT SMART 360°</h1>
+                <h1 className="hero-title">FIT SMART 360°</h1>
               </div>
 
               {/* Mulher na frente do título — mesma imagem, clipeada para mostrar só a metade inferior */}
