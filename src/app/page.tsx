@@ -128,12 +128,12 @@ export default function LandingPage() {
             {/* Barra superior: logo + badge */}
             <div className="flex-shrink-0 flex items-center justify-between mb-3">
               <div className="flex items-center gap-1.5">
-                <svg width="22" height="32" viewBox="0 0 14 22" aria-hidden="true">
+                <svg width="28" height="42" viewBox="0 0 14 22" aria-hidden="true">
                   <polygon points="9,0 2,12 7,12 6,22 13,10 8,10" fill="#eab308"/>
                 </svg>
                 <span className="font-heading italic leading-none"
-                      style={{ fontSize: '2.1rem', color: '#eab308',
-                               textShadow: '0 0 20px rgba(234,179,8,0.5)' }}>
+                      style={{ fontSize: '2.6rem', color: '#eab308',
+                               textShadow: '0 0 22px rgba(234,179,8,0.7), 0 2px 5px rgba(0,0,0,0.8)' }}>
                   FS360°
                 </span>
               </div>
@@ -167,11 +167,17 @@ export default function LandingPage() {
               <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.08)' }} />
 
               {/* Faixa do título */}
-              <div className="absolute left-0 right-0 z-20"
-                   style={{ top: '50%', transform: 'translateY(-50%)',
+              <div className="absolute left-0 right-0 z-10"
+                   style={{ top: '43%', transform: 'translateY(-50%)',
                             background: 'rgba(0,0,0,0.48)', overflow: 'hidden', clipPath: 'inset(0)' }}>
                 <h1 className="hero-title font-heading">FIT SMART 360°</h1>
               </div>
+
+              {/* Mulher na frente do título — mesma imagem, clipeada para mostrar só a metade inferior */}
+              <div className="absolute inset-0 z-20"
+                   style={{ backgroundImage: 'url(https://i.postimg.cc/NFzFCCBQ/Whats-App-Image-2026-07-27-at-16-35-09.jpg)',
+                            backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat',
+                            clipPath: 'polygon(0 48%, 100% 48%, 100% 100%, 0 100%)' }} />
             </div>
 
             {/* Seção inferior */}
