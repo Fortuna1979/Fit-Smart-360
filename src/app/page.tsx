@@ -36,24 +36,8 @@ export default function LandingPage() {
           text-shadow: 3px 3px 0 rgba(0,0,0,0.92), 6px 6px 20px rgba(0,0,0,0.66);
           animation: runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        /* ── LENS FLARE ── */
-        @keyframes flareFly {
-          0%   { left:-8%;  opacity:0;   transform:translateY(-50%) scale(0.5); }
-          4%   {            opacity:0.9; }
-          47%  { left:44%;  opacity:1;   transform:translateY(-50%) scale(1);   }
-          60%  { left:44%;  opacity:1;   transform:translateY(-50%) scale(2.6); }
-          73%  { left:44%;  opacity:0.85;transform:translateY(-50%) scale(1.8); }
-          86%  { left:44%;  opacity:0;   transform:translateY(-50%) scale(1.1); }
-          100% { left:44%;  opacity:0; }
-        }
-        .lens-flare {
-          position:absolute; top:50%; left:-8%;
-          width:110px; height:110px; opacity:0; pointer-events:none;
-          animation: flareFly 2.7s cubic-bezier(0.22,1,0.36,1) 1.15s 1 forwards;
-        }
         @media (prefers-reduced-motion: reduce) {
           .hero-title { animation:none; transform:translateX(0); }
-          .lens-flare { animation:none; opacity:0; }
         }
       `}</style>
 
@@ -64,12 +48,12 @@ export default function LandingPage() {
           {/* ── BARRA SUPERIOR: logo + badge ── */}
           <div className="flex items-center justify-between flex-shrink-0">
             {/* Logo ⚡FS360° */}
-            <div className="flex items-center gap-1">
-              <svg width="14" height="22" viewBox="0 0 14 22" aria-hidden="true">
+            <div className="flex items-center gap-1.5">
+              <svg width="20" height="30" viewBox="0 0 14 22" aria-hidden="true">
                 <polygon points="9,0 2,12 7,12 6,22 13,10 8,10" fill="#eab308"/>
               </svg>
-              <span className="font-heading italic text-[1.5rem] text-yellow-400 leading-none tracking-wide"
-                    style={{ textShadow: '0 0 18px rgba(234,179,8,0.45)' }}>
+              <span className="font-heading italic text-[2rem] text-yellow-400 leading-none tracking-wide"
+                    style={{ textShadow: '0 0 22px rgba(234,179,8,0.55)' }}>
                 FS360°
               </span>
             </div>
@@ -109,13 +93,16 @@ export default function LandingPage() {
             {/* Foto inferior — mulher correndo na esteira */}
             <div className="absolute bottom-0 left-0 right-0 h-[54%]">
               <div className="absolute inset-0 bg-cover bg-center"
-                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1594882645126-14ac19a0ee2e?w=1200&h=900&fit=crop&q=80)' }} />
+                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1571019613576-2b22c76fd955?w=1200&h=900&fit=crop&q=80)' }} />
+              {/* overlay leve — suficiente para o título ser legível sem esconder a foto */}
               <div className="absolute inset-0"
-                   style={{ background: 'rgba(6,6,6,0.35)' }} />
-              <div className="absolute top-0 left-0 right-0 h-[60%]"
-                   style={{ background: 'linear-gradient(to top,transparent,rgba(6,6,6,0.78))' }} />
-              <div className="absolute bottom-0 left-0 right-0 h-[30%]"
-                   style={{ background: 'linear-gradient(to bottom,transparent,rgba(6,6,6,0.65))' }} />
+                   style={{ background: 'rgba(6,6,6,0.18)' }} />
+              {/* fade sutil no topo para fundir com o título */}
+              <div className="absolute top-0 left-0 right-0 h-[28%]"
+                   style={{ background: 'linear-gradient(to bottom,rgba(6,6,6,0.55),transparent)' }} />
+              {/* fade suave no rodapé */}
+              <div className="absolute bottom-0 left-0 right-0 h-[25%]"
+                   style={{ background: 'linear-gradient(to top,rgba(6,6,6,0.5),transparent)' }} />
             </div>
 
             {/* ── FAIXA DO TÍTULO (cruza o centro) ── */}
@@ -124,48 +111,6 @@ export default function LandingPage() {
                           overflow: 'hidden', clipPath: 'inset(0)' }}>
               <h1 className="hero-title font-heading">FIT SMART 360°</h1>
 
-              {/* Lens flare star-burst */}
-              <div aria-hidden="true" className="lens-flare">
-                <svg width="110" height="110" viewBox="0 0 110 110" overflow="visible">
-                  <defs>
-                    <radialGradient id="fcg">
-                      <stop offset="0%"   stopColor="#fff"    stopOpacity="1"/>
-                      <stop offset="13%"  stopColor="#fef3c7" stopOpacity="0.98"/>
-                      <stop offset="32%"  stopColor="#f59e0b" stopOpacity="0.66"/>
-                      <stop offset="64%"  stopColor="#d97706" stopOpacity="0.26"/>
-                      <stop offset="100%" stopColor="#b45309" stopOpacity="0"/>
-                    </radialGradient>
-                    <linearGradient id="fhr" x1="0%" y1="50%" x2="100%" y2="50%">
-                      <stop offset="0%"   stopColor="#fff" stopOpacity="0"/>
-                      <stop offset="42%"  stopColor="#fff" stopOpacity="0.88"/>
-                      <stop offset="50%"  stopColor="#fff" stopOpacity="1"/>
-                      <stop offset="58%"  stopColor="#fff" stopOpacity="0.88"/>
-                      <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
-                    </linearGradient>
-                    <linearGradient id="fvr" x1="50%" y1="0%" x2="50%" y2="100%">
-                      <stop offset="0%"   stopColor="#fff" stopOpacity="0"/>
-                      <stop offset="42%"  stopColor="#fff" stopOpacity="0.88"/>
-                      <stop offset="50%"  stopColor="#fff" stopOpacity="1"/>
-                      <stop offset="58%"  stopColor="#fff" stopOpacity="0.88"/>
-                      <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
-                    </linearGradient>
-                    <linearGradient id="fdr" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%"   stopColor="#fde68a" stopOpacity="0"/>
-                      <stop offset="40%"  stopColor="#fde68a" stopOpacity="0.74"/>
-                      <stop offset="50%"  stopColor="#fde68a" stopOpacity="0.9"/>
-                      <stop offset="60%"  stopColor="#fde68a" stopOpacity="0.74"/>
-                      <stop offset="100%" stopColor="#fde68a" stopOpacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <rect x="-115" y="52" width="340" height="6"   fill="url(#fhr)"/>
-                  <rect x="52"   y="-115" width="6" height="340" fill="url(#fvr)"/>
-                  <rect x="-85"  y="52"  width="280" height="4"  fill="url(#fdr)" transform="rotate(45,55,55)"  opacity="0.64"/>
-                  <rect x="-85"  y="52"  width="280" height="4"  fill="url(#fdr)" transform="rotate(-45,55,55)" opacity="0.64"/>
-                  <circle cx="55" cy="55" r="34" fill="url(#fcg)"/>
-                  <circle cx="55" cy="55" r="10" fill="white" opacity="0.97"/>
-                  <circle cx="55" cy="55" r="4"  fill="white"/>
-                </svg>
-              </div>
             </div>
           </div>
 
@@ -202,7 +147,7 @@ export default function LandingPage() {
             {/* Botão CTA */}
             <button
               onClick={() => router.push('/auth')}
-              className="w-full font-heading italic text-black font-black tracking-[0.16em] uppercase rounded-[15px] active:scale-[0.975] transition-transform"
+              className="w-full font-heading italic text-white font-black tracking-[0.16em] uppercase rounded-[15px] active:scale-[0.975] transition-transform"
               style={{
                 padding: '19px',
                 fontSize: '1.08rem',
