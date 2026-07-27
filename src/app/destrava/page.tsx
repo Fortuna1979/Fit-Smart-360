@@ -51,10 +51,8 @@ export default function DestravaPage() {
 
   const [gpsConsent, setGpsConsent] = useState<boolean | null>(null);
   const [status, setStatus] = useState<Status>('idle');
-  const [isDay, setIsDay] = useState(() => {
-    const h = new Date().getHours(), m = new Date().getMinutes();
-    return h < 18 || (h === 18 && m < 30);
-  });
+  // Começa como true (claro); useEffect corrige imediatamente com horário local do dispositivo
+  const [isDay, setIsDay] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [distance, setDistance] = useState(0);
   const [position, setPosition] = useState<[number, number] | null>(null);

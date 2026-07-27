@@ -18,40 +18,47 @@ export default function LandingPage() {
     <div className="min-h-screen bg-black text-white">
       <style>{`
         @keyframes runIn {
-          0%   { transform: translateX(-110vw); opacity: 0; }
-          70%  { opacity: 1; }
-          100% { transform: translateX(0);      opacity: 1; }
+          0%   { transform: translateX(-110vw); }
+          78%  { transform: translateX(2.5%); }
+          90%  { transform: translateX(-1%); }
+          100% { transform: translateX(0); }
         }
         @keyframes gleam {
-          0%   { background-position: -300% center; }
-          100% { background-position:  300% center; }
+          0%   { background-position: 140% center; }
+          100% { background-position: -40% center; }
         }
         .hero-title {
-          animation: runIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards,
-                     gleam  1.4s ease-in-out 0.85s 3 both;
+          animation:
+            runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+            gleam 1.3s ease-in-out 1.25s 3;
           background: linear-gradient(
             90deg,
-            #a16207 0%,
-            #eab308 28%,
-            #fef9c3 46%,
+            #92400e  0%,
+            #b45309 12%,
+            #d97706 25%,
+            #eab308 38%,
+            #fefce8 46%,
             #ffffff 50%,
-            #fef9c3 54%,
-            #eab308 72%,
-            #a16207 100%
+            #fefce8 54%,
+            #eab308 62%,
+            #d97706 75%,
+            #b45309 88%,
+            #92400e 100%
           );
-          background-size: 300% auto;
+          background-size: 400% auto;
           -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           background-clip: text;
-          color: transparent;
+          display: block;
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         .fade-up { animation: fadeUp 0.6s ease-out forwards; }
-        .fade-up-1 { animation-delay: 1.0s; opacity: 0; }
-        .fade-up-2 { animation-delay: 1.2s; opacity: 0; }
-        .fade-up-3 { animation-delay: 1.4s; opacity: 0; }
+        .fade-up-1 { animation-delay: 1.4s; opacity: 0; }
+        .fade-up-2 { animation-delay: 1.6s; opacity: 0; }
+        .fade-up-3 { animation-delay: 1.8s; opacity: 0; }
       `}</style>
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
@@ -66,11 +73,11 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80" />
         </div>
 
-        {/* Foto inferior — mulher correndo */}
+        {/* Foto inferior — mulher correndo na esteira */}
         <div className="absolute bottom-0 left-0 right-0 h-[52%]">
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&h=800&fit=crop&q=80)' }}
+            style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1594882645126-14ac19a0ee2e?w=1200&h=800&fit=crop&q=80)' }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80" />
         </div>
@@ -94,9 +101,11 @@ export default function LandingPage() {
           </div>
 
           {/* Título animado — centro da tela */}
-          <div className="overflow-hidden -mx-2">
-            <h1 className="hero-title font-heading leading-none tracking-tighter text-center whitespace-nowrap"
-                style={{ fontSize: 'clamp(2.6rem, 12vw, 5rem)' }}>
+          <div style={{ overflow: 'hidden', clipPath: 'inset(0)', margin: '0 -8px' }}>
+            <h1
+              className="hero-title font-heading leading-none tracking-tighter text-center whitespace-nowrap"
+              style={{ fontSize: 'clamp(2.6rem, 12vw, 5rem)' }}
+            >
               FIT SMART 360°
             </h1>
           </div>
