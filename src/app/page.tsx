@@ -17,141 +17,204 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <style>{`
+        /* ── TITLE SLIDE-IN ── */
         @keyframes runIn {
           0%   { transform: translateX(-110vw); }
           78%  { transform: translateX(2.5%); }
           90%  { transform: translateX(-1%); }
           100% { transform: translateX(0); }
         }
-        @keyframes gleam {
-          0%   { background-position: 140% center; }
-          100% { background-position: -40% center; }
-        }
         .hero-title {
-          animation:
-            runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-            gleam 1.3s ease-in-out 1.25s 3;
-          background: linear-gradient(
-            90deg,
-            #92400e  0%,
-            #b45309 12%,
-            #d97706 25%,
-            #eab308 38%,
-            #fefce8 46%,
-            #ffffff 50%,
-            #fefce8 54%,
-            #eab308 62%,
-            #d97706 75%,
-            #b45309 88%,
-            #92400e 100%
-          );
-          background-size: 400% auto;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
           display: block;
+          text-align: center;
+          white-space: nowrap;
+          font-style: italic;
+          font-size: clamp(3rem, 13.5vw, 6rem);
+          letter-spacing: -0.02em;
+          line-height: 0.88;
+          color: #fff;
+          text-shadow: 3px 3px 0 rgba(0,0,0,0.92), 6px 6px 20px rgba(0,0,0,0.66);
+          animation: runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
+        /* ── LENS FLARE ── */
+        @keyframes flareFly {
+          0%   { left:-8%;  opacity:0;   transform:translateY(-50%) scale(0.5); }
+          4%   {            opacity:0.9; }
+          47%  { left:44%;  opacity:1;   transform:translateY(-50%) scale(1);   }
+          60%  { left:44%;  opacity:1;   transform:translateY(-50%) scale(2.6); }
+          73%  { left:44%;  opacity:0.85;transform:translateY(-50%) scale(1.8); }
+          86%  { left:44%;  opacity:0;   transform:translateY(-50%) scale(1.1); }
+          100% { left:44%;  opacity:0; }
         }
-        .fade-up { animation: fadeUp 0.6s ease-out forwards; }
-        .fade-up-1 { animation-delay: 1.4s; opacity: 0; }
-        .fade-up-2 { animation-delay: 1.6s; opacity: 0; }
-        .fade-up-3 { animation-delay: 1.8s; opacity: 0; }
+        .lens-flare {
+          position:absolute; top:50%; left:-8%;
+          width:110px; height:110px; opacity:0; pointer-events:none;
+          animation: flareFly 2.7s cubic-bezier(0.22,1,0.36,1) 1.15s 1 forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-title { animation:none; transform:translateX(0); }
+          .lens-flare { animation:none; opacity:0; }
+        }
       `}</style>
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative h-screen flex flex-col overflow-hidden bg-black">
+      <section className="h-screen bg-[#060606] flex items-stretch overflow-hidden">
+        <div className="w-full max-w-[430px] mx-auto flex flex-col px-3.5 pt-4 pb-4 gap-2.5">
 
-        {/* Foto superior — homem musculoso */}
-        <div className="absolute top-0 left-0 right-0 h-[52%]">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1200&h=800&fit=crop&q=80)' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/80" />
-        </div>
-
-        {/* Foto inferior — mulher correndo na esteira */}
-        <div className="absolute bottom-0 left-0 right-0 h-[52%]">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1594882645126-14ac19a0ee2e?w=1200&h=800&fit=crop&q=80)' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80" />
-        </div>
-
-        {/* Faixa central escura para o título */}
-        <div className="absolute inset-x-0 top-[44%] h-[14%] bg-gradient-to-b from-black/60 via-black/70 to-black/60 blur-sm" />
-
-        {/* Conteúdo sobre as fotos */}
-        <div className="relative z-10 h-full flex flex-col justify-between px-4 pt-10 pb-8 max-w-lg mx-auto w-full">
-
-          {/* Topo: logo + badge */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Dumbbell className="w-6 h-6 text-yellow-500" />
-              <span className="font-heading text-2xl text-white tracking-wide">FS360°</span>
+          {/* ── BARRA SUPERIOR: logo + badge ── */}
+          <div className="flex items-center justify-between flex-shrink-0">
+            {/* Logo ⚡FS360° */}
+            <div className="flex items-center gap-1">
+              <svg width="14" height="22" viewBox="0 0 14 22" aria-hidden="true">
+                <polygon points="9,0 2,12 7,12 6,22 13,10 8,10" fill="#eab308"/>
+              </svg>
+              <span className="font-heading italic text-[1.5rem] text-yellow-400 leading-none tracking-wide"
+                    style={{ textShadow: '0 0 18px rgba(234,179,8,0.45)' }}>
+                FS360°
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 bg-black/60 border border-yellow-500/50 rounded-full px-3 py-1.5 backdrop-blur-sm">
-              <Zap className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-              <span className="text-[11px] text-yellow-400 font-bold tracking-widest">IA ATIVA</span>
+            {/* Badge AI ACTIVE */}
+            <div className="flex items-center gap-1.5 border border-yellow-500/45 rounded-lg px-3 py-1.5 bg-black/35">
+              <span className="text-[11px] text-white font-bold tracking-[0.13em]">IA ATIVA</span>
+              <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
             </div>
           </div>
 
-          {/* Título animado — centro da tela */}
-          <div style={{ overflow: 'hidden', clipPath: 'inset(0)', margin: '0 -8px' }}>
-            <h1
-              className="hero-title font-heading leading-none tracking-tighter text-center whitespace-nowrap"
-              style={{ fontSize: 'clamp(2.6rem, 12vw, 5rem)' }}
-            >
-              FIT SMART 360°
-            </h1>
+          {/* ── CARD COM FOTOS ── */}
+          <div className="flex-1 min-h-0 relative rounded-[22px] overflow-hidden"
+               style={{ border: '1.5px solid rgba(180,110,10,0.2)' }}>
+
+            {/* Foto superior — homem musculoso */}
+            <div className="absolute top-0 left-0 right-0 h-[54%]">
+              <div className="absolute inset-0 bg-cover bg-top"
+                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1200&h=900&fit=crop&q=80)' }} />
+              {/* overlay + fade ao fundo */}
+              <div className="absolute inset-0"
+                   style={{ background: 'linear-gradient(to right,rgba(6,6,6,0.55) 0%,rgba(6,6,6,0.2) 55%,rgba(6,6,6,0.35) 100%)' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-[55%]"
+                   style={{ background: 'linear-gradient(to bottom,transparent,rgba(6,6,6,0.82))' }} />
+              {/* FITNESS PERFORMANCE */}
+              <div className="absolute top-4 left-4 z-10">
+                <p className="font-bold text-white leading-[1.04] tracking-[0.09em]"
+                   style={{ fontSize: 'clamp(1rem, 4.8vw, 1.3rem)', textShadow: '1px 1px 5px rgba(0,0,0,1)' }}>
+                  FITNESS
+                </p>
+                <p className="font-bold text-white leading-[1.04] tracking-[0.09em]"
+                   style={{ fontSize: 'clamp(1rem, 4.8vw, 1.3rem)', textShadow: '1px 1px 5px rgba(0,0,0,1)' }}>
+                  PERFORMANCE
+                </p>
+              </div>
+            </div>
+
+            {/* Foto inferior — mulher correndo na esteira */}
+            <div className="absolute bottom-0 left-0 right-0 h-[54%]">
+              <div className="absolute inset-0 bg-cover bg-center"
+                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1594882645126-14ac19a0ee2e?w=1200&h=900&fit=crop&q=80)' }} />
+              <div className="absolute inset-0"
+                   style={{ background: 'rgba(6,6,6,0.35)' }} />
+              <div className="absolute top-0 left-0 right-0 h-[60%]"
+                   style={{ background: 'linear-gradient(to top,transparent,rgba(6,6,6,0.78))' }} />
+              <div className="absolute bottom-0 left-0 right-0 h-[30%]"
+                   style={{ background: 'linear-gradient(to bottom,transparent,rgba(6,6,6,0.65))' }} />
+            </div>
+
+            {/* ── FAIXA DO TÍTULO (cruza o centro) ── */}
+            <div className="absolute left-0 right-0 z-20 py-1.5"
+                 style={{ top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.38)',
+                          overflow: 'hidden', clipPath: 'inset(0)' }}>
+              <h1 className="hero-title font-heading">FIT SMART 360°</h1>
+
+              {/* Lens flare star-burst */}
+              <div aria-hidden="true" className="lens-flare">
+                <svg width="110" height="110" viewBox="0 0 110 110" overflow="visible">
+                  <defs>
+                    <radialGradient id="fcg">
+                      <stop offset="0%"   stopColor="#fff"    stopOpacity="1"/>
+                      <stop offset="13%"  stopColor="#fef3c7" stopOpacity="0.98"/>
+                      <stop offset="32%"  stopColor="#f59e0b" stopOpacity="0.66"/>
+                      <stop offset="64%"  stopColor="#d97706" stopOpacity="0.26"/>
+                      <stop offset="100%" stopColor="#b45309" stopOpacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="fhr" x1="0%" y1="50%" x2="100%" y2="50%">
+                      <stop offset="0%"   stopColor="#fff" stopOpacity="0"/>
+                      <stop offset="42%"  stopColor="#fff" stopOpacity="0.88"/>
+                      <stop offset="50%"  stopColor="#fff" stopOpacity="1"/>
+                      <stop offset="58%"  stopColor="#fff" stopOpacity="0.88"/>
+                      <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="fvr" x1="50%" y1="0%" x2="50%" y2="100%">
+                      <stop offset="0%"   stopColor="#fff" stopOpacity="0"/>
+                      <stop offset="42%"  stopColor="#fff" stopOpacity="0.88"/>
+                      <stop offset="50%"  stopColor="#fff" stopOpacity="1"/>
+                      <stop offset="58%"  stopColor="#fff" stopOpacity="0.88"/>
+                      <stop offset="100%" stopColor="#fff" stopOpacity="0"/>
+                    </linearGradient>
+                    <linearGradient id="fdr" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%"   stopColor="#fde68a" stopOpacity="0"/>
+                      <stop offset="40%"  stopColor="#fde68a" stopOpacity="0.74"/>
+                      <stop offset="50%"  stopColor="#fde68a" stopOpacity="0.9"/>
+                      <stop offset="60%"  stopColor="#fde68a" stopOpacity="0.74"/>
+                      <stop offset="100%" stopColor="#fde68a" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="-115" y="52" width="340" height="6"   fill="url(#fhr)"/>
+                  <rect x="52"   y="-115" width="6" height="340" fill="url(#fvr)"/>
+                  <rect x="-85"  y="52"  width="280" height="4"  fill="url(#fdr)" transform="rotate(45,55,55)"  opacity="0.64"/>
+                  <rect x="-85"  y="52"  width="280" height="4"  fill="url(#fdr)" transform="rotate(-45,55,55)" opacity="0.64"/>
+                  <circle cx="55" cy="55" r="34" fill="url(#fcg)"/>
+                  <circle cx="55" cy="55" r="10" fill="white" opacity="0.97"/>
+                  <circle cx="55" cy="55" r="4"  fill="white"/>
+                </svg>
+              </div>
+            </div>
           </div>
 
-          {/* Rodapé do hero */}
-          <div className="space-y-5">
+          {/* ── SEÇÃO INFERIOR: avatares + botão ── */}
+          <div className="flex-shrink-0 flex flex-col gap-2">
 
-            {/* Avatares + contagem */}
-            <div className="fade-up fade-up-1 flex items-center gap-3">
-              <div className="flex -space-x-2.5">
-                {['bg-gray-600','bg-gray-500','bg-gray-700','bg-gray-600'].map((bg, i) => (
-                  <div key={i} className={`w-8 h-8 rounded-full ${bg} border-2 border-black flex items-center justify-center`}>
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 text-gray-300 fill-current"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-                  </div>
-                ))}
-                <div className="w-8 h-8 rounded-full bg-yellow-500 border-2 border-black flex items-center justify-center">
-                  <span className="text-[9px] font-black text-black leading-none text-center">FS<br/>360</span>
+            {/* Avatares */}
+            <div className="flex">
+              {[0.35, 0.30, 0.24, 0.18].map((op, i) => (
+                <div key={i}
+                     className="w-[42px] h-[42px] rounded-full bg-[#1c1c1c] flex items-center justify-center flex-shrink-0"
+                     style={{ marginRight: '-13px', border: '2.5px solid #060606',
+                              boxShadow: '0 0 0 1px rgba(180,100,10,0.18)' }}>
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" style={{ fill: `rgba(255,255,255,${op})` }}>
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                  </svg>
                 </div>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-white">+5.200 usuários ativos</p>
-                <p className="text-[10px] text-gray-400">treinando agora</p>
+              ))}
+              <div className="w-[42px] h-[42px] rounded-full flex items-center justify-center flex-shrink-0 text-black font-black leading-[1.15] text-center"
+                   style={{ marginRight: '-13px', border: '2.5px solid #060606', fontSize: '7.5px',
+                            background: 'linear-gradient(140deg,#d97706,#fbbf24)',
+                            boxShadow: '0 0 0 1px rgba(180,100,10,0.18)' }}>
+                FS<br/>CLUB
               </div>
             </div>
 
-            {/* Subtítulo */}
-            <div className="fade-up fade-up-2">
-              <p className="text-sm text-gray-300 leading-relaxed">
-                Fotografe os equipamentos da sua academia e receba treinos personalizados,
-                adaptados ao seu objetivo e condicionamento físico.
-              </p>
-            </div>
+            {/* FS Performance Platform */}
+            <p className="text-white font-bold tracking-[0.14em] pl-0.5"
+               style={{ fontSize: '11.5px' }}>
+              FS PERFORMANCE PLATFORM
+            </p>
 
-            {/* CTA */}
-            <div className="fade-up fade-up-3 space-y-3">
-              <Button
-                onClick={() => router.push('/auth')}
-                className="w-full bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 text-black font-black text-base py-6 rounded-2xl tracking-wide shadow-2xl shadow-yellow-500/25"
-              >
-                COMEÇAR GRÁTIS
-              </Button>
-              <p className="text-center text-xs text-gray-500">
-                Grátis para sempre · Sem cartão de crédito
-              </p>
-            </div>
+            {/* Botão CTA */}
+            <button
+              onClick={() => router.push('/auth')}
+              className="w-full font-heading italic text-black font-black tracking-[0.16em] uppercase rounded-[15px] active:scale-[0.975] transition-transform"
+              style={{
+                padding: '19px',
+                fontSize: '1.08rem',
+                background: 'linear-gradient(130deg,#191208 0%,#2e1c08 28%,#7c3b08 62%,#b45309 85%,#d97706 100%)',
+                border: '1px solid rgba(234,179,8,0.22)',
+                boxShadow: '0 6px 28px rgba(180,83,9,0.28), 0 2px 8px rgba(0,0,0,0.7)',
+              }}
+            >
+              COMEÇAR TREINO
+            </button>
           </div>
+
         </div>
       </section>
 
