@@ -68,12 +68,13 @@ export default function DestravaPage() {
     setGpsConsent(stored === 'true');
   }, []);
 
-  // Atualiza tema claro/escuro a cada minuto
+  // Atualiza tema claro/escuro — roda imediatamente no cliente (horário local) e a cada minuto
   useEffect(() => {
     const check = () => {
       const h = new Date().getHours(), m = new Date().getMinutes();
       setIsDay(h < 18 || (h === 18 && m < 30));
     };
+    check(); // corrige o horário UTC do servidor com o horário local do dispositivo
     const interval = setInterval(check, 60000);
     return () => clearInterval(interval);
   }, []);
