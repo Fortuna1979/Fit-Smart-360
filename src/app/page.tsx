@@ -97,9 +97,10 @@ export default function LandingPage() {
             display: block;
             text-align: center;
             white-space: nowrap;
-            font-family: var(--font-anton), Impact, 'Arial Black', sans-serif;
+            font-family: var(--font-barlow), var(--font-anton), Impact, 'Arial Black', sans-serif;
             font-style: italic;
-            font-size: clamp(4rem, 19vw, 8.5rem);
+            font-weight: 800;
+            font-size: clamp(3.2rem, 14.5vw, 6.5rem);
             letter-spacing: 0.01em;
             line-height: 1;
             color: #fff;
@@ -160,8 +161,7 @@ export default function LandingPage() {
             </div>
 
             {/* Card com imagem combinada */}
-            <div className="flex-1 min-h-0 relative rounded-[20px] overflow-hidden"
-                 style={{ border: '1.5px solid rgba(200,130,10,0.3)' }}>
+            <div className="flex-1 min-h-0 relative rounded-[20px] overflow-hidden">
               <div className="absolute inset-0"
                    style={{ backgroundImage: 'url(https://i.postimg.cc/NFzFCCBQ/Whats-App-Image-2026-07-27-at-16-35-09.jpg)',
                             backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }} />
