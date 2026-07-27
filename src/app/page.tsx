@@ -29,11 +29,11 @@ export default function LandingPage() {
           text-align: center;
           white-space: nowrap;
           font-style: italic;
-          font-size: clamp(3rem, 13.5vw, 6rem);
-          letter-spacing: -0.02em;
-          line-height: 0.88;
+          font-size: clamp(3.5rem, 15.5vw, 7rem);
+          letter-spacing: -0.01em;
+          line-height: 1;
           color: #fff;
-          text-shadow: 3px 3px 0 rgba(0,0,0,0.92), 6px 6px 20px rgba(0,0,0,0.66);
+          text-shadow: 2px 2px 0 rgba(0,0,0,0.85), 5px 5px 18px rgba(0,0,0,0.6);
           animation: runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @media (prefers-reduced-motion: reduce) {
@@ -42,118 +42,117 @@ export default function LandingPage() {
       `}</style>
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="h-screen bg-[#060606] flex items-stretch overflow-hidden">
-        <div className="w-full max-w-[430px] mx-auto flex flex-col px-3.5 pt-4 pb-4 gap-2.5">
+      <section className="h-screen bg-black flex flex-col overflow-hidden">
+        <div className="w-full max-w-[430px] mx-auto flex flex-col h-full px-4 pt-5 pb-5">
 
           {/* ── BARRA SUPERIOR: logo + badge ── */}
-          <div className="flex items-center justify-between flex-shrink-0">
-            {/* Logo ⚡FS360° */}
+          <div className="flex-shrink-0 flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5">
-              <svg width="20" height="30" viewBox="0 0 14 22" aria-hidden="true">
+              <svg width="22" height="32" viewBox="0 0 14 22" aria-hidden="true">
                 <polygon points="9,0 2,12 7,12 6,22 13,10 8,10" fill="#eab308"/>
               </svg>
-              <span className="font-heading italic text-[2rem] text-yellow-400 leading-none tracking-wide"
-                    style={{ textShadow: '0 0 22px rgba(234,179,8,0.55)' }}>
+              <span className="font-heading italic leading-none"
+                    style={{ fontSize: '2.1rem', color: '#eab308',
+                             textShadow: '0 0 20px rgba(234,179,8,0.5)' }}>
                 FS360°
               </span>
             </div>
-            {/* Badge AI ACTIVE */}
-            <div className="flex items-center gap-1.5 border border-yellow-500/45 rounded-lg px-3 py-1.5 bg-black/35">
-              <span className="text-[11px] text-white font-bold tracking-[0.13em]">IA ATIVA</span>
-              <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+            <div style={{ border: '1.5px solid rgba(234,179,8,0.6)', borderRadius: '8px',
+                          padding: '6px 14px', background: 'rgba(0,0,0,0.4)',
+                          display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: '#eab308', fontSize: '12px', fontWeight: 700,
+                             letterSpacing: '0.12em' }}>AI ACTIVE</span>
+              <Zap className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
             </div>
+          </div>
+
+          {/* ── FITNESS PERFORMANCE — fora do card, acima dele ── */}
+          <div className="flex-shrink-0 mb-2.5">
+            <p className="text-white font-black leading-[1.05]"
+               style={{ fontSize: 'clamp(1.15rem, 5.2vw, 1.5rem)', letterSpacing: '0.04em',
+                        textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }}>
+              FITNESS
+            </p>
+            <p className="text-white font-black leading-[1.05]"
+               style={{ fontSize: 'clamp(1.15rem, 5.2vw, 1.5rem)', letterSpacing: '0.04em',
+                        textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }}>
+              PERFORMANCE
+            </p>
           </div>
 
           {/* ── CARD COM FOTOS ── */}
-          <div className="flex-1 min-h-0 relative rounded-[22px] overflow-hidden"
-               style={{ border: '1.5px solid rgba(180,110,10,0.2)' }}>
+          <div className="flex-1 min-h-0 relative rounded-[20px] overflow-hidden"
+               style={{ border: '1.5px solid rgba(200,130,10,0.3)' }}>
 
             {/* Foto superior — homem musculoso */}
-            <div className="absolute top-0 left-0 right-0 h-[54%]">
-              <div className="absolute inset-0 bg-cover bg-top"
-                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1200&h=900&fit=crop&q=80)' }} />
-              {/* overlay + fade ao fundo */}
-              <div className="absolute inset-0"
-                   style={{ background: 'linear-gradient(to right,rgba(6,6,6,0.55) 0%,rgba(6,6,6,0.2) 55%,rgba(6,6,6,0.35) 100%)' }} />
-              <div className="absolute bottom-0 left-0 right-0 h-[55%]"
-                   style={{ background: 'linear-gradient(to bottom,transparent,rgba(6,6,6,0.82))' }} />
-              {/* FITNESS PERFORMANCE */}
-              <div className="absolute top-4 left-4 z-10">
-                <p className="font-bold text-white leading-[1.04] tracking-[0.09em]"
-                   style={{ fontSize: 'clamp(1rem, 4.8vw, 1.3rem)', textShadow: '1px 1px 5px rgba(0,0,0,1)' }}>
-                  FITNESS
-                </p>
-                <p className="font-bold text-white leading-[1.04] tracking-[0.09em]"
-                   style={{ fontSize: 'clamp(1rem, 4.8vw, 1.3rem)', textShadow: '1px 1px 5px rgba(0,0,0,1)' }}>
-                  PERFORMANCE
-                </p>
-              </div>
+            <div className="absolute top-0 left-0 right-0" style={{ height: '52%' }}>
+              <div className="absolute inset-0 bg-cover"
+                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1200&h=900&fit=crop&q=85)',
+                            backgroundPosition: 'center top' }} />
+              <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.22)' }} />
+              <div className="absolute bottom-0 left-0 right-0" style={{ height: '45%',
+                   background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.75))' }} />
             </div>
 
             {/* Foto inferior — mulher correndo na esteira */}
-            <div className="absolute bottom-0 left-0 right-0 h-[54%]">
+            <div className="absolute bottom-0 left-0 right-0" style={{ height: '52%' }}>
               <div className="absolute inset-0 bg-cover bg-center"
-                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1571019613576-2b22c76fd955?w=1200&h=900&fit=crop&q=80)' }} />
-              {/* overlay leve — suficiente para o título ser legível sem esconder a foto */}
-              <div className="absolute inset-0"
-                   style={{ background: 'rgba(6,6,6,0.18)' }} />
-              {/* fade sutil no topo para fundir com o título */}
-              <div className="absolute top-0 left-0 right-0 h-[28%]"
-                   style={{ background: 'linear-gradient(to bottom,rgba(6,6,6,0.55),transparent)' }} />
-              {/* fade suave no rodapé */}
-              <div className="absolute bottom-0 left-0 right-0 h-[25%]"
-                   style={{ background: 'linear-gradient(to top,rgba(6,6,6,0.5),transparent)' }} />
+                   style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1571019613576-2b22c76fd955?w=1200&h=900&fit=crop&q=85)' }} />
+              <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.2)' }} />
+              <div className="absolute top-0 left-0 right-0" style={{ height: '40%',
+                   background: 'linear-gradient(to top, transparent, rgba(0,0,0,0.7))' }} />
+              <div className="absolute bottom-0 left-0 right-0" style={{ height: '30%',
+                   background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.6))' }} />
             </div>
 
-            {/* ── FAIXA DO TÍTULO (cruza o centro) ── */}
-            <div className="absolute left-0 right-0 z-20 py-1.5"
-                 style={{ top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.38)',
-                          overflow: 'hidden', clipPath: 'inset(0)' }}>
+            {/* ── FAIXA DO TÍTULO — cruza o centro exato ── */}
+            <div className="absolute left-0 right-0 z-20"
+                 style={{ top: '50%', transform: 'translateY(-50%)',
+                          background: 'rgba(0,0,0,0.48)', overflow: 'hidden', clipPath: 'inset(0)' }}>
               <h1 className="hero-title font-heading">FIT SMART 360°</h1>
-
             </div>
           </div>
 
-          {/* ── SEÇÃO INFERIOR: avatares + botão ── */}
-          <div className="flex-shrink-0 flex flex-col gap-2">
+          {/* ── SEÇÃO INFERIOR ── */}
+          <div className="flex-shrink-0 mt-3 flex flex-col gap-2">
 
             {/* Avatares */}
-            <div className="flex">
-              {[0.35, 0.30, 0.24, 0.18].map((op, i) => (
+            <div className="flex items-center">
+              {[0.4, 0.32, 0.25, 0.18].map((op, i) => (
                 <div key={i}
-                     className="w-[42px] h-[42px] rounded-full bg-[#1c1c1c] flex items-center justify-center flex-shrink-0"
-                     style={{ marginRight: '-13px', border: '2.5px solid #060606',
-                              boxShadow: '0 0 0 1px rgba(180,100,10,0.18)' }}>
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" style={{ fill: `rgba(255,255,255,${op})` }}>
+                     className="w-[44px] h-[44px] rounded-full bg-[#1a1a1a] flex items-center justify-center"
+                     style={{ marginRight: '-14px', border: '2px solid #000',
+                              boxShadow: '0 0 0 1.5px rgba(200,130,10,0.35)' }}>
+                  <svg viewBox="0 0 24 24" width="22" height="22" style={{ fill: `rgba(255,255,255,${op})` }}>
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
                   </svg>
                 </div>
               ))}
-              <div className="w-[42px] h-[42px] rounded-full flex items-center justify-center flex-shrink-0 text-black font-black leading-[1.15] text-center"
-                   style={{ marginRight: '-13px', border: '2.5px solid #060606', fontSize: '7.5px',
-                            background: 'linear-gradient(140deg,#d97706,#fbbf24)',
-                            boxShadow: '0 0 0 1px rgba(180,100,10,0.18)' }}>
+              <div className="w-[44px] h-[44px] rounded-full flex items-center justify-center font-black text-center"
+                   style={{ marginRight: 0, border: '2px solid #000', fontSize: '7.5px', lineHeight: 1.2,
+                            background: 'linear-gradient(140deg,#b45309,#f59e0b)',
+                            color: '#000', boxShadow: '0 0 0 1.5px rgba(200,130,10,0.35)' }}>
                 FS<br/>CLUB
               </div>
             </div>
 
-            {/* FS Performance Platform */}
-            <p className="text-white font-bold tracking-[0.14em] pl-0.5"
-               style={{ fontSize: '11.5px' }}>
+            <p style={{ color: '#fff', fontWeight: 700, letterSpacing: '0.13em', fontSize: '11px' }}>
               FS PERFORMANCE PLATFORM
             </p>
 
-            {/* Botão CTA */}
+            {/* Botão */}
             <button
               onClick={() => router.push('/auth')}
-              className="w-full font-heading italic text-white font-black tracking-[0.16em] uppercase rounded-[15px] active:scale-[0.975] transition-transform"
+              className="w-full font-heading italic font-black tracking-[0.15em] uppercase active:scale-[0.975] transition-transform"
               style={{
-                padding: '19px',
-                fontSize: '1.08rem',
-                background: 'linear-gradient(130deg,#191208 0%,#2e1c08 28%,#7c3b08 62%,#b45309 85%,#d97706 100%)',
-                border: '1px solid rgba(234,179,8,0.22)',
-                boxShadow: '0 6px 28px rgba(180,83,9,0.28), 0 2px 8px rgba(0,0,0,0.7)',
+                padding: '18px',
+                fontSize: '1.1rem',
+                color: '#f59e0b',
+                borderRadius: '12px',
+                background: 'linear-gradient(90deg, #0a0a0a 0%, #1c1008 40%, #3b1c08 70%, #78350f 100%)',
+                border: '1.5px solid rgba(234,179,8,0.35)',
+                boxShadow: '0 4px 24px rgba(180,83,9,0.3), 0 1px 6px rgba(0,0,0,0.8)',
               }}
             >
               COMEÇAR TREINO
