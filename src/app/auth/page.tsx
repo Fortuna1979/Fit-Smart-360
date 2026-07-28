@@ -123,7 +123,7 @@ export default function AuthPage() {
   ) => (
     <div className="flex items-center rounded-2xl px-4 gap-3"
          style={{ background: '#111', border: '1.5px solid #222', height: 64 }}>
-      <span className="text-yellow-400 flex-shrink-0">{icon}</span>
+      <span className="text-white flex-shrink-0">{icon}</span>
       <div className="w-px h-6 bg-gray-700 flex-shrink-0" />
       <input
         id={id}
@@ -147,7 +147,7 @@ export default function AuthPage() {
       {/* Voltar */}
       <button
         onClick={() => router.push('/')}
-        className="flex items-center gap-2 text-yellow-400 font-bold tracking-widest text-sm mb-2 w-fit active:opacity-70"
+        className="flex items-center gap-2 text-white font-bold tracking-widest text-sm mb-2 w-fit active:opacity-70"
       >
         <ArrowLeft className="w-5 h-5" />
         VOLTAR
@@ -156,7 +156,7 @@ export default function AuthPage() {
       {/* Haltere */}
       <div className="flex justify-center" style={{ marginTop: 24, marginBottom: 36 }}>
         <Dumbbell
-          className="text-yellow-400"
+          className="text-white"
           style={{ width: 130, height: 130, transform: 'rotate(-20deg)' }}
           strokeWidth={2}
         />
