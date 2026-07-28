@@ -18,7 +18,7 @@ const SLIDES = [
   },
   {
     id: 'destrava',
-    photo: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&h=1600&fit=crop&q=85',
+    photo: 'https://i.postimg.cc/XNTzrpXC/file-00000000b1a8820eb3b72e5a9c9aa52d.png',
     appScreen: null as string | null,
     title: 'DESTRAVA', sub: 'CORRA · PEDALA · CARDIO',
     tag: 'Corrida, ciclismo e cardio intenso — tudo em uma só tela',
