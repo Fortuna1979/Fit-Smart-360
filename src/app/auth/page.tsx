@@ -156,7 +156,7 @@ export default function AuthPage() {
       {/* Haltere */}
       <div className="flex justify-center" style={{ marginTop: 24, marginBottom: 36 }}>
         <Dumbbell
-          className="text-white"
+          className="text-yellow-400"
           style={{ width: 130, height: 130, transform: 'rotate(-20deg)' }}
           strokeWidth={2}
         />
@@ -226,8 +226,8 @@ export default function AuthPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full font-bold flex items-center justify-between px-6 rounded-2xl active:scale-[0.98] transition-transform disabled:opacity-60"
-          style={{ background: '#f59e0b', color: '#000', height: 68, fontSize: '1.15rem', letterSpacing: '0.08em', marginTop: 4 }}
+          className="w-full font-bold flex items-center justify-between px-6 rounded-2xl active:scale-[0.98] active:bg-yellow-400 transition-all disabled:opacity-60"
+          style={{ background: '#ffffff', color: '#000', height: 68, fontSize: '1.15rem', letterSpacing: '0.08em', marginTop: 4 }}
         >
           <span>{isSubmitting ? 'AGUARDE...' : isLogin ? 'ENTRAR' : 'CRIAR CONTA'}</span>
           <ArrowRight className="w-6 h-6" />
