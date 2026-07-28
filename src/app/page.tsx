@@ -19,7 +19,7 @@ const SLIDES = [
   },
   {
     id: 'destrava',
-    photo: 'https://i.postimg.cc/XNTzrpXC/file-00000000b1a8820eb3b72e5a9c9aa52d.png',
+    photo: 'https://dytgdrmyxfugmtldzzqd.supabase.co/storage/v1/object/public/landing/destrava.webp',
     appScreen: null as string | null,
     title: 'DESTRAVA', sub: 'CORRA · PEDALA · CARDIO',
     tag: 'Corrida, ciclismo e cardio intenso — tudo em uma só tela',
@@ -27,7 +27,7 @@ const SLIDES = [
   },
   {
     id: 'calistenia',
-    photo: 'https://i.postimg.cc/NMZp2zGw/file-0000000066bc820eafa8cdcc31a997e9.png',
+    photo: 'https://dytgdrmyxfugmtldzzqd.supabase.co/storage/v1/object/public/landing/calistenia.webp',
     appScreen: null as string | null,
     title: 'CALISTENIA', sub: 'PESO CORPORAL',
     tag: 'Treino sem equipamento — apenas seu corpo, qualquer lugar',
@@ -35,7 +35,7 @@ const SLIDES = [
   },
   {
     id: 'hidratacao',
-    photo: 'https://i.postimg.cc/t49D6Pbg/file-000000005148820e96b7cb1ff888a259.png',
+    photo: 'https://dytgdrmyxfugmtldzzqd.supabase.co/storage/v1/object/public/landing/hidratacao.webp',
     appScreen: null as string | null,
     title: 'HIDRATAÇÃO', sub: 'INTELIGENTE',
     tag: 'Lembretes automáticos para manter seu rendimento no pico',
@@ -51,7 +51,7 @@ const SLIDES = [
   },
   {
     id: 'conquistas',
-    photo: 'https://i.postimg.cc/tTz4YLtf/file-0000000091bc820eaab69d5e4590c403.png',
+    photo: 'https://dytgdrmyxfugmtldzzqd.supabase.co/storage/v1/object/public/landing/conquistas.webp',
     appScreen: null as string | null,
     title: 'CONQUISTAS', sub: '& EVOLUÇÃO',
     tag: 'Badges e recordes pessoais que te mantêm motivado',
@@ -140,7 +140,7 @@ export default function LandingPage() {
             <div className="flex-1 min-h-0 relative rounded-[20px] overflow-hidden">
               {/* Imagem já com título embutido — priority: carrega antes de tudo */}
               <Image
-                src="https://i.postimg.cc/2y9PVwqx/file-00000000d144820ebc28f7f8d04acff0.png"
+                src="https://dytgdrmyxfugmtldzzqd.supabase.co/storage/v1/object/public/landing/hero.webp"
                 alt="Fit Smart 360"
                 fill
                 priority
