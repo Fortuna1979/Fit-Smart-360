@@ -5,13 +5,12 @@ import { useRouter } from 'next/navigation';
 import {
   ArrowRight, ArrowLeft, User, Scale, Ruler, Calendar, Target,
   Activity, AlertCircle, CheckCircle2, Heart, Pill, Dumbbell,
-  Coffee, Moon, Cigarette, Clock, ClipboardList
+  Coffee, Moon, Cigarette, Clock, ClipboardList, Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import { calculateBMI, getBMICategory, determineFitnessLevel, translateGoal, translateFitnessLevel } from '@/lib/utils';
 import { saveUserData } from '@/lib/supabase-helpers';
 import { useRequireAuth } from '@/hooks/use-require-auth';
@@ -559,19 +558,32 @@ export default function OnboardingPage() {
                     <YesNo value={formData.usesGLP1Medication} onChange={v => handle('usesGLP1Medication', v)} />
                   </RadioGroup>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-gray-800/50 border border-yellow-500/30 rounded-xl">
-                  <Checkbox id="consent" checked={consentGiven} onCheckedChange={c => setConsentGiven(c === true)} className="mt-0.5 shrink-0" />
-                  <Label htmlFor="consent" className="text-sm text-gray-300 font-normal leading-relaxed cursor-pointer">
-                    <span className="font-semibold text-white block mb-1">Consentimento para dados de saúde (LGPD art. 11)</span>
-                    Concordo que o Fit Smart 360° trate os dados de saúde informados neste questionário
-                    — incluindo condições cardíacas (PAR-Q), doenças crônicas, medicamentos, lesões,
-                    histórico familiar, cirurgia bariátrica, uso de GLP-1 e hábitos de vida — exclusivamente
-                    para personalizar e garantir a segurança dos meus treinos. Posso revogar este
-                    consentimento a qualquer momento excluindo minha conta. Declaro ter lido a{' '}
-                    <button type="button" onClick={() => router.push('/privacidade')} className="text-yellow-500 hover:underline">
-                      Política de Privacidade
-                    </button>.
-                  </Label>
+                <div
+                  className="flex items-start gap-3 p-4 bg-gray-800/50 border border-yellow-500/30 rounded-xl cursor-pointer"
+                  onClick={() => setConsentGiven(v => !v)}
+                >
+                  <div className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                    consentGiven ? 'bg-yellow-400 border-yellow-400' : 'border-gray-500 bg-transparent'
+                  }`}>
+                    {consentGiven && <Check className="w-3 h-3 text-black" strokeWidth={3} />}
+                  </div>
+                  <div className="flex-1 text-sm text-gray-300 leading-relaxed">
+                    <p className="font-semibold text-white mb-1">Consentimento para dados de saúde (LGPD art. 11)</p>
+                    <p>
+                      Concordo que o Fit Smart 360° trate os dados de saúde informados neste questionário
+                      — incluindo condições cardíacas (PAR-Q), doenças crônicas, medicamentos, lesões,
+                      histórico familiar, cirurgia bariátrica, uso de GLP-1 e hábitos de vida — exclusivamente
+                      para personalizar e garantir a segurança dos meus treinos. Posso revogar este
+                      consentimento a qualquer momento excluindo minha conta. Declaro ter lido a{' '}
+                      <button
+                        type="button"
+                        onClick={e => { e.stopPropagation(); router.push('/privacidade'); }}
+                        className="text-yellow-500 underline"
+                      >
+                        Política de Privacidade
+                      </button>.
+                    </p>
+                  </div>
                 </div>
                 {isStepValid() && (
                   <div className="p-5 bg-gradient-to-br from-yellow-500/20 to-yellow-600/20 border border-yellow-500/30 rounded-xl space-y-3">
