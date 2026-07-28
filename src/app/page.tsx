@@ -34,7 +34,7 @@ const SLIDES = [
   },
   {
     id: 'hidratacao',
-    photo: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=1600&fit=crop&q=85',
+    photo: 'https://i.postimg.cc/t49D6Pbg/file-000000005148820e96b7cb1ff888a259.png',
     appScreen: null as string | null,
     title: 'HIDRATAÇÃO', sub: 'INTELIGENTE',
     tag: 'Lembretes automáticos para manter seu rendimento no pico',
