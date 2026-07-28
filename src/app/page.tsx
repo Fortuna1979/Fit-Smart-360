@@ -182,9 +182,14 @@ export default function LandingPage() {
             className="flex-shrink-0 w-screen h-screen relative overflow-hidden"
             style={{ scrollSnapAlign: 'start', background: '#000' }}
           >
-            {/* Foto de fundo */}
-            <div className="absolute inset-0 bg-cover bg-center"
-                 style={{ backgroundImage: `url(${slide.photo})` }} />
+            {/* Foto de fundo — lazy load: só carrega quando o slide fica visível */}
+            <img
+              src={slide.photo}
+              alt={slide.title}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             {/* Gradiente dramático */}
             <div className="absolute inset-0"
                  style={{ background: 'linear-gradient(to bottom,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.04) 30%,rgba(0,0,0,0.55) 62%,rgba(0,0,0,0.95) 100%)' }} />
