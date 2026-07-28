@@ -87,26 +87,6 @@ export default function LandingPage() {
         <style>{`
           #carousel::-webkit-scrollbar { display: none; }
           #carousel { scrollbar-width: none; }
-          @keyframes runIn {
-            0%   { transform: translateX(-110vw); }
-            78%  { transform: translateX(2.5%); }
-            90%  { transform: translateX(-1%); }
-            100% { transform: translateX(0); }
-          }
-          .hero-title {
-            display: block;
-            text-align: center;
-            white-space: nowrap;
-            font-family: 'Aero Matics', var(--font-barlow), var(--font-anton), Impact, 'Arial Black', sans-serif;
-            font-style: italic;
-            font-weight: 700;
-            font-size: clamp(3rem, 13.5vw, 6rem);
-            letter-spacing: 0.01em;
-            line-height: 1;
-            color: #fff;
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.9), 6px 6px 20px rgba(0,0,0,0.65);
-            animation: runIn 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-          }
           .slide-title {
             font-style: italic;
             font-size: clamp(2.8rem, 12vw, 5rem);
@@ -114,9 +94,6 @@ export default function LandingPage() {
             color: #fff;
             letter-spacing: -0.02em;
             text-shadow: 2px 2px 0 rgba(0,0,0,0.75);
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .hero-title { animation: none; transform: translateX(0); }
           }
         `}</style>
 
@@ -162,23 +139,10 @@ export default function LandingPage() {
 
             {/* Card com imagem combinada */}
             <div className="flex-1 min-h-0 relative rounded-[20px] overflow-hidden">
+              {/* Imagem já com título embutido */}
               <div className="absolute inset-0"
-                   style={{ backgroundImage: 'url(https://i.postimg.cc/NFzFCCBQ/Whats-App-Image-2026-07-27-at-16-35-09.jpg)',
-                            backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }} />
-              <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.08)' }} />
-
-              {/* Faixa do título */}
-              <div className="absolute left-0 right-0 z-10"
-                   style={{ top: '47%', transform: 'translateY(-50%)',
-                            background: 'rgba(0,0,0,0.48)', overflow: 'hidden', clipPath: 'inset(0)' }}>
-                <h1 className="hero-title">FIT SMART 360°</h1>
-              </div>
-
-              {/* Mulher na frente do título — mesma imagem, clipeada para mostrar só a metade inferior */}
-              <div className="absolute inset-0 z-20"
-                   style={{ backgroundImage: 'url(https://i.postimg.cc/NFzFCCBQ/Whats-App-Image-2026-07-27-at-16-35-09.jpg)',
-                            backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat',
-                            clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)' }} />
+                   style={{ backgroundImage: 'url(https://i.postimg.cc/2y9PVwqx/file-00000000d144820ebc28f7f8d04acff0.png)',
+                            backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
             </div>
 
             {/* Seção inferior */}
