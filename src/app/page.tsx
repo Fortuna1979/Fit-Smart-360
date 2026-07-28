@@ -50,7 +50,7 @@ const SLIDES = [
   },
   {
     id: 'conquistas',
-    photo: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&h=1600&fit=crop&q=85',
+    photo: 'https://i.postimg.cc/tTz4YLtf/file-0000000091bc820eaab69d5e4590c403.png',
     appScreen: null as string | null,
     title: 'CONQUISTAS', sub: '& EVOLUÇÃO',
     tag: 'Badges e recordes pessoais que te mantêm motivado',
