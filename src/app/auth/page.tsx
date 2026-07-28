@@ -2,11 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Dumbbell, Mail, Lock, User, ArrowLeft, MailCheck } from 'lucide-react';
+import { Dumbbell, Mail, Lock, User, ArrowLeft, ArrowRight, Eye, EyeOff, MailCheck } from 'lucide-react';
 import InstallPrompt from '@/components/InstallPrompt';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { getSupabaseClient } from '@/lib/supabase';
 import { getUserData } from '@/lib/supabase-helpers';
 
@@ -24,9 +21,10 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
   const [signupEmail, setSignupEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -37,7 +35,6 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-    setInfoMessage(null);
 
     const supabase = getSupabaseClient();
     if (!supabase) {
@@ -54,10 +51,7 @@ export default function AuthPage() {
           password: formData.password,
         });
 
-        if (error) {
-          setErrorMessage(translateAuthError(error.message));
-          return;
-        }
+        if (error) { setErrorMessage(translateAuthError(error.message)); return; }
 
         const userData = await getUserData();
         router.push(userData ? '/dashboard' : '/onboarding');
@@ -76,10 +70,7 @@ export default function AuthPage() {
           },
         });
 
-        if (error) {
-          setErrorMessage(translateAuthError(error.message));
-          return;
-        }
+        if (error) { setErrorMessage(translateAuthError(error.message)); return; }
 
         if (data.session) {
           router.push('/onboarding');
@@ -88,8 +79,7 @@ export default function AuthPage() {
           setEmailSent(true);
         }
       }
-    } catch (error) {
-      console.error('Erro na autenticação:', error);
+    } catch {
       setErrorMessage('Ocorreu um erro inesperado. Tente novamente.');
     } finally {
       setIsSubmitting(false);
@@ -97,241 +87,181 @@ export default function AuthPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  /* ── Tela de confirmação de e-mail ── */
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(234,179,8,0.15),transparent_60%)]" />
-        <div className="relative w-full max-w-md text-center">
-          <div className="bg-gray-900 border border-gray-800 rounded-3xl p-10 shadow-2xl">
-            <div className="flex items-center justify-center gap-2 mb-8">
-              <Dumbbell className="w-9 h-9 text-yellow-500" />
-              <span className="font-heading text-4xl bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent tracking-wide">
-                Fit Smart 360°
-              </span>
-            </div>
-            <div className="flex justify-center mb-6">
-              <div className="w-24 h-24 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center">
-                <MailCheck className="w-12 h-12 text-yellow-500" />
-              </div>
-            </div>
-            <h1 className="font-heading text-3xl mb-3">Verifique seu e-mail</h1>
-            <p className="text-gray-400 mb-2">Enviamos um link de confirmação para:</p>
-            <p className="text-yellow-400 font-semibold mb-6">{signupEmail}</p>
-            <p className="text-gray-500 text-sm mb-8">
-              Clique no link do e-mail para ativar sua conta e acessar o Fit Smart 360º.
-              Verifique também a pasta de spam.
-            </p>
-            <Button
-              onClick={() => { setEmailSent(false); setIsLogin(true); }}
-              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-300 text-black font-bold py-6 rounded-2xl text-lg"
-            >
-              Já confirmei, fazer login
-            </Button>
-          </div>
-        </div>
+      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6 text-center">
+        <Dumbbell className="text-yellow-400 mb-8" style={{ width: 80, height: 80, transform: 'rotate(-20deg)' }} strokeWidth={2} />
+        <MailCheck className="text-yellow-400 mb-4" style={{ width: 56, height: 56 }} />
+        <h1 className="text-2xl font-bold mb-2">Verifique seu e-mail</h1>
+        <p className="text-gray-400 mb-1">Enviamos um link de confirmação para:</p>
+        <p className="text-yellow-400 font-semibold mb-6">{signupEmail}</p>
+        <p className="text-gray-500 text-sm mb-8">Clique no link para ativar sua conta. Verifique também o spam.</p>
+        <button
+          onClick={() => { setEmailSent(false); setIsLogin(true); }}
+          className="w-full max-w-sm bg-yellow-400 text-black font-bold py-5 rounded-2xl flex items-center justify-between px-6 active:scale-[0.98] transition-transform"
+        >
+          <span className="text-lg tracking-wide">JÁ CONFIRMEI</span>
+          <ArrowRight className="w-6 h-6" />
+        </button>
       </div>
     );
   }
 
+  /* ── Campos de input reutilizáveis ── */
+  const inputRow = (
+    icon: React.ReactNode,
+    id: string,
+    name: string,
+    type: string,
+    placeholder: string,
+    value: string,
+    rightIcon?: React.ReactNode
+  ) => (
+    <div className="flex items-center rounded-2xl px-4 gap-3"
+         style={{ background: '#111', border: '1.5px solid #222', height: 64 }}>
+      <span className="text-yellow-400 flex-shrink-0">{icon}</span>
+      <div className="w-px h-6 bg-gray-700 flex-shrink-0" />
+      <input
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={handleChange}
+        required
+        autoComplete={type === 'password' ? 'current-password' : type === 'email' ? 'email' : 'name'}
+        className="flex-1 bg-transparent text-white placeholder-gray-600 outline-none text-base"
+      />
+      {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+    </div>
+  );
+
+  /* ── Tela principal de login / cadastro ── */
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(234,179,8,0.1),transparent_50%)]" />
+    <div className="min-h-screen bg-black text-white flex flex-col px-6" style={{ paddingTop: 48, paddingBottom: 32 }}>
 
-      <div className="relative w-full max-w-md">
-        {/* Back Button */}
-        <Button
-          onClick={() => router.push('/')}
-          variant="ghost"
-          className="mb-6 text-gray-400 hover:text-white"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
-        </Button>
+      {/* Voltar */}
+      <button
+        onClick={() => router.push('/')}
+        className="flex items-center gap-2 text-yellow-400 font-bold tracking-widest text-sm mb-2 w-fit active:opacity-70"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        VOLTAR
+      </button>
 
-        {/* Card */}
-        <div className="bg-gray-900 border border-gray-800 rounded-3xl p-5 sm:p-8 shadow-2xl">
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-2 mb-8">
-            <Dumbbell className="w-10 h-10 text-yellow-500" />
-            <span className="font-heading text-4xl bg-gradient-to-r from-yellow-500 to-yellow-300 bg-clip-text text-transparent tracking-wide">
-              Fit Smart 360°
-            </span>
+      {/* Haltere */}
+      <div className="flex justify-center" style={{ marginTop: 24, marginBottom: 36 }}>
+        <Dumbbell
+          className="text-yellow-400"
+          style={{ width: 130, height: 130, transform: 'rotate(-20deg)' }}
+          strokeWidth={2}
+        />
+      </div>
+
+      {/* Erro */}
+      {errorMessage && (
+        <div className="mb-4 px-4 py-3 rounded-2xl text-center text-sm text-red-400"
+             style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Formulário */}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+        {!isLogin && (
+          <div>
+            <p className="text-xs font-bold tracking-widest text-gray-400 mb-2 uppercase">Nome</p>
+            {inputRow(<User className="w-5 h-5" />, 'name', 'name', 'text', 'Seu nome completo', formData.name)}
           </div>
+        )}
 
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="font-heading text-3xl mb-2">
-              {isLogin ? 'Bem-vindo de volta!' : 'Crie sua conta'}
-            </h1>
-            <p className="text-gray-400">
-              {isLogin 
-                ? 'Entre para continuar seu treino' 
-                : 'Comece sua jornada fitness hoje'}
-            </p>
-          </div>
+        <div>
+          <p className="text-xs font-bold tracking-widest text-gray-400 mb-2 uppercase">E-mail</p>
+          {inputRow(<Mail className="w-5 h-5" />, 'email', 'email', 'email', 'seu@email.com', formData.email)}
+        </div>
 
-          {/* Messages */}
-          {errorMessage && (
-            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
-              <p className="text-sm text-center text-red-400">{errorMessage}</p>
-            </div>
-          )}
-          {infoMessage && (
-            <div className="mb-6 p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
-              <p className="text-sm text-center text-green-400">{infoMessage}</p>
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-300">
-                  Nome completo
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    placeholder="Seu nome"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-yellow-500"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300">
-                E-mail
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="seu@email.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-yellow-500"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-300">
-                Senha
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-yellow-500"
-                />
-              </div>
-            </div>
-
-            {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-300">
-                  Confirmar senha
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-yellow-500"
-                  />
-                </div>
-              </div>
-            )}
-
-            {isLogin && (
-              <div className="text-right">
-                <button
-                  type="button"
-                  className="text-sm text-yellow-500 hover:text-yellow-400 transition-colors"
-                >
-                  Esqueceu a senha?
-                </button>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-6 text-lg disabled:opacity-60"
-            >
-              {isSubmitting ? 'Aguarde...' : isLogin ? 'Entrar' : 'Criar conta'}
-            </Button>
-          </form>
-
-          {/* Toggle */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
-              {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}{' '}
-              <button
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErrorMessage(null);
-                  setInfoMessage(null);
-                }}
-                className="text-yellow-500 hover:text-yellow-400 font-semibold transition-colors"
-              >
-                {isLogin ? 'Cadastre-se' : 'Faça login'}
-              </button>
-            </p>
-          </div>
-
-          {/* Trial Info */}
-          {!isLogin && (
-            <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-              <p className="text-sm text-center text-yellow-500">
-                🎉 3 dias de teste grátis • Cancele quando quiser
-              </p>
-            </div>
+        <div>
+          <p className="text-xs font-bold tracking-widest text-gray-400 mb-2 uppercase">Senha</p>
+          {inputRow(
+            <Lock className="w-5 h-5" />,
+            'password', 'password',
+            showPassword ? 'text' : 'password',
+            '••••••••',
+            formData.password,
+            <button type="button" onClick={() => setShowPassword(v => !v)} className="text-gray-500 active:text-yellow-400">
+              {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+            </button>
           )}
         </div>
 
-        {/* Footer Note */}
-        <p className="text-center text-xs text-gray-500 mt-6">
-          Ao continuar, você concorda com nossos{' '}
-          <button className="text-yellow-500 hover:underline">Termos de Uso</button>
-          {' '}e{' '}
-          <button
-            type="button"
-            onClick={() => router.push('/privacidade')}
-            className="text-yellow-500 hover:underline"
-          >
-            Política de Privacidade
-          </button>
-        </p>
+        {!isLogin && (
+          <div>
+            <p className="text-xs font-bold tracking-widest text-gray-400 mb-2 uppercase">Confirmar Senha</p>
+            {inputRow(
+              <Lock className="w-5 h-5" />,
+              'confirmPassword', 'confirmPassword',
+              showConfirm ? 'text' : 'password',
+              '••••••••',
+              formData.confirmPassword,
+              <button type="button" onClick={() => setShowConfirm(v => !v)} className="text-gray-500 active:text-yellow-400">
+                {showConfirm ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+              </button>
+            )}
+          </div>
+        )}
+
+        {isLogin && (
+          <div className="text-right">
+            <button type="button" className="text-yellow-400 text-sm font-semibold">
+              Esqueceu a senha?
+            </button>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full font-bold flex items-center justify-between px-6 rounded-2xl active:scale-[0.98] transition-transform disabled:opacity-60"
+          style={{ background: '#f59e0b', color: '#000', height: 68, fontSize: '1.15rem', letterSpacing: '0.08em', marginTop: 4 }}
+        >
+          <span>{isSubmitting ? 'AGUARDE...' : isLogin ? 'ENTRAR' : 'CRIAR CONTA'}</span>
+          <ArrowRight className="w-6 h-6" />
+        </button>
+      </form>
+
+      {/* Divisor OU */}
+      <div className="flex items-center gap-4 my-6">
+        <div className="flex-1 h-px" style={{ background: '#222' }} />
+        <span className="text-gray-600 text-sm font-bold tracking-widest">OU</span>
+        <div className="flex-1 h-px" style={{ background: '#222' }} />
       </div>
+
+      {/* Toggle login/cadastro */}
+      <p className="text-center text-white text-base">
+        {isLogin ? 'Não tem uma conta? ' : 'Já tem uma conta? '}
+        <button
+          onClick={() => { setIsLogin(!isLogin); setErrorMessage(null); }}
+          className="text-yellow-400 font-semibold"
+        >
+          {isLogin ? 'Cadastre-se' : 'Faça login'}
+        </button>
+      </p>
+
+      {/* Termos */}
+      <p className="text-center text-xs text-gray-600 mt-6">
+        Ao continuar, você concorda com os{' '}
+        <button className="text-yellow-600 hover:underline">Termos de Uso</button>
+        {' '}e{' '}
+        <button onClick={() => router.push('/privacidade')} className="text-yellow-600 hover:underline">
+          Política de Privacidade
+        </button>
+      </p>
+
       <InstallPrompt />
     </div>
   );
