@@ -66,13 +66,15 @@ export default function DestravaPage() {
     setGpsConsent(stored === 'true');
   }, []);
 
-  // Atualiza tema claro/escuro — roda imediatamente no cliente (horário local) e a cada minuto
+  // Atualiza tema claro/escuro no fuso de Brasília (America/Sao_Paulo)
+  // Claro: 06:30 → 18:29 | Escuro: 18:30 → 06:29
   useEffect(() => {
     const check = () => {
-      const h = new Date().getHours(), m = new Date().getMinutes();
-      setIsDay(h < 18 || (h === 18 && m < 30));
+      const brt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+      const total = brt.getHours() * 60 + brt.getMinutes();
+      setIsDay(total >= 390 && total < 1110); // 390 = 06:30, 1110 = 18:30
     };
-    check(); // corrige o horário UTC do servidor com o horário local do dispositivo
+    check();
     const interval = setInterval(check, 60000);
     return () => clearInterval(interval);
   }, []);
