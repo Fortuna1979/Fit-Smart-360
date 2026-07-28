@@ -196,10 +196,10 @@ export default function DestravaPage() {
   // ── Modal de consentimento GPS (LGPD art. 11) ───────────────────
   if (!gpsConsent) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-3xl p-6 space-y-5">
+      <div className={`min-h-screen flex items-center justify-center p-4 ${isDay ? 'bg-gray-100 text-gray-900' : 'bg-black text-white'}`}>
+        <div className={`w-full max-w-md rounded-3xl p-6 space-y-5 border ${isDay ? 'bg-white border-gray-200' : 'bg-gray-900 border-gray-800'}`}>
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white">
+            <button onClick={() => router.push('/dashboard')} className={isDay ? 'text-gray-500' : 'text-gray-400'}>
               <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="font-heading text-2xl text-[#FC4C02]">Destrava</h1>
@@ -209,25 +209,25 @@ export default function DestravaPage() {
           </div>
           <div className="text-center">
             <h2 className="text-xl font-bold mb-2">Acesso à localização GPS</h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <p className={`text-sm leading-relaxed ${isDay ? 'text-gray-500' : 'text-gray-400'}`}>
               O Destrava usa o GPS do seu dispositivo para medir distância, ritmo e traçar sua
               rota durante corridas, caminhadas e pedaladas.
             </p>
           </div>
-          <div className="bg-gray-800/60 border border-gray-700 rounded-xl p-4 space-y-2 text-sm text-gray-300">
-            <p className="font-semibold text-white">O que fazemos com sua localização:</p>
+          <div className={`rounded-xl p-4 space-y-2 text-sm border ${isDay ? 'bg-gray-50 border-gray-200 text-gray-600' : 'bg-gray-800/60 border-gray-700 text-gray-300'}`}>
+            <p className={`font-semibold ${isDay ? 'text-gray-900' : 'text-white'}`}>O que fazemos com sua localização:</p>
             <ul className="space-y-1 list-disc pl-4">
               <li>Calcular distância e ritmo durante o treino</li>
               <li>Exibir seu trajeto no mapa durante a atividade</li>
               <li>Registrar células de território conquistado (~250m de precisão)</li>
             </ul>
-            <p className="font-semibold text-white mt-2">O que NÃO fazemos:</p>
+            <p className={`font-semibold mt-2 ${isDay ? 'text-gray-900' : 'text-white'}`}>O que NÃO fazemos:</p>
             <ul className="space-y-1 list-disc pl-4">
               <li>Não rastreamos sua localização em segundo plano</li>
               <li>Não compartilhamos coordenadas exatas com terceiros</li>
             </ul>
           </div>
-          <p className="text-xs text-gray-500 text-center">
+          <p className={`text-xs text-center ${isDay ? 'text-gray-400' : 'text-gray-500'}`}>
             Você pode revogar esse consentimento a qualquer momento nas configurações do seu
             dispositivo. Para saber mais, leia nossa{' '}
             <button onClick={() => router.push('/privacidade')} className="text-yellow-500 hover:underline">
@@ -242,7 +242,7 @@ export default function DestravaPage() {
           </button>
           <button
             onClick={() => router.push('/dashboard')}
-            className="w-full text-gray-400 hover:text-white text-sm py-2"
+            className={`w-full text-sm py-2 ${isDay ? 'text-gray-400' : 'text-gray-400'}`}
           >
             Voltar sem aceitar
           </button>
