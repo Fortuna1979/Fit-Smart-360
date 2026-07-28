@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Zap } from 'lucide-react';
+import { Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import InstallPrompt from '@/components/InstallPrompt';
 
@@ -107,9 +107,7 @@ export default function LandingPage() {
             {/* Barra superior: logo + badge */}
             <div className="flex-shrink-0 flex items-center justify-between mb-3">
               <div className="flex items-center gap-1.5">
-                <svg width="28" height="42" viewBox="0 0 14 22" aria-hidden="true">
-                  <polygon points="9,0 2,12 7,12 6,22 13,10 8,10" fill="#eab308"/>
-                </svg>
+                <Dumbbell className="text-yellow-400 fill-yellow-400" style={{ width: 30, height: 30 }} />
                 <span className="font-heading italic leading-none"
                       style={{ fontSize: '2.6rem', color: '#eab308',
                                textShadow: '0 0 22px rgba(234,179,8,0.7), 0 2px 5px rgba(0,0,0,0.8)' }}>
@@ -120,8 +118,8 @@ export default function LandingPage() {
                             padding: '6px 14px', background: 'rgba(0,0,0,0.4)',
                             display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ color: '#eab308', fontSize: '12px', fontWeight: 700,
-                               letterSpacing: '0.12em' }}>AI ACTIVE</span>
-                <Zap className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                               letterSpacing: '0.08em' }}>Personal IA</span>
+                <Dumbbell className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
               </div>
             </div>
 
@@ -147,29 +145,16 @@ export default function LandingPage() {
 
             {/* Seção inferior */}
             <div className="flex-shrink-0 mt-3 flex flex-col gap-2">
-              <div className="flex items-center">
-                {[0.4, 0.32, 0.25, 0.18].map((op, i) => (
-                  <div key={i}
-                       className="w-[44px] h-[44px] rounded-full bg-[#1a1a1a] flex items-center justify-center"
-                       style={{ marginRight: '-14px', border: '2px solid #000',
-                                boxShadow: '0 0 0 1.5px rgba(200,130,10,0.35)' }}>
-                    <svg viewBox="0 0 24 24" width="22" height="22" style={{ fill: `rgba(255,255,255,${op})` }}>
-                      <circle cx="12" cy="8" r="4"/>
-                      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                    </svg>
-                  </div>
-                ))}
-                <div className="w-[44px] h-[44px] rounded-full flex items-center justify-center font-black text-center"
-                     style={{ marginRight: 0, border: '2px solid #000', fontSize: '7.5px', lineHeight: 1.2,
-                              background: 'linear-gradient(140deg,#b45309,#f59e0b)',
-                              color: '#000', boxShadow: '0 0 0 1.5px rgba(200,130,10,0.35)' }}>
-                  FS<br/>CLUB
-                </div>
+              <div>
+                <p className="font-heading italic leading-[1.0]"
+                   style={{ fontSize: 'clamp(1.1rem, 5.2vw, 1.45rem)', color: '#fff', letterSpacing: '0.02em' }}>
+                  SEU TREINO, DO SEU JEITO,
+                </p>
+                <p className="font-heading italic leading-[1.0]"
+                   style={{ fontSize: 'clamp(1.1rem, 5.2vw, 1.45rem)', color: '#eab308', letterSpacing: '0.02em' }}>
+                  COM OS APARELHOS QUE VOCÊ TEM
+                </p>
               </div>
-
-              <p style={{ color: '#fff', fontWeight: 700, letterSpacing: '0.13em', fontSize: '11px' }}>
-                FS PERFORMANCE PLATFORM
-              </p>
 
               <button
                 onClick={() => router.push('/auth')}
