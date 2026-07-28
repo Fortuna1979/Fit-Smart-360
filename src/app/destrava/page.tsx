@@ -66,12 +66,14 @@ export default function DestravaPage() {
     setGpsConsent(stored === 'true');
   }, []);
 
-  // Atualiza tema claro/escuro no fuso de Brasília (America/Sao_Paulo)
-  // Claro: 06:30 → 18:29 | Escuro: 18:30 → 06:29
+  // Claro: 06:30 → 18:29 BRT | Escuro: 18:30 → 06:29 BRT
+  // BRT = UTC-3 fixo (Brasil aboliu horário de verão em 2019)
+  // Usa getUTCHours sobre (agora - 3h) → independe do fuso do dispositivo
   useEffect(() => {
     const check = () => {
-      const brt = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-      const total = brt.getHours() * 60 + brt.getMinutes();
+      const brtMs = Date.now() - 3 * 60 * 60 * 1000;
+      const d = new Date(brtMs);
+      const total = d.getUTCHours() * 60 + d.getUTCMinutes();
       setIsDay(total >= 390 && total < 1110); // 390 = 06:30, 1110 = 18:30
     };
     check();
