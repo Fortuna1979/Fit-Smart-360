@@ -26,7 +26,7 @@ const SLIDES = [
   },
   {
     id: 'calistenia',
-    photo: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&h=1600&fit=crop&q=85',
+    photo: 'https://i.postimg.cc/NMZp2zGw/file-0000000066bc820eafa8cdcc31a997e9.png',
     appScreen: null as string | null,
     title: 'CALISTENIA', sub: 'PESO CORPORAL',
     tag: 'Treino sem equipamento — apenas seu corpo, qualquer lugar',
