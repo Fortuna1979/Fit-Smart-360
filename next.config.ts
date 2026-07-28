@@ -106,6 +106,12 @@ const nextConfig: NextConfig = {
         hostname: 'raw.githubusercontent.com',
       },
       
+      // PostImg — imagens do projeto
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc',
+      },
+
       // Imgur
       {
         protocol: 'https',

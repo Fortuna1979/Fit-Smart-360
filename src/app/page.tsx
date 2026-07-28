@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Dumbbell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import InstallPrompt from '@/components/InstallPrompt';
@@ -137,10 +138,15 @@ export default function LandingPage() {
 
             {/* Card com imagem combinada */}
             <div className="flex-1 min-h-0 relative rounded-[20px] overflow-hidden">
-              {/* Imagem já com título embutido */}
-              <div className="absolute inset-0"
-                   style={{ backgroundImage: 'url(https://i.postimg.cc/2y9PVwqx/file-00000000d144820ebc28f7f8d04acff0.png)',
-                            backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+              {/* Imagem já com título embutido — priority: carrega antes de tudo */}
+              <Image
+                src="https://i.postimg.cc/2y9PVwqx/file-00000000d144820ebc28f7f8d04acff0.png"
+                alt="Fit Smart 360"
+                fill
+                priority
+                className="object-cover"
+                sizes="430px"
+              />
             </div>
 
             {/* Seção inferior */}
@@ -182,13 +188,14 @@ export default function LandingPage() {
             className="flex-shrink-0 w-screen h-screen relative overflow-hidden"
             style={{ scrollSnapAlign: 'start', background: '#000' }}
           >
-            {/* Foto de fundo — lazy load: só carrega quando o slide fica visível */}
-            <img
+            {/* Foto de fundo — lazy + WebP automático pelo Next.js */}
+            <Image
               src={slide.photo}
               alt={slide.title}
+              fill
               loading="lazy"
-              decoding="async"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="object-cover"
+              sizes="100vw"
             />
             {/* Gradiente dramático */}
             <div className="absolute inset-0"
