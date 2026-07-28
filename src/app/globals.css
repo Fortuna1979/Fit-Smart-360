@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Aero Matics — fonte do título principal do hero */
+@font-face {
+  font-family: 'Aero Matics';
+  src: url('https://fonts.cdnfonts.com/s/14679/Aero%20Matics%20Bold%20Italic.woff') format('woff');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Aero Matics';
+  src: url('https://fonts.cdnfonts.com/s/14679/Aero%20Matics%20Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

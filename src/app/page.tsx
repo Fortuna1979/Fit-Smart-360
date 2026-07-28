@@ -97,10 +97,10 @@ export default function LandingPage() {
             display: block;
             text-align: center;
             white-space: nowrap;
-            font-family: var(--font-barlow), var(--font-anton), Impact, 'Arial Black', sans-serif;
+            font-family: 'Aero Matics', var(--font-barlow), var(--font-anton), Impact, 'Arial Black', sans-serif;
             font-style: italic;
-            font-weight: 800;
-            font-size: clamp(3.2rem, 14.5vw, 6.5rem);
+            font-weight: 700;
+            font-size: clamp(3rem, 13.5vw, 6rem);
             letter-spacing: 0.01em;
             line-height: 1;
             color: #fff;
@@ -169,7 +169,7 @@ export default function LandingPage() {
 
               {/* Faixa do título */}
               <div className="absolute left-0 right-0 z-10"
-                   style={{ top: '43%', transform: 'translateY(-50%)',
+                   style={{ top: '47%', transform: 'translateY(-50%)',
                             background: 'rgba(0,0,0,0.48)', overflow: 'hidden', clipPath: 'inset(0)' }}>
                 <h1 className="hero-title">FIT SMART 360°</h1>
               </div>
@@ -178,7 +178,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 z-20"
                    style={{ backgroundImage: 'url(https://i.postimg.cc/NFzFCCBQ/Whats-App-Image-2026-07-27-at-16-35-09.jpg)',
                             backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat',
-                            clipPath: 'polygon(0 48%, 100% 48%, 100% 100%, 0 100%)' }} />
+                            clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)' }} />
             </div>
 
             {/* Seção inferior */}
