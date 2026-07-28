@@ -108,7 +108,7 @@ export default function LandingPage() {
             {/* Barra superior: logo + badge */}
             <div className="flex-shrink-0 flex items-center justify-between mb-3">
               <div className="flex items-center gap-1.5">
-                <Dumbbell className="text-yellow-400 fill-yellow-400" style={{ width: 30, height: 30 }} />
+                <img src="/icon-source-new.png" alt="" style={{ width: 56, height: 56, mixBlendMode: 'screen' }} />
                 <span className="font-heading italic leading-none"
                       style={{ fontSize: '2.6rem', color: '#eab308',
                                textShadow: '0 0 22px rgba(234,179,8,0.7), 0 2px 5px rgba(0,0,0,0.8)' }}>
