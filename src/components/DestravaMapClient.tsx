@@ -6,14 +6,19 @@ import 'leaflet/dist/leaflet.css';
 interface Props {
   position: [number, number] | null;
   route: [number, number][];
+  isDay: boolean;
 }
 
-export default function DestravaMapClient({ position, route }: Props) {
+const TILE_DARK  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+export default function DestravaMapClient({ position, route, isDay }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<import('leaflet').Map | null>(null);
-  const markerRef = useRef<import('leaflet').CircleMarker | null>(null);
-  const polylineRef = useRef<import('leaflet').Polyline | null>(null);
-  const readyRef = useRef(false);
+  const mapRef       = useRef<import('leaflet').Map | null>(null);
+  const tileRef      = useRef<import('leaflet').TileLayer | null>(null);
+  const markerRef    = useRef<import('leaflet').CircleMarker | null>(null);
+  const polylineRef  = useRef<import('leaflet').Polyline | null>(null);
+  const readyRef     = useRef(false);
 
   // Mount map once
   useEffect(() => {
@@ -31,8 +36,7 @@ export default function DestravaMapClient({ position, route }: Props) {
         attributionControl: false,
       });
 
-      // Dark tiles (CartoDB Dark Matter)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      tileRef.current = L.tileLayer(isDay ? TILE_LIGHT : TILE_DARK, {
         maxZoom: 20,
       }).addTo(map);
 
@@ -44,13 +48,29 @@ export default function DestravaMapClient({ position, route }: Props) {
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
+        mapRef.current  = null;
+        tileRef.current = null;
+        markerRef.current   = null;
         polylineRef.current = null;
-        readyRef.current = false;
+        readyRef.current    = false;
       }
     };
   }, []); // eslint-disable-line
+
+  // Trocar tile quando isDay mudar
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const swap = async () => {
+      const L = (await import('leaflet')).default;
+      if (tileRef.current) {
+        mapRef.current!.removeLayer(tileRef.current);
+      }
+      tileRef.current = L.tileLayer(isDay ? TILE_LIGHT : TILE_DARK, {
+        maxZoom: 20,
+      }).addTo(mapRef.current!);
+    };
+    swap();
+  }, [isDay]);
 
   // Update position marker
   useEffect(() => {

@@ -360,7 +360,7 @@ export default function DestravaPage() {
           </button>
         )}
 
-        <DestravaMapClient position={position} route={route} />
+        <DestravaMapClient position={position} route={route} isDay={isDay} />
       </div>
 
       {/* GPS error */}
