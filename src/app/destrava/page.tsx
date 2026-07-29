@@ -5,13 +5,34 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft, Pause, Play, Square, PersonStanding, Zap, ChevronDown, Bike, Activity,
+  Layers, Compass, Lock, Check, X,
 } from 'lucide-react';
 import { useRequireAuth } from '@/hooks/use-require-auth';
+import { getUserData } from '@/lib/supabase-helpers';
 
 const DestravaMapClient = dynamic(() => import('@/components/DestravaMapClient'), { ssr: false });
 
 type Status = 'idle' | 'acquiring' | 'recording' | 'paused' | 'completed';
 type ActivityType = 'Corrida' | 'Caminhada' | 'Ciclismo';
+
+const MAP_BASE_STYLES = [
+  { id: 'padrao',   label: 'Padrão',       premium: false, preview: '#e8e0d5' },
+  { id: 'satelite', label: 'Satélite',     premium: false, preview: '#2d4a1e' },
+  { id: 'hibrido',  label: 'Híbrido',      premium: false, preview: '#3a5a2a' },
+  { id: 'noturno',  label: 'Noturno',      premium: true,  preview: '#1a1a2e' },
+  { id: 'topo',     label: 'Topográfico',  premium: true,  preview: '#d4c9a8' },
+];
+
+const MAP_OVERLAYS = [
+  { id: 'poi',       label: 'Pontos de interesse', premium: false },
+  { id: 'ciclovias', label: 'Ciclovias',            premium: false },
+];
+
+const MAP_TERRAIN = [
+  { id: 'aspecto',    label: 'Aspecto',                  premium: true },
+  { id: 'avalanche',  label: 'Inclinação de avalanche',  premium: true },
+  { id: 'inclinacao', label: 'Inclinação',               premium: true },
+];
 
 const ACTIVITY_TYPES: { label: ActivityType; Icon: React.ComponentType<{ className?: string }>; color: string }[] = [
   { label: 'Corrida',   Icon: Zap,             color: 'text-orange-400' },
@@ -51,7 +72,6 @@ export default function DestravaPage() {
 
   const [gpsConsent, setGpsConsent] = useState<boolean | null>(null);
   const [status, setStatus] = useState<Status>('idle');
-  // Começa como true (claro); useEffect corrige imediatamente com horário local do dispositivo
   const [isDay, setIsDay] = useState(true);
   const [elapsed, setElapsed] = useState(0);
   const [distance, setDistance] = useState(0);
@@ -60,11 +80,38 @@ export default function DestravaPage() {
   const [activityType, setActivityType] = useState<ActivityType>('Corrida');
   const [showTypePicker, setShowTypePicker] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
+  // Mapa e bússola
+  const [subscriptionPlan, setSubscriptionPlan] = useState<'free' | 'basic' | 'premium'>('free');
+  const [mapStyleId, setMapStyleId] = useState('padrao');
+  const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [compassMode, setCompassMode] = useState(false);
+  const [compassHeading, setCompassHeading] = useState<number | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('destrava_gps_consent');
     setGpsConsent(stored === 'true');
   }, []);
+
+  // Busca plano do usuário
+  useEffect(() => {
+    getUserData().then(d => {
+      if (d?.subscription_plan) setSubscriptionPlan(d.subscription_plan as 'free' | 'basic' | 'premium');
+    });
+  }, []);
+
+  // Bússola — escuta orientação do dispositivo quando ativo
+  useEffect(() => {
+    if (!compassMode) return;
+    const handler = (e: DeviceOrientationEvent) => {
+      const h = (e as DeviceOrientationEvent & { webkitCompassHeading?: number }).webkitCompassHeading;
+      if (h != null) { setCompassHeading(h); return; }
+      if (e.alpha != null) setCompassHeading((360 - e.alpha) % 360);
+    };
+    window.addEventListener('deviceorientation', handler, true);
+    return () => window.removeEventListener('deviceorientation', handler, true);
+  }, [compassMode]);
 
   // Claro: 06:30 → 18:29 BRT | Escuro: 18:30 → 06:29 BRT
   // BRT = UTC-3 fixo (Brasil aboliu horário de verão em 2019)
@@ -184,6 +231,35 @@ export default function DestravaPage() {
     }
     setStatus('completed');
   }, []);
+
+  const handleMapStyle = (id: string, premium: boolean) => {
+    if (premium && subscriptionPlan !== 'premium') { setShowPremiumModal(true); return; }
+    setMapStyleId(id);
+  };
+
+  const handleOverlay = (id: string, premium: boolean) => {
+    if (premium && subscriptionPlan !== 'premium') { setShowPremiumModal(true); return; }
+    setActiveOverlays(prev =>
+      prev.includes(id) ? prev.filter(o => o !== id) : [...prev, id]
+    );
+  };
+
+  const handleCompassToggle = async () => {
+    if (compassMode) {
+      setCompassMode(false);
+      setCompassHeading(null);
+      return;
+    }
+    // iOS 13+ precisa de permissão explícita
+    const DOE = DeviceOrientationEvent as DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
+    if (typeof DOE.requestPermission === 'function') {
+      try {
+        const perm = await DOE.requestPermission();
+        if (perm !== 'granted') return;
+      } catch { return; }
+    }
+    setCompassMode(true);
+  };
 
   const activityCfg = ACTIVITY_TYPES.find(a => a.label === activityType)!;
 
@@ -360,7 +436,36 @@ export default function DestravaPage() {
           </button>
         )}
 
-        <DestravaMapClient position={position} route={route} isDay={isDay} />
+        <DestravaMapClient
+          position={position}
+          route={route}
+          isDay={isDay}
+          mapStyleId={mapStyleId}
+          overlays={activeOverlays}
+          compassHeading={compassHeading}
+        />
+
+        {/* 3 botões laterais */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
+          <button
+            onClick={() => setShowMapPicker(true)}
+            className="w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <Layers className="w-5 h-5 text-gray-700" />
+          </button>
+          <button
+            onClick={() => setShowPremiumModal(true)}
+            className="w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <span className="text-xs font-black text-gray-700">3D</span>
+          </button>
+          <button
+            onClick={handleCompassToggle}
+            className={`w-11 h-11 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform ${compassMode ? 'bg-[#FC4C02]' : 'bg-white'}`}
+          >
+            <Compass className={`w-5 h-5 ${compassMode ? 'text-white' : 'text-gray-700'}`} />
+          </button>
+        </div>
       </div>
 
       {/* GPS error */}
@@ -479,6 +584,123 @@ export default function DestravaPage() {
           )}
         </div>
       </div>
+
+      {/* Modal de tipos de mapa */}
+      {showMapPicker && (
+        <div className="absolute inset-0 bg-black/60 z-50 flex items-end" onClick={() => setShowMapPicker(false)}>
+          <div className="w-full bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mt-4 mb-2" />
+            <div className="px-5 pb-8 pt-2">
+
+              {/* Tipos de mapa */}
+              <h2 className="text-base font-bold text-gray-900 mb-3">Tipos de mapa</h2>
+              <div className="flex gap-3 overflow-x-auto pb-2 mb-5">
+                {MAP_BASE_STYLES.map(s => (
+                  <button
+                    key={s.id}
+                    onClick={() => { handleMapStyle(s.id, s.premium); if (!s.premium || subscriptionPlan === 'premium') setShowMapPicker(false); }}
+                    className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
+                  >
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2"
+                      style={{ borderColor: mapStyleId === s.id ? '#FC4C02' : '#e5e7eb', background: s.preview }}>
+                      {s.premium && subscriptionPlan !== 'premium' && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <Lock className="w-5 h-5 text-white" />
+                        </div>
+                      )}
+                      {mapStyleId === s.id && (
+                        <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#FC4C02] flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-700 font-medium">{s.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Camadas */}
+              <h2 className="text-base font-bold text-gray-900 mb-3">Camadas</h2>
+              <div className="flex gap-3 mb-5">
+                {MAP_OVERLAYS.map(o => {
+                  const active = activeOverlays.includes(o.id);
+                  return (
+                    <button
+                      key={o.id}
+                      onClick={() => handleOverlay(o.id, o.premium)}
+                      className={`flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform`}
+                    >
+                      <div className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center ${active ? 'border-[#FC4C02] bg-[#FC4C02]/10' : 'border-gray-200 bg-gray-50'}`}>
+                        {active
+                          ? <Check className="w-6 h-6 text-[#FC4C02]" strokeWidth={3} />
+                          : <div className="w-6 h-6 rounded border-2 border-gray-400" />
+                        }
+                      </div>
+                      <span className="text-xs text-gray-700 font-medium text-center leading-tight w-16">{o.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Terreno */}
+              <h2 className="text-base font-bold text-gray-900 mb-3">Terreno</h2>
+              <div className="flex gap-3">
+                {MAP_TERRAIN.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => handleOverlay(t.id, t.premium)}
+                    className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
+                  >
+                    <div className="relative w-16 h-16 rounded-xl border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
+                      <Lock className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <span className="text-xs text-gray-700 font-medium text-center leading-tight w-16">{t.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Premium */}
+      {showPremiumModal && (
+        <div className="absolute inset-0 bg-black/70 z-50 flex items-end" onClick={() => setShowPremiumModal(false)}>
+          <div className="w-full bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6" />
+            <button onClick={() => setShowPremiumModal(false)} className="absolute top-5 right-5">
+              <X className="w-5 h-5 text-gray-400" />
+            </button>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-yellow-400/20 flex items-center justify-center mx-auto mb-4">
+                <Lock className="w-7 h-7 text-yellow-500" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Recurso Premium</h2>
+              <p className="text-sm text-gray-500">Este recurso está disponível nos planos Básico e Premium do Fit Smart 360°.</p>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0" strokeWidth={3} />
+                <span className="text-sm text-gray-700">Modos de mapa exclusivos (Noturno, Topográfico)</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0" strokeWidth={3} />
+                <span className="text-sm text-gray-700">Camadas de terreno (Aspecto, Inclinação)</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <Check className="w-5 h-5 text-green-500 flex-shrink-0" strokeWidth={3} />
+                <span className="text-sm text-gray-700">Modo 3D e visualizações avançadas</span>
+              </div>
+            </div>
+            <button
+              onClick={() => { setShowPremiumModal(false); router.push('/#planos'); }}
+              className="w-full mt-6 py-4 rounded-2xl bg-yellow-400 text-black font-bold text-base active:scale-95 transition-transform"
+            >
+              Ver planos
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal de tipo de atividade */}
       {showTypePicker && (
