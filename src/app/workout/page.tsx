@@ -507,7 +507,12 @@ export default function WorkoutPage() {
 
         {/* Banner de anúncio na base */}
         <div className="pb-8 px-6">
-          <p className="text-xs text-gray-600 text-center mb-3">Publicidade — assine para remover</p>
+          <button
+            onClick={() => router.push('/#planos')}
+            className="w-full text-xs text-yellow-500 underline text-center mb-3 active:opacity-70"
+          >
+            Publicidade — assine para remover
+          </button>
           <AdBanner />
         </div>
       </div>
