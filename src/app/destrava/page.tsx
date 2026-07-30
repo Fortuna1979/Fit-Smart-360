@@ -420,7 +420,7 @@ export default function DestravaPage() {
       <div className="flex-1 relative min-h-0">
         {/* GPS acquiring bar */}
         {status === 'acquiring' && (
-          <div className="absolute top-0 left-0 right-0 z-20 bg-blue-600 px-4 py-2.5 flex items-center gap-2">
+          <div className="absolute top-0 left-0 right-0 z-[1000] bg-blue-600 px-4 py-2.5 flex items-center gap-2">
             <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
             <span className="text-sm font-semibold text-white">Adquirindo GPS</span>
           </div>
@@ -430,7 +430,7 @@ export default function DestravaPage() {
         {(status === 'recording' || status === 'paused') && (
           <button
             onClick={() => router.push('/dashboard')}
-            className={`absolute top-3 left-3 z-20 w-10 h-10 ${T.backBtn} rounded-full flex items-center justify-center backdrop-blur-sm`}
+            className={`absolute top-3 left-3 z-[1000] w-10 h-10 ${T.backBtn} rounded-full flex items-center justify-center backdrop-blur-sm`}
           >
             <ChevronDown className="w-5 h-5" />
           </button>
@@ -446,7 +446,7 @@ export default function DestravaPage() {
         />
 
         {/* 3 botões laterais */}
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-[1000] flex flex-col gap-2">
           <button
             onClick={() => setShowMapPicker(true)}
             className="w-11 h-11 bg-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"
@@ -587,7 +587,7 @@ export default function DestravaPage() {
 
       {/* Modal de tipos de mapa */}
       {showMapPicker && (
-        <div className="absolute inset-0 bg-black/60 z-50 flex items-end" onClick={() => setShowMapPicker(false)}>
+        <div className="absolute inset-0 bg-black/60 z-[2000] flex items-end" onClick={() => setShowMapPicker(false)}>
           <div className="w-full bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mt-4 mb-2" />
             <div className="px-5 pb-8 pt-2">
@@ -665,7 +665,7 @@ export default function DestravaPage() {
 
       {/* Modal Premium */}
       {showPremiumModal && (
-        <div className="absolute inset-0 bg-black/70 z-50 flex items-end" onClick={() => setShowPremiumModal(false)}>
+        <div className="absolute inset-0 bg-black/70 z-[2000] flex items-end" onClick={() => setShowPremiumModal(false)}>
           <div className="w-full bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
             <div className="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-6" />
             <button onClick={() => setShowPremiumModal(false)} className="absolute top-5 right-5">
@@ -705,7 +705,7 @@ export default function DestravaPage() {
       {/* Modal de tipo de atividade */}
       {showTypePicker && (
         <div
-          className="absolute inset-0 bg-black/70 z-50 flex items-end"
+          className="absolute inset-0 bg-black/70 z-[2000] flex items-end"
           onClick={() => setShowTypePicker(false)}
         >
           <div
