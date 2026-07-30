@@ -16,22 +16,22 @@ type Status = 'idle' | 'acquiring' | 'recording' | 'paused' | 'completed';
 type ActivityType = 'Corrida' | 'Caminhada' | 'Ciclismo';
 
 const MAP_BASE_STYLES = [
-  { id: 'padrao',   label: 'Padrão',       premium: false, preview: '#e8e0d5' },
-  { id: 'satelite', label: 'Satélite',     premium: false, preview: '#2d4a1e' },
-  { id: 'hibrido',  label: 'Híbrido',      premium: false, preview: '#3a5a2a' },
-  { id: 'noturno',  label: 'Noturno',      premium: true,  preview: '#1a1a2e' },
-  { id: 'topo',     label: 'Topográfico',  premium: true,  preview: '#d4c9a8' },
+  { id: 'padrao',   label: 'Padrão',      premium: false, thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/13/2931/4640.png' },
+  { id: 'satelite', label: 'Satélite',    premium: false, thumbnail: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/4640/2931' },
+  { id: 'hibrido',  label: 'Híbrido',     premium: false, thumbnail: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/13/4640/2931' },
+  { id: 'noturno',  label: 'Noturno',     premium: true,  thumbnail: 'https://a.basemaps.cartocdn.com/dark_all/13/2931/4640.png' },
+  { id: 'topo',     label: 'Topográfico', premium: true,  thumbnail: 'https://a.tile.opentopomap.org/13/2931/4640.png' },
 ];
 
 const MAP_OVERLAYS = [
-  { id: 'poi',       label: 'Pontos de interesse', premium: false },
-  { id: 'ciclovias', label: 'Ciclovias',            premium: false },
+  { id: 'poi',       label: 'Pontos de interesse', premium: false, thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/13/2931/4640.png' },
+  { id: 'ciclovias', label: 'Ciclovias',            premium: false, thumbnail: 'https://tile.waymarkedtrails.org/cycling/13/2931/4640.png' },
 ];
 
 const MAP_TERRAIN = [
-  { id: 'aspecto',    label: 'Aspecto',                  premium: true },
-  { id: 'avalanche',  label: 'Inclinação de avalanche',  premium: true },
-  { id: 'inclinacao', label: 'Inclinação',               premium: true },
+  { id: 'aspecto',    label: 'Aspecto',                 premium: true, gradient: 'linear-gradient(135deg,#4fc3f7 0%,#81c784 35%,#ffb74d 65%,#e57373 100%)' },
+  { id: 'avalanche',  label: 'Inclinação de avalanche', premium: true, gradient: 'linear-gradient(135deg,#66bb6a 0%,#ffee58 40%,#ef5350 100%)' },
+  { id: 'inclinacao', label: 'Inclinação',              premium: true, gradient: 'linear-gradient(135deg,#fff176 0%,#ffa726 50%,#d32f2f 100%)' },
 ];
 
 const ACTIVITY_TYPES: { label: ActivityType; Icon: React.ComponentType<{ className?: string }>; color: string }[] = [
@@ -602,10 +602,11 @@ export default function DestravaPage() {
                     className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                   >
                     <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2"
-                      style={{ borderColor: mapStyleId === s.id ? '#FC4C02' : '#e5e7eb', background: s.preview }}>
+                      style={{ borderColor: mapStyleId === s.id ? '#FC4C02' : '#e5e7eb' }}>
+                      <img src={s.thumbnail} alt={s.label} className="w-full h-full object-cover" />
                       {s.premium && subscriptionPlan !== 'premium' && (
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <Lock className="w-5 h-5 text-white" />
+                          <Lock className="w-4 h-4 text-white" />
                         </div>
                       )}
                       {mapStyleId === s.id && (
@@ -614,7 +615,7 @@ export default function DestravaPage() {
                         </div>
                       )}
                     </div>
-                    <span className="text-xs text-gray-700 font-medium">{s.label}</span>
+                    <span className={`text-xs font-medium ${mapStyleId === s.id ? 'text-[#FC4C02]' : 'text-gray-700'}`}>{s.label}</span>
                   </button>
                 ))}
               </div>
@@ -628,15 +629,18 @@ export default function DestravaPage() {
                     <button
                       key={o.id}
                       onClick={() => handleOverlay(o.id, o.premium)}
-                      className={`flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform`}
+                      className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                     >
-                      <div className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center ${active ? 'border-[#FC4C02] bg-[#FC4C02]/10' : 'border-gray-200 bg-gray-50'}`}>
-                        {active
-                          ? <Check className="w-6 h-6 text-[#FC4C02]" strokeWidth={3} />
-                          : <div className="w-6 h-6 rounded border-2 border-gray-400" />
-                        }
+                      <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2"
+                        style={{ borderColor: active ? '#FC4C02' : '#e5e7eb' }}>
+                        <img src={o.thumbnail} alt={o.label} className="w-full h-full object-cover" />
+                        {active && (
+                          <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#FC4C02] flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                          </div>
+                        )}
                       </div>
-                      <span className="text-xs text-gray-700 font-medium text-center leading-tight w-16">{o.label}</span>
+                      <span className={`text-xs font-medium text-center leading-tight w-16 ${active ? 'text-[#FC4C02]' : 'text-gray-700'}`}>{o.label}</span>
                     </button>
                   );
                 })}
@@ -651,8 +655,11 @@ export default function DestravaPage() {
                     onClick={() => handleOverlay(t.id, t.premium)}
                     className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                   >
-                    <div className="relative w-16 h-16 rounded-xl border-2 border-gray-200 bg-gray-100 flex items-center justify-center">
-                      <Lock className="w-5 h-5 text-gray-400" />
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-200"
+                      style={{ background: t.gradient }}>
+                      <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/40 flex items-center justify-center">
+                        <Lock className="w-3 h-3 text-white" />
+                      </div>
                     </div>
                     <span className="text-xs text-gray-700 font-medium text-center leading-tight w-16">{t.label}</span>
                   </button>
