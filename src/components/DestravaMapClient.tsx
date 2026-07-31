@@ -10,6 +10,15 @@ const LABELS    = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_la
 const TOPO      = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
 const CYCLING   = 'https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png';
 
+const POI_TYPES: Record<string, { color: string; label: string }> = {
+  drinking_water:  { color: '#3b82f6', label: 'Bebedouro'        },
+  toilets:         { color: '#06b6d4', label: 'Banheiro'          },
+  fitness_station: { color: '#f97316', label: 'Academia ext.'     },
+  outdoor_gym:     { color: '#f97316', label: 'Academia ext.'     },
+  park:            { color: '#22c55e', label: 'Parque'            },
+  pharmacy:        { color: '#ef4444', label: 'Farmácia'          },
+};
+
 interface Props {
   position:       [number, number] | null;
   route:          [number, number][];
@@ -36,6 +45,7 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
   const baseTileRef   = useRef<import('leaflet').TileLayer | null>(null);
   const labelsRef     = useRef<import('leaflet').TileLayer | null>(null);
   const cyclingRef    = useRef<import('leaflet').TileLayer | null>(null);
+  const poiMarkersRef = useRef<import('leaflet').CircleMarker[]>([]);
   const markerRef     = useRef<import('leaflet').CircleMarker | null>(null);
   const polylineRef   = useRef<import('leaflet').Polyline | null>(null);
   const readyRef      = useRef(false);
@@ -69,6 +79,7 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
         mapRef.current.remove();
         mapRef.current = baseTileRef.current = labelsRef.current =
           cyclingRef.current = markerRef.current = polylineRef.current = null;
+        poiMarkersRef.current = [];
         readyRef.current = false;
       }
     };
@@ -106,6 +117,62 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
     };
     toggle();
   }, [overlays]);
+
+  // POI overlay toggle — busca dados do OpenStreetMap via Overpass API
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const toggle = async () => {
+      const L = (await import('leaflet')).default;
+      const map = mapRef.current!;
+      const want = overlays.includes('poi');
+
+      if (!want) {
+        poiMarkersRef.current.forEach(m => map.removeLayer(m));
+        poiMarkersRef.current = [];
+        return;
+      }
+
+      if (poiMarkersRef.current.length > 0) return; // já carregado
+
+      const center = position ?? [map.getCenter().lat, map.getCenter().lng] as [number, number];
+      const [lat, lng] = center;
+      const radius = 2000;
+
+      const query = `[out:json][timeout:25];
+(
+  node["amenity"="drinking_water"](around:${radius},${lat},${lng});
+  node["amenity"="toilets"](around:${radius},${lat},${lng});
+  node["leisure"="fitness_station"](around:${radius},${lat},${lng});
+  node["leisure"="outdoor_gym"](around:${radius},${lat},${lng});
+  node["amenity"="pharmacy"](around:${radius},${lat},${lng});
+);
+out body;`;
+
+      try {
+        const res = await fetch('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          body: query,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        for (const node of (data.elements ?? [])) {
+          const type = node.tags?.amenity ?? node.tags?.leisure;
+          const cfg = POI_TYPES[type];
+          if (!cfg || !node.lat || !node.lon) continue;
+
+          const marker = L.circleMarker([node.lat, node.lon] as [number, number], {
+            radius: 7, color: '#fff', weight: 2,
+            fillColor: cfg.color, fillOpacity: 0.95,
+          }).bindTooltip(cfg.label, { permanent: false, direction: 'top', className: 'leaflet-poi-tip' });
+
+          marker.addTo(map);
+          poiMarkersRef.current.push(marker);
+        }
+      } catch { /* falha silenciosa — Overpass pode estar sobrecarregado */ }
+    };
+    toggle();
+  }, [overlays, position]);
 
   // Compass rotation via CSS transform on wrapper
   useEffect(() => {
