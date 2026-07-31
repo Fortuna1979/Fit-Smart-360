@@ -8,7 +8,6 @@ const DARK      = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png
 const SATELLITE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const LABELS    = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png';
 const TOPO      = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
-const CYCLING   = 'https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png';
 
 const POI_TYPES: Record<string, { color: string; label: string }> = {
   drinking_water:  { color: '#3b82f6', label: 'Bebedouro'        },
@@ -44,7 +43,7 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
   const mapRef        = useRef<import('leaflet').Map | null>(null);
   const baseTileRef   = useRef<import('leaflet').TileLayer | null>(null);
   const labelsRef     = useRef<import('leaflet').TileLayer | null>(null);
-  const cyclingRef    = useRef<import('leaflet').TileLayer | null>(null);
+  const cyclingLinesRef = useRef<import('leaflet').Polyline[]>([]);
   const poiMarkersRef = useRef<import('leaflet').CircleMarker[]>([]);
   const markerRef     = useRef<import('leaflet').CircleMarker | null>(null);
   const polylineRef   = useRef<import('leaflet').Polyline | null>(null);
@@ -78,7 +77,8 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = baseTileRef.current = labelsRef.current =
-          cyclingRef.current = markerRef.current = polylineRef.current = null;
+          markerRef.current = polylineRef.current = null;
+        cyclingLinesRef.current = [];
         poiMarkersRef.current = [];
         readyRef.current = false;
       }
@@ -101,22 +101,55 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
     swap();
   }, [mapStyleId, isDay]);
 
-  // Ciclovias overlay toggle
+  // Ciclovias overlay — busca vias de bicicleta do OpenStreetMap via Overpass API
   useEffect(() => {
     if (!mapRef.current) return;
     const toggle = async () => {
       const L = (await import('leaflet')).default;
       const map = mapRef.current!;
       const want = overlays.includes('ciclovias');
-      if (want && !cyclingRef.current) {
-        cyclingRef.current = L.tileLayer(CYCLING, { maxZoom: 20, opacity: 0.85 }).addTo(map);
-      } else if (!want && cyclingRef.current) {
-        map.removeLayer(cyclingRef.current);
-        cyclingRef.current = null;
+
+      if (!want) {
+        cyclingLinesRef.current.forEach(l => map.removeLayer(l));
+        cyclingLinesRef.current = [];
+        return;
       }
+
+      if (cyclingLinesRef.current.length > 0) return; // já carregado
+
+      const center = position ?? [map.getCenter().lat, map.getCenter().lng] as [number, number];
+      const [lat, lng] = center;
+      const radius = 3000;
+
+      const query = `[out:json][timeout:25];
+(
+  way["highway"="cycleway"](around:${radius},${lat},${lng});
+  way["cycleway"="track"](around:${radius},${lat},${lng});
+  way["cycleway"="lane"](around:${radius},${lat},${lng});
+  way["cycleway"="shared_lane"](around:${radius},${lat},${lng});
+  way["bicycle"="designated"](around:${radius},${lat},${lng});
+);
+out geom;`;
+
+      try {
+        const res = await fetch('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          body: query,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        for (const way of (data.elements ?? [])) {
+          if (!way.geometry?.length) continue;
+          const coords = way.geometry.map((p: { lat: number; lon: number }) => [p.lat, p.lon] as [number, number]);
+          const line = L.polyline(coords, { color: '#22c55e', weight: 4, opacity: 0.85 });
+          line.addTo(map);
+          cyclingLinesRef.current.push(line);
+        }
+      } catch { /* falha silenciosa */ }
     };
     toggle();
-  }, [overlays]);
+  }, [overlays, position]);
 
   // POI overlay toggle — busca dados do OpenStreetMap via Overpass API
   useEffect(() => {
