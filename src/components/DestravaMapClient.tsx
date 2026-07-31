@@ -27,6 +27,22 @@ interface Props {
   compassHeading: number | null;
 }
 
+const OVERPASS_ENDPOINTS = [
+  'https://overpass-api.de/api/interpreter',
+  'https://overpass.kumi.systems/api/interpreter',
+  'https://overpass.openstreetmap.fr/api/interpreter',
+];
+
+async function fetchOverpass(query: string): Promise<{ elements: unknown[] }> {
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    try {
+      const res = await fetch(endpoint, { method: 'POST', body: query });
+      if (res.ok) return await res.json();
+    } catch { continue; }
+  }
+  return { elements: [] };
+}
+
 function getTileUrl(styleId: string, isDay: boolean): string {
   switch (styleId) {
     case 'satelite': return SATELLITE;
@@ -132,16 +148,11 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
 out geom;`;
 
       try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          body: query,
-        });
-        if (!res.ok) return;
-        const data = await res.json();
+        const data = await fetchOverpass(query);
 
-        for (const way of (data.elements ?? [])) {
+        for (const way of (data.elements ?? []) as Array<{ geometry?: { lat: number; lon: number }[] }>) {
           if (!way.geometry?.length) continue;
-          const coords = way.geometry.map((p: { lat: number; lon: number }) => [p.lat, p.lon] as [number, number]);
+          const coords = way.geometry.map((p) => [p.lat, p.lon] as [number, number]);
           const line = L.polyline(coords, { color: '#22c55e', weight: 4, opacity: 0.85 });
           line.addTo(map);
           cyclingLinesRef.current.push(line);
@@ -182,14 +193,9 @@ out geom;`;
 out body;`;
 
       try {
-        const res = await fetch('https://overpass-api.de/api/interpreter', {
-          method: 'POST',
-          body: query,
-        });
-        if (!res.ok) return;
-        const data = await res.json();
+        const data = await fetchOverpass(query);
 
-        for (const node of (data.elements ?? [])) {
+        for (const node of (data.elements ?? []) as Array<{ lat: number; lon: number; tags?: Record<string, string> }>) {
           const type = node.tags?.amenity ?? node.tags?.leisure;
           const cfg = POI_TYPES[type];
           if (!cfg || !node.lat || !node.lon) continue;

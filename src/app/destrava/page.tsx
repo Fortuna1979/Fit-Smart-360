@@ -31,8 +31,8 @@ const MAP_OVERLAYS = [
   },
   {
     id: 'ciclovias', label: 'Ciclovias', premium: false,
-    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/16830/10753.png',
-    overlay: 'https://tile.waymarkedtrails.org/cycling/15/16830/10753.png',
+    thumbnail: 'https://tile-cyclosm.openstreetmap.fr/cyclosm/14/8415/5376.png',
+    overlay: null,
   },
 ];
 
