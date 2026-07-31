@@ -40,19 +40,11 @@ interface Props {
   compassHeading: number | null;
 }
 
-const OVERPASS_ENDPOINTS = [
-  'https://overpass-api.de/api/interpreter',
-  'https://overpass.kumi.systems/api/interpreter',
-  'https://overpass.openstreetmap.fr/api/interpreter',
-];
-
 async function fetchOverpass(query: string): Promise<{ elements: unknown[] }> {
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    try {
-      const res = await fetch(endpoint, { method: 'POST', body: query });
-      if (res.ok) return await res.json();
-    } catch { continue; }
-  }
+  try {
+    const res = await fetch('/api/overpass', { method: 'POST', body: query });
+    if (res.ok) return await res.json();
+  } catch { /* falha silenciosa */ }
   return { elements: [] };
 }
 
