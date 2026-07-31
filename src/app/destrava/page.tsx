@@ -26,13 +26,13 @@ const MAP_BASE_STYLES = [
 const MAP_OVERLAYS = [
   {
     id: 'poi', label: 'Pontos de interesse', premium: false,
-    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/11723/18560.png',
+    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/16598/11282.png',
     overlay: null,
   },
   {
     id: 'ciclovias', label: 'Ciclovias', premium: false,
-    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/11723/18560.png',
-    overlay: 'https://tile.waymarkedtrails.org/cycling/15/11723/18560.png',
+    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/16830/10753.png',
+    overlay: 'https://tile.waymarkedtrails.org/cycling/15/16830/10753.png',
   },
 ];
 
