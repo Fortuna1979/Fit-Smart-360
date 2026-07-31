@@ -70,6 +70,13 @@ export default function LandingPage() {
   const handlePremiumPlanCheckout = () => window.open('https://pay.kiwify.com.br/3aKNiC9', '_blank');
 
   useEffect(() => {
+    if (window.location.hash === '#planos') {
+      setShowPricing(true);
+      history.replaceState(null, '', '/');
+    }
+  }, []);
+
+  useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     const onScroll = () => setActiveSlide(Math.round(el.scrollLeft / window.innerWidth));
