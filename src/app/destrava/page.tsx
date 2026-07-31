@@ -661,22 +661,34 @@ export default function DestravaPage() {
               {/* Terreno */}
               <h2 className="text-base font-bold text-gray-900 mb-3">Terreno</h2>
               <div className="flex gap-3">
-                {MAP_TERRAIN.map(t => (
+                {MAP_TERRAIN.map(t => {
+                  const active = activeOverlays.includes(t.id);
+                  const locked = t.premium && subscriptionPlan !== 'premium';
+                  return (
                   <button
                     key={t.id}
                     onClick={() => handleOverlay(t.id, t.premium)}
                     className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                   >
-                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-200">
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2"
+                      style={{ borderColor: active ? '#FC4C02' : '#e5e7eb' }}>
                       <img src={t.hillshade} alt={t.label} className="w-full h-full object-cover" />
                       <div className="absolute inset-0" style={{ background: t.color }} />
-                      <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/40 flex items-center justify-center">
-                        <Lock className="w-3 h-3 text-white" />
-                      </div>
+                      {locked && (
+                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/40 flex items-center justify-center">
+                          <Lock className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                      {active && !locked && (
+                        <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#FC4C02] flex items-center justify-center">
+                          <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                        </div>
+                      )}
                     </div>
-                    <span className="text-xs text-gray-700 font-medium text-center leading-tight w-16">{t.label}</span>
+                    <span className={`text-xs font-medium text-center leading-tight w-16 ${active && !locked ? 'text-[#FC4C02]' : 'text-gray-700'}`}>{t.label}</span>
                   </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

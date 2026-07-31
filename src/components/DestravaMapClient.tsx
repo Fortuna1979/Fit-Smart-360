@@ -7,7 +7,20 @@ const VOYAGER   = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}
 const DARK      = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 const SATELLITE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const LABELS    = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png';
-const TOPO      = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+const TOPO           = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+const HILLSHADE      = 'https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}';
+const HILLSHADE_DARK = 'https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade_Dark/MapServer/tile/{z}/{y}/{x}';
+
+const TERRAIN_IDS = ['aspecto', 'avalanche', 'inclinacao'];
+
+function getTerrainCfg(id: string): { url: string; opacity: number } | null {
+  switch (id) {
+    case 'aspecto':    return { url: HILLSHADE,      opacity: 0.55 };
+    case 'avalanche':  return { url: HILLSHADE_DARK, opacity: 0.50 };
+    case 'inclinacao': return { url: TOPO,           opacity: 0.65 };
+    default:           return null;
+  }
+}
 
 const POI_TYPES: Record<string, { color: string; label: string }> = {
   drinking_water:  { color: '#3b82f6', label: 'Bebedouro'        },
@@ -60,7 +73,8 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
   const baseTileRef   = useRef<import('leaflet').TileLayer | null>(null);
   const labelsRef     = useRef<import('leaflet').TileLayer | null>(null);
   const cyclingLinesRef = useRef<import('leaflet').Polyline[]>([]);
-  const poiMarkersRef = useRef<import('leaflet').CircleMarker[]>([]);
+  const poiMarkersRef   = useRef<import('leaflet').CircleMarker[]>([]);
+  const terrainRef      = useRef<import('leaflet').TileLayer | null>(null);
   const markerRef     = useRef<import('leaflet').CircleMarker | null>(null);
   const polylineRef   = useRef<import('leaflet').Polyline | null>(null);
   const readyRef      = useRef(false);
@@ -93,7 +107,7 @@ export default function DestravaMapClient({ position, route, isDay, mapStyleId, 
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = baseTileRef.current = labelsRef.current =
-          markerRef.current = polylineRef.current = null;
+          terrainRef.current = markerRef.current = polylineRef.current = null;
         cyclingLinesRef.current = [];
         poiMarkersRef.current = [];
         readyRef.current = false;
@@ -212,6 +226,22 @@ out body;`;
     };
     toggle();
   }, [overlays, position]);
+
+  // Terrain overlay — aspecto, avalanche, inclinação (apenas um ativo por vez)
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const update = async () => {
+      const L = (await import('leaflet')).default;
+      const map = mapRef.current!;
+      if (terrainRef.current) { map.removeLayer(terrainRef.current); terrainRef.current = null; }
+      const activeId = overlays.find(o => TERRAIN_IDS.includes(o));
+      if (!activeId) return;
+      const cfg = getTerrainCfg(activeId);
+      if (!cfg) return;
+      terrainRef.current = L.tileLayer(cfg.url, { maxZoom: 20, opacity: cfg.opacity }).addTo(map);
+    };
+    update();
+  }, [overlays]);
 
   // Compass rotation via CSS transform on wrapper
   useEffect(() => {
