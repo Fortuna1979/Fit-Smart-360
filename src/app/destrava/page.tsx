@@ -24,14 +24,23 @@ const MAP_BASE_STYLES = [
 ];
 
 const MAP_OVERLAYS = [
-  { id: 'poi',       label: 'Pontos de interesse', premium: false, thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/13/2931/4640.png' },
-  { id: 'ciclovias', label: 'Ciclovias',            premium: false, thumbnail: 'https://tile.waymarkedtrails.org/cycling/13/2931/4640.png' },
+  {
+    id: 'poi', label: 'Pontos de interesse', premium: false,
+    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/11723/18560.png',
+    overlay: null,
+  },
+  {
+    id: 'ciclovias', label: 'Ciclovias', premium: false,
+    thumbnail: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/15/11723/18560.png',
+    overlay: 'https://tile.waymarkedtrails.org/cycling/15/11723/18560.png',
+  },
 ];
 
+const HILLSHADE = 'https://services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/13/4615/3082';
 const MAP_TERRAIN = [
-  { id: 'aspecto',    label: 'Aspecto',                 premium: true, gradient: 'linear-gradient(135deg,#4fc3f7 0%,#81c784 35%,#ffb74d 65%,#e57373 100%)' },
-  { id: 'avalanche',  label: 'Inclinação de avalanche', premium: true, gradient: 'linear-gradient(135deg,#66bb6a 0%,#ffee58 40%,#ef5350 100%)' },
-  { id: 'inclinacao', label: 'Inclinação',              premium: true, gradient: 'linear-gradient(135deg,#fff176 0%,#ffa726 50%,#d32f2f 100%)' },
+  { id: 'aspecto',    label: 'Aspecto',                 premium: true, hillshade: HILLSHADE, color: 'rgba(79,195,247,0.55)'  },
+  { id: 'avalanche',  label: 'Inclinação de avalanche', premium: true, hillshade: HILLSHADE, color: 'rgba(239,83,80,0.55)'   },
+  { id: 'inclinacao', label: 'Inclinação',              premium: true, hillshade: HILLSHADE, color: 'rgba(255,183,77,0.55)'  },
 ];
 
 const ACTIVITY_TYPES: { label: ActivityType; Icon: React.ComponentType<{ className?: string }>; color: string }[] = [
@@ -634,6 +643,9 @@ export default function DestravaPage() {
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2"
                         style={{ borderColor: active ? '#FC4C02' : '#e5e7eb' }}>
                         <img src={o.thumbnail} alt={o.label} className="w-full h-full object-cover" />
+                        {o.overlay && (
+                          <img src={o.overlay} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        )}
                         {active && (
                           <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#FC4C02] flex items-center justify-center">
                             <Check className="w-3 h-3 text-white" strokeWidth={3} />
@@ -655,8 +667,9 @@ export default function DestravaPage() {
                     onClick={() => handleOverlay(t.id, t.premium)}
                     className="flex-shrink-0 flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
                   >
-                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-200"
-                      style={{ background: t.gradient }}>
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-200">
+                      <img src={t.hillshade} alt={t.label} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0" style={{ background: t.color }} />
                       <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/40 flex items-center justify-center">
                         <Lock className="w-3 h-3 text-white" />
                       </div>
